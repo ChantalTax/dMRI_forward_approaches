@@ -11,14 +11,14 @@ Interactive [marimo](https://marimo.io) notebooks with exercises, worked answers
 | 3 | Finite differences and finite elements | coming |
 | 4 | Monte Carlo | coming |
 
-The "Open in molab" link runs the notebook in your browser (WebAssembly). Nothing needs to be installed. The first load takes a minute while NumPy, SciPy and Matplotlib download.
+The "Open in molab" link runs the notebook in your browser (WebAssembly). Nothing needs to be installed. The first load takes a minute while Python, NumPy and Matplotlib download. On a phone or tablet the browser version is heavy; a laptop works best.
 
 Answers are folded under each exercise. The **Teacher view** switch at the top shows all answers at once.
 
 ## Run locally
 
 ```bash
-pip install marimo numpy scipy matplotlib
+pip install marimo numpy matplotlib
 marimo run simulation/ch1_foundations.py    # lesson view, code hidden
 marimo edit simulation/ch1_foundations.py   # editing view
 ```

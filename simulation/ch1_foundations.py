@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["marimo", "numpy", "matplotlib", "scipy"]
+# dependencies = ["marimo", "numpy", "matplotlib"]
 # ///
 # © 2026 Chantal Tax. All rights reserved.
 # Shared for viewing only; not licensed for reuse or redistribution.
@@ -19,9 +19,77 @@ def _():
     import marimo as mo
     import numpy as np
     import matplotlib.pyplot as plt
-    from scipy.special import jv, jn_zeros, jnp_zeros, spherical_jn
-    from scipy.optimize import brentq
-    from scipy.linalg import expm
+
+    # Small NumPy versions of the few SciPy routines we need. Leaving SciPy out keeps the
+    # in-browser (WebAssembly) version light enough for tablets and phones.
+    def expm(A):
+        """Matrix exponential by scaling and squaring with a Taylor series."""
+        A = np.asarray(A)
+        nrm = np.abs(A).sum(axis=0).max()
+        s = max(0, int(np.ceil(np.log2(nrm))) + 1) if nrm > 0 else 0
+        X = A / 2.0**s
+        E = np.eye(A.shape[0], dtype=X.dtype)
+        term = E.copy()
+        for k in range(1, 20):
+            term = term @ X / k
+            E = E + term
+        for _ in range(s):
+            E = E @ E
+        return E
+
+    _tau_q = np.linspace(0, np.pi, 257)
+    _w_q = np.full(_tau_q.size, _tau_q[1]); _w_q[[0, -1]] /= 2
+
+    def jv(m, x):
+        """Bessel function J_m(x), integer m, from its integral representation."""
+        x = np.asarray(x, float)
+        integrand = np.cos(m * _tau_q - x[..., None] * np.sin(_tau_q))
+        return (integrand @ _w_q) / np.pi
+
+    def brentq(f, a, b, tol=1e-13):
+        """Root of f in [a, b] by bisection (f(a) and f(b) must differ in sign)."""
+        fa = f(a)
+        for _ in range(200):
+            c = 0.5 * (a + b)
+            fc = f(c)
+            if fa * fc <= 0:
+                b = c
+            else:
+                a, fa = c, fc
+            if b - a < tol:
+                break
+        return 0.5 * (a + b)
+
+    def _roots(fvec, k, xmax=40.0):
+        """First k positive roots of a vectorised function, by sign changes then bisection."""
+        grid = np.linspace(1e-6, xmax, 8000)
+        vals = fvec(grid)
+        out = []
+        for a, b, va, vb in zip(grid[:-1], grid[1:], vals[:-1], vals[1:]):
+            if va * vb < 0:
+                out.append(brentq(lambda x: float(fvec(np.array([x]))[0]), a, b))
+                if len(out) == k:
+                    break
+        return np.array(out)
+
+    def jn_zeros(m, k):
+        """First k positive zeros of J_m."""
+        return _roots(lambda x: jv(m, x), k)
+
+    def jnp_zeros(m, k):
+        """First k positive zeros of J_m' (m >= 1)."""
+        return _roots(lambda x: 0.5 * (jv(m - 1, x) - jv(m + 1, x)), k)
+
+    def spherical_jn(l, x, derivative=False):
+        """Spherical Bessel function j_l(x) for l = 0..4, or its derivative."""
+        x = np.asarray(x, float)
+        s_, c_ = np.sin(x), np.cos(x)
+        j = [s_ / x, s_ / x**2 - c_ / x]
+        for n in range(1, 4):
+            j.append((2 * n + 1) / x * j[n] - j[n - 1])
+        if not derivative:
+            return j[l]
+        return -j[1] if l == 0 else j[l - 1] - (l + 1) / x * j[l]
 
     plt.rcParams.update(
         {
@@ -712,7 +780,7 @@ def _(mo):
 
     → The slowest non-uniform mode of a disk is not the radially symmetric one ($m = 0$, $\alpha = 3.83$) but the one with one sign change across the disk ($m = 1$, $\alpha = 1.84$). The same holds for the sphere ($l=1$). These modes look like the slab's $\cos(\pi x/L)$: high on one side, low on the other.
 
-    The roots below are computed in this notebook (SciPy); the table quotes them.
+    The roots below are computed in this notebook; the table quotes them.
     """)
     return
 
@@ -1462,7 +1530,7 @@ def _(
     _L, _G = L2.value, G2.value
     _Gs = np.linspace(0, 600, 61)
     _exact = np.array([abs(pgse_exact(g, _L)) for g in _Gs])
-    _mc = np.abs(np.exp(-1j * GAMMA * np.outer(_Gs, mc_I)).mean(axis=1))
+    _mc = np.array([abs(np.mean(np.exp(-1j * GAMMA * _gv * mc_I))) for _gv in _Gs])
     _var_I = np.mean(mc_I**2)
     _gpa = np.exp(-0.5 * (GAMMA * _Gs) ** 2 * _var_I)
 
@@ -1599,16 +1667,11 @@ def _(mo):
 def _(C_ALT, C_FREE, C_MAIN, G2, L2, mo, np, pgse_exact, plt):
     _L = 1.0
     _n = np.arange(1, 201)
-    _xg = np.linspace(0, _L, 40001)
-    _wq = np.full(_xg.size, _xg[1] - _xg[0])
-    _wq[[0, -1]] /= 2
-
-    def _coef(f):
-        return np.abs((np.sqrt(2 / _L) * np.cos(np.outer(_n, _xg) * np.pi / _L) * f) @ _wq)
-
-    _c_step = _coef((_xg > 0.5).astype(float))
-    _c_x = _coef(_xg)
-    _c_smooth = _coef(3 * _xg**2 - 2 * _xg**3)
+    _k = _n * np.pi
+    # cosine coefficients on [0, 1], in closed form (integrate by parts)
+    _c_step = np.abs(np.sqrt(2) * np.sin(_k / 2) / _k)                  # step at x = 1/2
+    _c_x = np.abs(np.sqrt(2) * ((-1.0) ** _n - 1) / _k**2)               # x
+    _c_smooth = np.abs(np.sqrt(2) * 12 * ((-1.0) ** _n - 1) / _k**4)     # 3x² − 2x³
     _c_prop = np.sqrt(2) * np.exp(-(_n * np.pi) ** 2 * 0.002)  # envelope of e^{-Dλt} u_n(x0)
 
     _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(10.5, 3.9))
