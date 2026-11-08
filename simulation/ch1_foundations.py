@@ -167,7 +167,7 @@ def _(mo):
     | --- | --- | --- |
     | **1** | **Foundations:** notation, diffusion equation, interface and boundary conditions, eigenmodes; Bloch–Torrey; phases and Feynman–Kac | this notebook |
     | 2 | Series expansions: (a) the eigenmodes of 1a coupled by the gradient, i.e. matrix methods; (b) the cumulant expansion in powers of the gradient; (c) how the two connect | next notebook |
-    | 3 | Analytical formulas: a map of the $(q,t)$ plane, and the regions where the signal has a closed form | coming |
+    | 3 | Analytical formulas: the PGSE box, the narrow-pulse $(q,t)$ map, the long-pulse $(g,T)$ map, the inside of the box, relaxing walls and exchange | done |
     | 4 | Solving the PDE on a grid or a mesh: finite differences and finite elements | coming |
     | 5 | Monte Carlo: simulating the random walk | coming |
 
@@ -1682,16 +1682,13 @@ def _(mo):
     - **2c · The link.** Grebenkov's MCF moment series computes each cumulant from the modes; the second is $\propto\iint g(t_1)g(t_2)\,[\mathbf B\,e^{-D\Lambda|t_1-t_2|}\mathbf B]_{00}\,dt_1dt_2$. Where the cumulant series stops converging, and why the matrix methods of 2a do not have that limit.
     - *Implementations:* MCFAL, MISST, SpinDoctor, the cylindrical-surface code; GPA formulas in Camino and dmipy.
 
-    **Chapter 3 · Analytical formulas: a map of the $(q,t)$ plane**
+    **Chapter 3 · Analytical formulas: a map of the PGSE parameter space**
 
-    Every closed-form result is valid in one region of a plane spanned by the diffusion time and $q$ (narrow pulses), or by the time and the gradient strength (finite pulses). The chapter walks the map, checking each formula against the exact solutions of Chapter 2.
+    A PGSE experiment in a pore is fixed by three dimensionless numbers, $D\Delta/L^2$, $D\delta/L^2$ and $\gamma gL^3/D$. Every closed-form result holds in one corner of this box. The chapter computes each corner by comparing the formula with the exact solutions of Chapter 2.
 
-    - **Short times:** free diffusion, $E = e^{-bD}$ with $b = \int q^2dt$, and the $b$-matrix (Stejskal & Tanner 1965; Basser et al. 1994); the surface-to-volume ratio from $D(t)$ (Mitra et al. 1992) and the short-time kurtosis.
-    - **Long times:** motional narrowing (Robertson 1966), tortuosity and homogenisation, and structural disorder from how $D(t)$ approaches $D_\infty$ (Novikov et al. 2014).
-    - **Narrow pulses:** the signal as the characteristic function of the displacement, $E(q,\Delta) = \langle e^{iqX}\rangle$; why the cumulant series stops at the first zero ($qL = 2\pi$ for a slab).
-    - **Large $q$, narrow pulses:** diffusion–diffraction and the pore form factor; closed forms for slab, cylinder and sphere (Tanner & Stejskal 1968; Callaghan et al. 1991).
-    - **Strong gradients, finite pulses:** the localisation regime (Stoller, Happer & Dyson 1991; Hürlimann et al. 1995). The $(g,T)$ map built from the length scales of 1b, and why the edge of the cumulant region moves when the pulses are long.
-    - **The crossover zones** with no formula, where Chapters 2, 4 and 5 are needed.
+    - **Narrow pulses, the $(q,t)$ map:** the signal as the characteristic function of the displacement, $E(q,\Delta) = \langle e^{iqX}\rangle$. Short times: free diffusion, the $b$-matrix (Stejskal & Tanner 1965; Basser et al. 1994), the surface-to-volume ratio from $D(t)$ (Mitra et al. 1992) and the short-time kurtosis. Long times: closed pores, tortuosity and structural disorder (Novikov et al. 2014). Large $q$: diffusion–diffraction and the form factors of slab, cylinder and sphere (Tanner & Stejskal 1968; Callaghan et al. 1991). Where the cumulant series stops.
+    - **Long pulses, the $(g,T)$ map** built from the length scales of 1b: free diffusion, motional narrowing (Robertson 1966) and localisation (Stoller, Happer & Dyson 1991; Hürlimann et al. 1995), meeting at a triple point.
+    - **Inside the box:** how the edge of the cumulant region moves with $\delta/\Delta$, and a tested rule for it.
     - **Extra axes:** exchange between compartments (Kärger 1985) and relaxing walls (Brownstein & Tarr 1979).
     - *Implementations:* closed-form compartment models, for example the cylinder and sphere models in Camino and dmipy.
 
@@ -1705,6 +1702,7 @@ def _(mo):
 
     - The algorithm from Exercise 12: Gaussian steps, reflection at walls, phase accumulation, and the average $\langle e^{-i\varphi}\rangle$.
     - Permeable membranes as a crossing probability; choosing the time step; the $1/\sqrt N$ noise floor, compared with an exact eigenmode solution.
+    - Walker histories as reusable data: replay packs that answer any later sequence as an inner product ([Fick 2026](https://arxiv.org/abs/2611.01758)).
     - *Implementations:* Camino, MC-DC Simulator, Disimpy, RMS.
     """)
     return

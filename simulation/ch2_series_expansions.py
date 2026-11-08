@@ -168,7 +168,7 @@ def _(mo):
     | --- | --- | --- |
     | 1 | Foundations: notation, diffusion equation, interface and boundary conditions, eigenmodes, displacement cumulants; Bloch–Torrey; length scales; Feynman–Kac | done |
     | **2** | **Series expansions:** (a) the eigenmodes coupled by the gradient, i.e. matrix methods; (b) the cumulant expansion in powers of the gradient; (c) how the two connect | this notebook |
-    | 3 | Analytical formulas: a map of the $(q,t)$ plane, and the regions where the signal has a closed form | coming |
+    | 3 | Analytical formulas: the PGSE box, the narrow-pulse $(q,t)$ map, the long-pulse $(g,T)$ map, the inside of the box, relaxing walls and exchange | next |
     | 4 | Solving the PDE on a grid or a mesh: finite differences and finite elements | coming |
     | 5 | Monte Carlo: simulating the random walk | coming |
 
@@ -964,18 +964,17 @@ def _(mo):
     ---
     ## Coming next
 
-    **Chapter 3 · Analytical formulas: a map of the $(q,t)$ plane**
+    **Chapter 3 · Analytical formulas: a map of the PGSE parameter space**
 
-    - **Narrow pulses:** the signal as the characteristic function of the displacement, $E(q,\Delta) = \langle e^{iqX}\rangle$; why the cumulant series stops at the first zero ($qL = 2\pi$ for a slab).
-    - **Short times:** free diffusion and the $b$-matrix; the surface-to-volume ratio from $D(t)$ (Mitra et al. 1992).
-    - **Long times:** motional narrowing, tortuosity, and structural disorder from how $D(t)$ approaches $D_\infty$ (Novikov et al. 2014).
-    - **Large $q$:** diffusion–diffraction and the pore form factor (Tanner & Stejskal 1968; Callaghan et al. 1991).
-    - **Strong gradients:** localisation (Stoller, Happer & Dyson 1991; Hürlimann et al. 1995). The $(\Delta, \delta, g)$ space, with the $(q,t)$ map as its narrow-pulse face and the $(g,T)$ map as its long-pulse face.
-    - **Extra axes:** exchange (Kärger 1985) and relaxing walls (Brownstein & Tarr 1979).
+    - **The PGSE box:** three dimensionless numbers, $D\Delta/L^2$, $D\delta/L^2$ and $\gamma gL^3/D$, with a narrow-pulse face and a long-pulse face.
+    - **Narrow pulses, the $(q,t)$ map:** $E = \langle e^{iqX}\rangle$ (Tanner & Stejskal 1968); free diffusion and the $b$-matrix; the surface-to-volume ratio and the short-time kurtosis (Mitra et al. 1992); closed pores, tortuosity and disorder (Novikov et al. 2014); diffraction and the form factors of slab, cylinder and sphere (Callaghan et al. 1991); where the cumulant series stops, $qX_{\text{rms}}\approx1$.
+    - **Long pulses, the $(g,T)$ map:** free diffusion, motional narrowing (Robertson 1966; Neuman 1974) and localisation (Stoller, Happer & Dyson 1991; Hürlimann et al. 1995), with the triple point.
+    - **Inside the box:** when the Gaussian phase approximation of 2b holds for a real PGSE, tested against the exact MCF of 2a.
+    - **Extra axes:** relaxing walls (Brownstein & Tarr 1979) and exchange (Kärger 1985).
 
     **Chapter 4 · Solving the PDE on a grid or a mesh:** finite differences (MATI) and finite elements (SpinDoctor), including the mesh-based modes used by the matrix formalism.
 
-    **Chapter 5 · Monte Carlo:** walkers, reflections and membranes; the $1/\sqrt N$ noise floor, checked against the exact signals of this chapter.
+    **Chapter 5 · Monte Carlo:** walkers, reflections and membranes; the $1/\sqrt N$ noise floor, checked against the exact signals of this chapter; walker histories stored as reusable "replay packs" ([Fick 2026](https://arxiv.org/abs/2611.01758)).
     """)
     return
 
