@@ -181,11 +181,12 @@ def _(mo):
     | Ch | Topic | Status |
     | --- | --- | --- |
     | **1** | **Foundations:** notation, diffusion equation, interface and boundary conditions, eigenmodes; Bloch–Torrey; phases and Feynman–Kac | this notebook |
-    | 2 | Analytical approaches and approximations | coming |
-    | 3 | Solving the PDE on a grid or a mesh: finite differences and finite elements | coming |
-    | 4 | Monte Carlo: simulating the random walk | coming |
+    | 2 | Analytical formulas: the regimes where the signal has a closed form | coming |
+    | 3 | Matrix methods: the eigenmodes of 1a, coupled by the gradient | coming |
+    | 4 | Solving the PDE on a grid or a mesh: finite differences and finite elements | coming |
+    | 5 | Monte Carlo: simulating the random walk | coming |
 
-    Chapters 2–4 each follow the same pattern: the **principle**, then how different **toolboxes implement it**, then exercises.
+    Chapters 2–5 each follow the same pattern: the **principle** (with its assumptions), then how different **toolboxes implement it**, then exercises.
 
     **Units used throughout:** lengths in µm, times in ms, $D$ in µm²/ms (free water at 37 °C ≈ 3), gradients in mT/m.
     """)
@@ -688,7 +689,7 @@ def _(answer):
 
     **(b)** The free Gaussian of Exercise 1, centred at $x_0$, as long as $\sqrt{2Dt}$ is small compared with the distance from $x_0$ to the nearest wall. Move $x_0$ close to a wall and you see the reflected part appear first there.
 
-    **(c)** At long times only a handful of modes survive, so eigenmode methods are cheap exactly where diffusion has explored the whole pore. At short times you need many modes to build a narrow peak. There, a free Gaussian (or a random walk) is the natural description. You will see this trade-off again in Chapters 2 and 4.
+    **(c)** At long times only a handful of modes survive, so eigenmode methods are cheap exactly where diffusion has explored the whole pore. At short times you need many modes to build a narrow peak. There, a free Gaussian (or a random walk) is the natural description. You will see this trade-off again in Chapters 3 and 5.
     """)
     return
 
@@ -893,7 +894,7 @@ def _(mo):
 
     $$E = \sum_i w_i\,E(r_i),\qquad w_i = \frac{r_i}{\sum_j r_j}.$$
 
-    The layers are evenly spaced between the inner radius (the axon) and the outer radius; in the 2025 simulations they are 7.5 nm apart, roughly a 4–5 nm lipid bilayer plus about 3 nm of water. Outer layers count more, so a single-cylinder fit returns an effective radius biased towards the outer radius. The 2025 paper approximates it by the radius-weighted mean $\sum_i w_i r_i = \sum_i r_i^2/\sum_i r_i$. [Canales-Rodríguez, Tax et al. (2026)](https://doi.org/10.1088/1361-6560/aeb2a0) ([arXiv 2603.23421](https://arxiv.org/abs/2603.23421)) then derived the exact PGSE signal for one cylindrical surface from exactly these modes, with the matrix method of Chapter 2. They name distributions of concentric radii as a natural extension.
+    The layers are evenly spaced between the inner radius (the axon) and the outer radius; in the 2025 simulations they are 7.5 nm apart, roughly a 4–5 nm lipid bilayer plus about 3 nm of water. Outer layers count more, so a single-cylinder fit returns an effective radius biased towards the outer radius. The 2025 paper approximates it by the radius-weighted mean $\sum_i w_i r_i = \sum_i r_i^2/\sum_i r_i$. [Canales-Rodríguez, Tax et al. (2026)](https://doi.org/10.1088/1361-6560/aeb2a0) ([arXiv 2603.23421](https://arxiv.org/abs/2603.23421)) then derived the exact PGSE signal for one cylindrical surface from exactly these modes, with the matrix method of Chapter 3. They name distributions of concentric radii as a natural extension.
 
     → A layer of finite thickness is an annulus between two radii. Its modes combine the Bessel functions $J_m$ and $Y_m$, with the wall condition at both radii; the cylindrical surface is the limit of a very thin annulus.
     """)
@@ -1162,7 +1163,7 @@ def _(mo):
     - **Diffusion** smooths phase differences out; the **gradient** winds them up. Every regime in this course is a contest between those two.
     - The **180° pulse** of the spin echo ([Hahn 1950](https://doi.org/10.1103/PhysRev.80.580)) flips the sign of all phase gathered so far. We account for it by using the **effective gradient**, whose sign flips at each 180° pulse.
     - The scanner measures the sum over the voxel: $S(T) = \int_\Omega m(\mathbf r,T)\,d\mathbf r$, and we report $E = S/S_0$.
-    - The domain, interface and boundary conditions are the same as in 1a. So the **geometry enters exactly as before**: through the eigenmodes. The gradient adds a coupling between them (Chapter 2).
+    - The domain, interface and boundary conditions are the same as in 1a. So the **geometry enters exactly as before**: through the eigenmodes. The gradient adds a coupling between them (Chapter 3).
     """)
     return
 
@@ -1350,7 +1351,7 @@ def _(mo):
     mo.md(r"""
     ## Two pictures of the same signal
 
-    **Field picture.** Solve the Bloch–Torrey equation for $m(\mathbf r,t)$ everywhere, then integrate at the echo. Chapters 2 and 3 work this way.
+    **Field picture.** Solve the Bloch–Torrey equation for $m(\mathbf r,t)$ everywhere, then integrate at the echo. Chapters 2 to 4 work this way.
 
     **Path picture.** Follow single spins. Each spin random-walks along its own path $\mathbf r(t)$ (reflected at walls) and gathers its own phase
 
@@ -1360,7 +1361,7 @@ def _(mo):
 
     $$E = \big\langle e^{-i\varphi}\big\rangle_{\text{paths}} .$$
 
-    In the language of probability: the signal is the **characteristic function** of the random phase. Chapter 4 (Monte Carlo) works this way.
+    In the language of probability: the signal is the **characteristic function** of the random phase. Chapter 5 (Monte Carlo) works this way.
 
     *Sign convention: some texts write $e^{+i\varphi}$. For a refocused echo the two give the same magnitude.*
 
@@ -1430,7 +1431,7 @@ def _(answer):
     $$\int m(x,T)\,dx = \big\langle e^{-i\varphi}\big\rangle .\qquad\blacksquare$$
 
     → **What it means.** The magnetization at $x$ *is* the phase-weighted density of spins at $x$. The PDE tracks the density; the random walk tracks the spins.
-    → **What it means for simulation.** Step (b), repeated many times, is a recipe: move each walker with a Gaussian step, then add its phase. That is a Monte Carlo simulation (Chapter 4). Written in the eigenbasis of 1a, the same alternation of "diffuse, then add phase" is the multiple propagator method (Chapter 2). Both converge to the Bloch–Torrey solution as $\delta t\to0$, for exactly the reason shown in (c).
+    → **What it means for simulation.** Step (b), repeated many times, is a recipe: move each walker with a Gaussian step, then add its phase. That is a Monte Carlo simulation (Chapter 5). Written in the eigenbasis of 1a, the same alternation of "diffuse, then add phase" is the multiple propagator method (Chapter 3). Both converge to the Bloch–Torrey solution as $\delta t\to0$, for exactly the reason shown in (c).
     """)
     return
 
@@ -1440,7 +1441,7 @@ def _(mo):
     mo.md(r"""
     ### See it: walkers and modes give the same signal
 
-    A slab of width $L$, PGSE with $\delta = 10$ ms and $\Delta = 20$ ms, $D = 2$ µm²/ms. The **walkers** (Monte Carlo, 40 000 of them, step 0.05 ms) compute $\langle e^{-i\varphi}\rangle$ directly. The **exact** curve solves the Bloch–Torrey equation in the slab's eigenmodes (the matrix method of Chapter 2). The dashed curve keeps only the variance of the phase: $E \approx e^{-\langle\varphi^2\rangle/2}$, the Gaussian phase approximation.
+    A slab of width $L$, PGSE with $\delta = 10$ ms and $\Delta = 20$ ms, $D = 2$ µm²/ms. The **walkers** (Monte Carlo, 40 000 of them, step 0.05 ms) compute $\langle e^{-i\varphi}\rangle$ directly. The **exact** curve solves the Bloch–Torrey equation in the slab's eigenmodes (the matrix method of Chapter 3). The dashed curve keeps only the variance of the phase: $E \approx e^{-\langle\varphi^2\rangle/2}$, the Gaussian phase approximation.
     """)
     return
 
@@ -1637,7 +1638,7 @@ def _(answer):
         → At low $G$ the signal is close to 1, so $\ln E \approx -\langle\varphi^2\rangle/2$ plus terms in $\langle\varphi^4\rangle$ that are of order $G^4$ and still small. The non-Gaussian shape only matters once the phase spread approaches about one radian. That expansion, and what you can compute with it, is the start of Chapter 2.
 
         **(c)** ⇒ The walker estimate is an average of $N$ unit phasors. Where the true $E$ is tiny, the phasors point almost uniformly in all directions, and their average does not vanish but has a random length of about $1/\sqrt N$ (a 2D random walk of $N$ unit steps, divided by $N$). With $N = 40\,000$ that floor is 0.005: the dotted line.
-        ⇒ To see $|E| = 0.001$ you need $1/\sqrt N \ll 0.001$, so $N \gg 10^6$ walkers. Halving the noise costs four times the walkers. Chapter 4 comes back to this; the eigenmode solution has no such floor.
+        ⇒ To see $|E| = 0.001$ you need $1/\sqrt N \ll 0.001$, so $N \gg 10^6$ walkers. Halving the noise costs four times the walkers. Chapter 5 comes back to this; the eigenmode solution has no such floor.
         """)
     return
 
@@ -1647,7 +1648,7 @@ def _(mo):
     mo.md(r"""
     ## How many modes? Smoothness, and Jackson's theorem
 
-    When you solve the Bloch–Torrey equation in the eigenmodes (Chapter 2), you keep $N$ modes. How large must $N$ be? Approximation theory gives the right way to think about it.
+    When you solve the Bloch–Torrey equation in the eigenmodes (Chapter 3), you keep $N$ modes. How large must $N$ be? Approximation theory gives the right way to think about it.
 
     **The idea.** The slab's modes are cosines. A sum of $N$ of them is a truncated Fourier series of the function **mirrored at both walls** (its even, periodic extension). **Jackson's theorems** (Jackson 1911) bound how well $N$ terms can approximate a function by how smooth it is: if the mirrored function has $k$ continuous derivatives, the best error falls at least as fast as $N^{-k}$ (times a measure of how smoothly the $k$-th derivative varies). Bernstein's theorems (Bernstein 1912) give the converse, and for analytic functions the convergence is exponential. In short: **smoothness of the mirrored function sets the speed of convergence.**
 
@@ -1717,7 +1718,7 @@ def _(mo):
     2. **Damping must beat dephasing in the last mode kept** (Grebenkov's criterion, [Grebenkov 2007](https://doi.org/10.1103/RevModPhys.79.1077), Sec. VI.A): $D\lambda_N \gg \gamma g L$.
     3. **Always check:** double $N$ and see whether $E$ changes in the digits you care about.
 
-    In 2D and 3D the number of modes below a given $\lambda$ grows as $\lambda^{d/2}$ ([Weyl's law](https://doi.org/10.1007/BF01456804), 1912), so the same resolution costs about $(L/\ell)^d$ modes. A linear gradient couples only some of them, which keeps cylinders and spheres cheap (Chapter 2).
+    In 2D and 3D the number of modes below a given $\lambda$ grows as $\lambda^{d/2}$ ([Weyl's law](https://doi.org/10.1007/BF01456804), 1912), so the same resolution costs about $(L/\ell)^d$ modes. A linear gradient couples only some of them, which keeps cylinders and spheres cheap (Chapter 3).
     """)
     return
 
@@ -1775,23 +1776,36 @@ def _(mo):
     ---
     ## Coming next
 
-    **Chapter 2 · Analytical approaches and approximations**
+    **Chapter 2 · Analytical formulas: the regimes where the signal has a closed form**
 
-    - Free diffusion and the $b$-value for any waveform (Stejskal–Tanner).
-    - **Narrow-pulse approximation:** the signal as the Fourier transform of the averaged propagator; $q$-space and diffusion–diffraction.
-    - **Gaussian phase approximation:** closed formulas for slab, cylinder and sphere from the weights and time scales of 1a; OGSE and the diffusion spectrum $D(\omega)$.
-    - Short- and long-time limits: surface-to-volume ratio and tortuosity.
-    - **Matrix formalism:** the eigenmodes of 1a coupled by the gradient. Grebenkov's MCF (exact for piecewise-constant gradients) and the multiple propagator method (Callaghan; MISST).
-    - When all approximations fail: the localisation regime at strong gradients.
-    - *Implementations:* MCFAL, MISST.
+    Organised by the regime map of the length-scale section: each formula is placed where it is valid, with its assumptions, and checked against an exact solution.
 
-    **Chapter 3 · Solving the PDE on a grid or a mesh**
+    - **Free diffusion, any waveform:** $E = e^{-bD}$ with $b = \int q^2dt$; the $b$-matrix for anisotropic diffusion (Stejskal & Tanner 1965; Basser et al. 1994).
+    - **Narrow pulses** ($\delta \ll \Delta$ and $\delta \ll \tau_1$): the signal as the Fourier transform of the averaged propagator; closed forms for slab, cylinder and sphere; $q$-space, diffusion–diffraction and the long-time pore form factor (Tanner & Stejskal 1968; Callaghan et al. 1991).
+    - **Gaussian phase approximation, any waveform:** closed formulas from the mode weights and time scales of 1a (Murday & Cotts 1968; Neuman 1974; van Gelderen et al. 1994); the same in frequency, the diffusion spectrum $D(\omega)$ and OGSE (Stepišnik 1993); exact in a harmonic well. Cumulants and kurtosis as the next terms.
+    - **Short times:** the surface-to-volume ratio from $D(t)$ (Mitra et al. 1992).
+    - **Long times:** motional narrowing (Robertson 1966), tortuosity and homogenisation, and structural disorder from how $D(t)$ approaches $D_\infty$ (Novikov et al. 2014).
+    - **Strong gradients:** the localisation regime, where none of the above holds (Stoller, Happer & Dyson 1991; Hürlimann et al. 1995).
+    - **Exchange between compartments:** the Kärger model (Kärger 1985).
+    - **Relaxing walls:** fast-diffusion and diffusion-limited regimes (Brownstein & Tarr 1979).
+    - *Implementations:* closed-form compartment models, for example the cylinder and sphere models in Camino and dmipy.
+
+    **Chapter 3 · Matrix methods: the eigenmodes of 1a, coupled by the gradient**
+
+    - The gradient as a matrix $\mathbf B$ in the eigenbasis; the Bloch–Torrey equation becomes $d\mathbf c/dt = -(D\Lambda + i\gamma g(t)\mathbf B)\,\mathbf c$.
+    - **Grebenkov's MCF:** one matrix exponential per piece of constant gradient, exact for piecewise-constant waveforms (Barzykin 1999; Grebenkov 2007).
+    - **Multiple propagator:** diffusion and phase kicks in turn; Strang splitting and its $\tau^2$ error (Caprihan et al. 1996; Callaghan 1997).
+    - How the methods relate: the time-ordered exponential (Axelrod & Sen 2001) and the MCF moment series, whose first term is the Gaussian phase approximation of Chapter 2; trapezoids and other waveforms; how many modes.
+    - Beyond simple shapes: modes computed on a mesh (SpinDoctor's matrix formalism), a differentiable version for fitting (ReMiDi), and cylindrical surfaces (Canales-Rodríguez, Tax et al. 2026).
+    - *Implementations:* MCFAL, MISST, SpinDoctor, the cylindrical-surface code.
+
+    **Chapter 4 · Solving the PDE on a grid or a mesh**
 
     - **Finite differences:** the domain as voxels; the Laplacian as jumps to neighbours; explicit time steps and their stability limit; periodic boundaries with a phase shift. *Implementation:* MATI.
     - **Finite elements:** the weak form, mass and stiffness matrices, a mesh that follows the cell walls; permeable membranes as interface conditions. *Implementation:* SpinDoctor.
-    - Eigenmodes computed on a mesh, and differentiable simulators that can be fitted: ReMiDi. Physics-informed neural networks.
+    - Physics-informed neural networks: the PDE as a loss function.
 
-    **Chapter 4 · Monte Carlo: simulating the random walk**
+    **Chapter 5 · Monte Carlo: simulating the random walk**
 
     - The algorithm from Exercise 10: Gaussian steps, reflection at walls, phase accumulation, and the average $\langle e^{-i\varphi}\rangle$.
     - Permeable membranes as a crossing probability; choosing the time step; the $1/\sqrt N$ noise.

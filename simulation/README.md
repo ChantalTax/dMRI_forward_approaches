@@ -7,9 +7,10 @@ Interactive [marimo](https://marimo.io) notebooks with exercises, worked answers
 | Ch | Topic | Run in your browser |
 |----|-------|---------------------|
 | 1 | Foundations: notation, diffusion equation, interface and boundary conditions, eigenmodes, Bloch–Torrey, length scales, Feynman–Kac | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/ChantalTax/dMRI_forward_approaches/blob/main/simulation/ch1_foundations.py/wasm) |
-| 2 | Analytical approaches and approximations | coming |
-| 3 | Finite differences and finite elements | coming |
-| 4 | Monte Carlo | coming |
+| 2 | Analytical formulas: the regimes where the signal has a closed form | coming |
+| 3 | Matrix methods: eigenmodes coupled by the gradient | coming |
+| 4 | Finite differences and finite elements | coming |
+| 5 | Monte Carlo | coming |
 
 The "Open in molab" link runs the notebook in your browser (WebAssembly). Nothing needs to be installed. The first load takes a minute while Python, NumPy and Matplotlib download. On a phone or tablet the browser version is heavy; a laptop works best.
 
