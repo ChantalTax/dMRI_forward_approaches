@@ -186,7 +186,7 @@ def _(mo):
     | --- | --- |
     | Eigenmodes of a pore | $-\nabla^2u_n = \lambda_nu_n$, $\ \partial u_n/\partial n = 0$ on the walls, $\ \int u_nu_m = \delta_{nm}$ |
     | Slab | $u_0 = 1/\sqrt L$, $\ u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$ |
-    | Propagator | $P(x\,|\,x_0,t) = \sum_n u_n(x)u_n(x_0)e^{-D\lambda_nt}$ |
+    | Propagator | $P(x\mid x_0,t) = \sum_n u_n(x)u_n(x_0)e^{-D\lambda_nt}$ |
     | MSD weights in a slab | $\langle(x-x_0)^2\rangle = \frac{L^2}{6} - 2\sum_{n\ \text{odd}} \frac{8L^2}{(n\pi)^4}e^{-D\lambda_nt}$ |
     | Bloch–Torrey | $\partial m/\partial t = D\nabla^2m - i\gamma\,g(t)\,x\,m$, $\ E = \int m\,dx\big/\int m(x,0)\,dx$ |
     | Path picture | $E = \langle e^{-i\varphi}\rangle$, $\ \varphi = \gamma\int_0^T g(t)\,x(t)\,dt$ |
@@ -230,6 +230,8 @@ def _(mo):
     - **The gradient couples the modes.** The field $x$ is not a mode, so multiplying a mode by $x$ spreads it over the others; $\mathbf B$ says how much goes where. All the geometry is in $\Lambda$ and $\mathbf B$.
     - **Start and finish.** Spins start uniform, $m(x,0) = u_0$, so $\mathbf c(0) = \mathbf e_0 = (1,0,0,\dots)$. Only the uniform mode has a nonzero integral, so the signal is just the first component at the echo: $E = c_0(T)$.
 
+    $\mathbf B$ is the **position matrix** of Chapter 1 (Exercise 5): real, symmetric, nonzero only between modes of opposite parity, with couplings that fall off as $1/n^2$, and $B_{0n}^2$ equal to the MSD weights. Together, $\Lambda$ and $\mathbf B$ are everything the geometry contributes.
+
     The whole simulation problem is now: propagate $\mathbf c$ from $\mathbf e_0$ to the echo, and read off $c_0$. The methods below differ only in **how they step through time**.
     """)
     return
@@ -252,73 +254,6 @@ def _(maths):
 
     → Measure $x$ from the centre of the pore. Then $B_{00} = \langle x\rangle = 0$, and the diagonal of $\mathbf B$ vanishes for a symmetric pore. A shift of origin would only add a constant to the diagonal, a common phase that a refocused echo removes.
     """, title="From Bloch–Torrey to dc/dt")
-    return
-
-
-@app.cell(hide_code=True)
-def _(exercise):
-    exercise(r"""
-    Take the slab, with $x$ measured from its centre.
-
-    **(a)** Show that $\mathbf B$ is real and symmetric.
-
-    **(b)** Show that $B_{nm} = 0$ whenever $n + m$ is even. (Think of parity about the centre.)
-
-    **(c)** Compute the couplings to the uniform mode, $B_{0n}$, and show that $B_{0n}^2 = 8L^2/(n\pi)^4$ for odd $n$. Where did you see these numbers in Chapter 1?
-
-    **(d)** Show that for $n, m \ge 1$
-
-    $$B_{nm} = \frac{L}{\pi^2}\left[\frac{(-1)^{n-m}-1}{(n-m)^2} + \frac{(-1)^{n+m}-1}{(n+m)^2}\right].$$
-    """, "1 · The gradient as a matrix")
-    return
-
-
-@app.cell(hide_code=True)
-def _(hint):
-    hint(r"""
-    - **(b)** About the centre, $x - L/2$ is odd and $\cos(n\pi x/L)$ has parity $(-1)^n$. The integral of an odd function over a symmetric interval is zero.
-    - **(c, d)** $\cos a\cos b = \frac12[\cos(a-b) + \cos(a+b)]$, and for $k \neq 0$, $\int_0^L (x - \tfrac L2)\cos\frac{k\pi x}{L}\,dx = \frac{L^2}{(k\pi)^2}\big[(-1)^k - 1\big]$ (integrate by parts).
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(answer):
-    answer(r"""
-    **(a)** ⇒ The modes are real and $B_{nm} = \int u_n\,x\,u_m\,dx$ is unchanged when $n$ and $m$ swap.
-
-    **(b)** ⇒ Put $y = x - L/2$. Then $u_n$ has parity $(-1)^n$ in $y$, and $y$ is odd, so $u_n\,y\,u_m$ has parity $(-1)^{n+m+1}$. For $n + m$ even it is odd, and its integral over $[-L/2, L/2]$ is zero.
-
-    → In particular the diagonal vanishes: a mode is never coupled to itself.
-
-    **(c)** ⇒ $B_{0n} = \frac{1}{\sqrt L}\sqrt{\frac 2L}\int_0^L(x - \tfrac L2)\cos\frac{n\pi x}{L}\,dx = \frac{\sqrt2}{L}\cdot\frac{L^2[(-1)^n-1]}{(n\pi)^2} = -\frac{2\sqrt2\,L}{(n\pi)^2}$ for odd $n$.
-
-    ⇒ $B_{0n}^2 = \dfrac{8L^2}{(n\pi)^4}$: exactly the weights in the mean-squared displacement of Chapter 1, Exercise 4. They will be the weights of the Gaussian phase approximation in 2b.
-
-    **(d)** ⇒ $B_{nm} = \frac2L\int_0^L y\cos\frac{n\pi x}{L}\cos\frac{m\pi x}{L}dx = \frac1L\int_0^L y\Big[\cos\frac{(n-m)\pi x}{L} + \cos\frac{(n+m)\pi x}{L}\Big]dx$.
-
-    ⇒ Apply the integral from the hint with $k = n - m$ and $k = n + m$ and simplify: $\frac1L\cdot\frac{L^2}{\pi^2}[\dots] = \frac{L}{\pi^2}[\dots]$. ✓
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(C_ALT, C_MAIN, mo, np, plt, slab_B):
-    _lam, _B = slab_B(8.0, 16)
-    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(9.5, 3.6), gridspec_kw={"width_ratios": [1, 1.2]})
-    _im = _a1.imshow(np.log10(np.abs(_B) + 1e-12), cmap="Blues", vmin=-3, vmax=1)
-    _a1.set(xlabel="m", ylabel="n", title="log₁₀ |B_nm|, L = 8 µm", xticks=range(0, 16, 3), yticks=range(0, 16, 3))
-    _a1.grid(False)
-    _fig.colorbar(_im, ax=_a1, fraction=0.046)
-    _n = np.arange(1, 16, 2)
-    _a2.loglog(_n, np.abs(_B[0, 1::2]), "o-", color=C_MAIN, label="|B₀ₙ| (coupling to the uniform mode)")
-    _ne = np.arange(2, 16, 2)
-    _a2.loglog(_ne, np.abs(_B[3, _ne]), "s-", color=C_ALT, ms=4, label="|B₃ₙ| (even n; odd n give zero)")
-    _a2.loglog(_n, np.abs(_B[0, 1]) * _n**-2.0, ":", color="k", lw=1, label="∝ 1/n²")
-    _a2.set(xlabel="n", ylabel="|B| (µm)", title="Couplings fall off as 1/n²")
-    _a2.legend(frameon=False, fontsize=8)
-    _fig.tight_layout()
-    mo.vstack([_fig, mo.md("The checkerboard is the parity rule of Exercise 1(b): a mode only couples to modes of opposite parity. Each mode talks mostly to its neighbours.")])
     return
 
 
@@ -384,7 +319,7 @@ def _(exercise):
     **(c)** Why is it enough to know the first row and column of each matrix product at the very start and end, while the full matrices are needed in between?
 
     **(d)** Make $\Delta$ much longer than $\tau_1 = L^2/(\pi^2 D)$. Which factor in the product changes, and what does it do to the modes $n \ge 1$?
-    """, "2 · PGSE in three matrix exponentials")
+    """, "1 · PGSE in three matrix exponentials")
     return
 
 
@@ -509,7 +444,7 @@ def _(exercise):
     **(b)** Set the ramp time to its smallest value. Why does the staircase MCF then need hardly any steps?
 
     **(c)** Per step, the staircase MCF costs a matrix exponential and the multiple propagator two matrix–vector products. For $N$ modes, how do the costs scale? When would you still choose the staircase?
-    """, "3 · Two ways through a trapezoid")
+    """, "2 · Two ways through a trapezoid")
     return
 
 
@@ -552,7 +487,7 @@ def _(mo):
     Mirroring is what makes the wall behaviour matter. A function with a nonzero slope at a wall gets a kink when mirrored, even if it is perfectly smooth inside. The left panel shows the cosine coefficients of four functions:
 
     - a **step** (a jump): coefficients fall as $1/n$;
-    - the gradient field **$x$** itself: slope 1 at the walls, so the mirror has kinks, and the coefficients fall as $1/n^2$. These are the couplings $B_{0n}$ of Exercise 1;
+    - the gradient field **$x$** itself: slope 1 at the walls, so the mirror has kinks, and the coefficients fall as $1/n^2$. These are the couplings $B_{0n}$ of Chapter 1, Exercise 5;
     - a **smooth step with zero slope at the walls**: the first jump is in the third derivative of the mirror, so $1/n^4$;
     - the **propagator** at $t > 0$: diffusion has smoothed it completely, and the coefficients $e^{-D\lambda_n t}u_n(x_0)$ fall faster than any power.
 
@@ -615,12 +550,12 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
-    **(a)** You found in Exercise 1 that $B_{0n} \propto 1/n^2$. Explain the $1/n^2$ with the mirrored function. Would measuring $x$ from a wall instead of the centre change anything?
+    **(a)** In Chapter 1, Exercise 5 you found that $B_{0n} \propto 1/n^2$. Explain the $1/n^2$ with the mirrored function. Would measuring $x$ from a wall instead of the centre change anything?
 
     **(b)** Use rule 2 for $L = 8$ µm, $D = 2$ µm²/ms and $G = 300$ mT/m: from which $N$ on is the last mode damped more strongly than it is dephased? Compare with the right-hand panel.
 
     **(c)** Raise $G$ to 600 mT/m. What happens to the error at fixed $N$, and to $\ell_g$? Which regime of the Chapter 1 length-scale table are you moving towards?
-    """, "4 · Why the couplings fall as 1/n²")
+    """, "3 · Why the couplings fall as 1/n²")
     return
 
 
@@ -672,7 +607,7 @@ def _(mo):
 
     The odd cumulants vanish for a refocused echo in a symmetric pore (the phase is as likely to be $+\varphi$ as $-\varphi$). Since $\varphi \propto g$, this is a series in **powers of the gradient**: $\kappa_2 \propto g^2$, $\kappa_4 \propto g^4$, and so on.
 
-    **The Gaussian phase approximation (GPA)** keeps only the first term: $E \approx e^{-\langle\varphi^2\rangle/2}$. It is exact when the phase is Gaussian (free diffusion, Exercise 5), and good whenever the higher cumulants are small compared with $\langle\varphi^2\rangle$.
+    **The Gaussian phase approximation (GPA)** keeps only the first term: $E \approx e^{-\langle\varphi^2\rangle/2}$. It is exact when the phase is Gaussian (free diffusion, Exercise 4), and good whenever the higher cumulants are small compared with $\langle\varphi^2\rangle$.
 
     ## The second cumulant from the modes
 
@@ -716,7 +651,7 @@ def _(exercise):
 
     - Large pore (all $a\delta, a\Delta \ll 1$): you should recover free diffusion, $\langle\varphi^2\rangle = 2bD$ with $b = \gamma^2G^2\delta^2(\Delta - \delta/3)$.
     - Small pore (all $a\delta \gg 1$): you should recover motional narrowing, $\ln E = -\gamma^2G^2L^4(2\delta)/(120D)$, the formula in the Chapter 1 length-scale table with $T = 2\delta$ the time the gradient is on.
-    """, "5 · The Gaussian phase approximation for a slab")
+    """, "4 · The Gaussian phase approximation for a slab")
     return
 
 
@@ -761,7 +696,7 @@ def _(mo):
     mo.md(r"""
     ### See it: the GPA against the exact signal
 
-    The exact curve is the MCF of 2a with 40 modes; the GPA uses the closed formula of Exercise 5 summed over 400 modes. Both use the PGSE sliders above.
+    The exact curve is the MCF of 2a with 40 modes; the GPA uses the closed formula of Exercise 4 summed over 400 modes. Both use the PGSE sliders above.
     """)
     return
 
@@ -808,7 +743,7 @@ def _(exercise):
     **(c)** For a finite number of modes, $E(G)$ is an **entire** function of $G$: a finite sum of exponentials, finite everywhere in the complex plane. It has a zero at $G^* \approx 463 + 20i$ mT/m. What does that imply for the cumulant series of $\ln E$ in powers of $G$?
 
     **(d)** Make the slab smaller ($L = 4$ µm). Where does the GPA fail now, and why?
-    """, "6 · When is the phase Gaussian?")
+    """, "5 · When is the phase Gaussian?")
     return
 
 
@@ -825,7 +760,7 @@ def _(answer):
 
     → The dip on the real axis is the shadow of that nearby complex zero. Beyond $|G^*|$ no number of cumulants describes the signal. Below it, the series converges, but slowly near the edge: the GPA (one term) is already 5% off at less than half of $|G^*|$.
 
-    → Compare Chapter 1, Exercise 5: for narrow pulses at long times the zero is real, at $qL = 2\pi$.
+    → Chapter 3 shows that for narrow pulses at long times the zero lies on the real axis, at $qL = 2\pi$ for a slab.
 
     **(d)** ⇒ With $L = 4$ µm the GPA stays within 5% over the whole range. The pore is much smaller than $\ell_g$ (2.3–3.4 µm here), so spins sample the whole pore many times while the gradient is on: motional narrowing, where the phase is a sum of many nearly independent pieces and therefore close to Gaussian (central limit theorem).
     """)
@@ -892,7 +827,7 @@ def _(exercise):
     **(b)** For $\delta = 10$ ms, compare $D_{\text{app}}$ with the displacement value at long $\Delta$. Is the apparent pore larger or smaller than the real one? Explain with the time-averaged position during a lobe.
 
     **(c)** Two groups report the kurtosis of the same tissue at the same $\Delta$, one with $\delta = 2$ ms, the other with $\delta = 10$ ms. Should they agree?
-    """, "7 · Kurtosis with finite pulses")
+    """, "6 · Kurtosis with finite pulses")
     return
 
 
@@ -962,7 +897,7 @@ def _(mo):
 
     - The **moments** of the phase are these terms. Taking the logarithm turns them into **cumulants**: the second-order term is $-\langle\varphi^2\rangle/2$, the GPA.
     - The matrix methods of 2a sum the whole series at once, by computing the exponentials directly. That is why they work at any $G$.
-    - The cumulant series of 2b truncates the logarithm. That is why it has a radius of convergence (Exercise 6c), while the series for $E$ itself does not (for a finite number of modes).
+    - The cumulant series of 2b truncates the logarithm. That is why it has a radius of convergence (Exercise 5c), while the series for $E$ itself does not (for a finite number of modes).
     """)
     return
 
@@ -975,7 +910,7 @@ def _(exercise):
     **(b)** Show that the second-order term equals $-\langle\varphi^2\rangle/2$ with $\langle\varphi^2\rangle$ from 2b. Use $\mathbf e_0^{\mathsf T}e^{-D\Lambda s} = \mathbf e_0^{\mathsf T}$ and $e^{-D\Lambda s}\mathbf e_0 = \mathbf e_0$.
 
     **(c)** For a finite number of modes, the series for $E = c_0(T)$ converges for every $G$, but the cumulant series for $\ln E$ does not. Explain the difference in one sentence. Which would you use to compute the signal at $G = 600$ mT/m in an 8 µm slab, and which to write down a model you can fit?
-    """, "8 · The second-order term is the GPA")
+    """, "7 · The second-order term is the GPA")
     return
 
 
@@ -1000,7 +935,7 @@ def _(answer):
 
     **(c)** ⇒ $E$ is a finite sum of exponentials, finite everywhere, so its power series converges for all $G$; $\ln E$ blows up where $E = 0$, which caps the radius of its series.
 
-    → To compute the signal at 600 mT/m, use the matrix method (or the full series, but its terms grow large and cancel, so computing the exponentials directly is far more accurate). To build a fittable model at low $b$, use the cumulants: $D_{\text{app}}$ and $K_{\text{app}}$, with the caveats of Exercise 7.
+    → To compute the signal at 600 mT/m, use the matrix method (or the full series, but its terms grow large and cancel, so computing the exponentials directly is far more accurate). To build a fittable model at low $b$, use the cumulants: $D_{\text{app}}$ and $K_{\text{app}}$, with the caveats of Exercise 6.
     """)
     return
 
@@ -1019,11 +954,11 @@ def _(mo):
     | Multiple propagator | $e^{-D\Lambda\tau/2}e^{-i\gamma g\tau\mathbf B}e^{-D\Lambda\tau/2}$ per step; error $\propto\tau^2$ |
     | Number of modes | mirrored $m$ has a jump in $\partial_x^3$: error $\sim N^{-5}$; $D\lambda_N \gg \gamma gL$; double $N$ to check |
     | Cumulant expansion | $\ln E = -\frac12\langle\varphi^2\rangle + \frac1{24}\kappa_4 - \dots$; GPA keeps the first term |
-    | GPA from the modes | $\langle\varphi^2\rangle = \gamma^2\iint g\,g\sum_n B_{0n}^2e^{-D\lambda_n|t_1-t_2|}$ |
+    | GPA from the modes | $\langle\varphi^2\rangle = \gamma^2\iint g\,g\sum_n B_{0n}^2e^{-D\lambda_n\lvert t_1-t_2\rvert}$ |
     | Limits of the GPA | large pore: $e^{-bD}$; small pore: $\ln E = -\gamma^2G^2L^4T/(120D)$ |
     | Radius of the cumulant series | the nearest complex zero of $E(G)$ |
     | Finite pulses | $D_{\text{app}}$, $K_{\text{app}}$ depend on $\delta$: the centre-of-mass effect |
-    | Diffusion spectrum | $\langle\varphi^2\rangle = \frac2\pi\int_0^\infty|Q|^2\mathcal D(\omega)d\omega$, $\ \mathcal D = \sum w_nD\lambda_n\,\omega^2/((D\lambda_n)^2 + \omega^2)$ |
+    | Diffusion spectrum | $\langle\varphi^2\rangle = \frac2\pi\int_0^\infty\lvert Q\rvert^2\mathcal D(\omega)d\omega$, $\ \mathcal D = \sum w_nD\lambda_n\,\omega^2/((D\lambda_n)^2 + \omega^2)$ |
     | The link | Dyson series of $c_0(T)$: products $[\mathbf B e^{-D\Lambda\tau}\mathbf B\cdots]_{00}$ = multi-time correlation functions |
 
     ---

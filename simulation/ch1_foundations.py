@@ -205,7 +205,7 @@ def _(mo):
     | $\varphi$ | phase gathered by one spin | rad |
     | $S$, $S_0$, $E = S/S_0$ | signal with and without diffusion weighting; normalised signal | |
     | $\lambda_n$, $u_n(\mathbf r)$, $\tau_n$ | eigenvalue, eigenmode, decay time $1/(D\lambda_n)$ | 1/µm², –, ms |
-    | $P(\mathbf r\,|\,\mathbf r_0,t)$ | propagator: probability density to be at $\mathbf r$ at $t$ after starting at $\mathbf r_0$ | 1/µm³ |
+    | $P(\mathbf r\mid\mathbf r_0,t)$ | propagator: probability density to be at $\mathbf r$ at $t$ after starting at $\mathbf r_0$ | 1/µm³ |
 
     **Notation**
 
@@ -500,7 +500,7 @@ def _(maths):
 
     ⇒ **Point source.** Start with one molecule at $\mathbf r_0$: $C(\mathbf r,0) = \delta(\mathbf r - \mathbf r_0)$. Then $c_n = u_n(\mathbf r_0)$, and the solution is the **propagator**, the probability density of being at $\mathbf r$ at time $t$ after starting at $\mathbf r_0$:
 
-    $$P(\mathbf r\,|\,\mathbf r_0,t) = \sum_n u_n(\mathbf r)\,u_n(\mathbf r_0)\,e^{-D\lambda_n t}.$$
+    $$P(\mathbf r\mid\mathbf r_0,t) = \sum_n u_n(\mathbf r)\,u_n(\mathbf r_0)\,e^{-D\lambda_n t}.$$
 
     → Why a point source if spins start everywhere? Because every other start is a sum of point sources: $C(\mathbf r,t) = \int P(\mathbf r|\mathbf r_0,t)\,C(\mathbf r_0,0)\,d\mathbf r_0$. One propagator serves all initial conditions.
     """, title="Derivation: separation of variables")
@@ -718,7 +718,7 @@ def _(answer):
 
     → Check $t=0$: $\sum_{n\ \text{odd}} n^{-4} = \pi^4/96$, so the MSD is $L^2/6 - L^2/6 = 0$. ✓
     → $t\to\infty$: all exponentials vanish and the MSD is $L^2/6$: start and end positions have become independent, each uniform in the slab.
-    → The weights $8L^2/(n\pi)^4$ fall as $n^{-4}$: the first mode carries 98.6% of the total. Remember this. In Chapter 2b these same weights set the signal in the Gaussian phase approximation.
+    → The weights $8L^2/(n\pi)^4$ fall as $n^{-4}$: the first mode carries 98.6% of the total. Remember this. Exercise 5 shows where they come from, and in Chapter 2b the same weights set the signal in the Gaussian phase approximation.
     """)
     return
 
@@ -745,6 +745,97 @@ def _(C_ALT, C_FREE, C_MAIN, D1, L1, mo, np, plt):
     _a2.legend(frameon=False, fontsize=8)
     _fig.tight_layout()
     mo.vstack([_fig, mo.md(f"Uses L and D from the sliders above. τ₁ = L²/(π²D) = **{_L**2 / (np.pi**2 * _D):.2f} ms**.")])
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### The position in the mode basis
+
+    The MSD needed the integrals $\int x\,u_n\,dx$. They are the first row of a matrix that every later chapter uses: the **position written in the mode basis**,
+
+    $$B_{nm} = \int u_n(x)\;x\;u_m(x)\,dx ,$$
+
+    with $x$ measured from the centre of the pore. Like the eigenvalues $\lambda_n$, it depends only on the geometry. It answers: if magnetization sits in mode $m$ and is multiplied by $x$, how much ends up in mode $n$? A linear gradient multiplies the magnetization by exactly such a field, so in Chapter 2 $\mathbf B$ is how the gradient couples the modes. $\Lambda$ and $\mathbf B$ together are everything a pore contributes to the signal.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(exercise):
+    exercise(r"""
+    Take the slab, with $x$ measured from its centre.
+
+    **(a)** Show that $\mathbf B$ is real and symmetric.
+
+    **(b)** Show that $B_{nm} = 0$ whenever $n + m$ is even. (Think of parity about the centre.)
+
+    **(c)** Compute the couplings to the uniform mode, $B_{0n}$, and show that $B_{0n}^2 = 8L^2/(n\pi)^4$ for odd $n$. Where did you see these numbers before?
+
+    **(d)** Show that for $n, m \ge 1$
+
+    $$B_{nm} = \frac{L}{\pi^2}\left[\frac{(-1)^{n-m}-1}{(n-m)^2} + \frac{(-1)^{n+m}-1}{(n+m)^2}\right].$$
+    """, "5 · The position in the mode basis")
+    return
+
+
+@app.cell(hide_code=True)
+def _(hint):
+    hint(r"""
+    - **(b)** About the centre, $x - L/2$ is odd and $\cos(n\pi x/L)$ has parity $(-1)^n$. The integral of an odd function over a symmetric interval is zero.
+    - **(c, d)** $\cos a\cos b = \frac12[\cos(a-b) + \cos(a+b)]$, and for $k \neq 0$, $\int_0^L (x - \tfrac L2)\cos\frac{k\pi x}{L}\,dx = \frac{L^2}{(k\pi)^2}\big[(-1)^k - 1\big]$ (integrate by parts).
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(answer):
+    answer(r"""
+    **(a)** ⇒ The modes are real and $B_{nm} = \int u_n\,x\,u_m\,dx$ is unchanged when $n$ and $m$ swap.
+
+    **(b)** ⇒ Put $y = x - L/2$. Then $u_n$ has parity $(-1)^n$ in $y$, and $y$ is odd, so $u_n\,y\,u_m$ has parity $(-1)^{n+m+1}$. For $n + m$ even it is odd, and its integral over $[-L/2, L/2]$ is zero.
+
+    → In particular the diagonal vanishes: a mode is never coupled to itself.
+
+    **(c)** ⇒ $B_{0n} = \frac{1}{\sqrt L}\sqrt{\frac 2L}\int_0^L(x - \tfrac L2)\cos\frac{n\pi x}{L}\,dx = \frac{\sqrt2}{L}\cdot\frac{L^2[(-1)^n-1]}{(n\pi)^2} = -\frac{2\sqrt2\,L}{(n\pi)^2}$ for odd $n$.
+
+    ⇒ $B_{0n}^2 = \dfrac{8L^2}{(n\pi)^4}$: exactly the weights in the mean-squared displacement of Exercise 4 (there you computed $\int x\,u_n$ from a wall; centring only changes $n = 0$). In Chapter 2 they become the weights of the Gaussian phase approximation.
+
+    **(d)** ⇒ $B_{nm} = \frac2L\int_0^L y\cos\frac{n\pi x}{L}\cos\frac{m\pi x}{L}dx = \frac1L\int_0^L y\Big[\cos\frac{(n-m)\pi x}{L} + \cos\frac{(n+m)\pi x}{L}\Big]dx$.
+
+    ⇒ Apply the integral from the hint with $k = n - m$ and $k = n + m$ and simplify: $\frac1L\cdot\frac{L^2}{\pi^2}[\dots] = \frac{L}{\pi^2}[\dots]$. ✓
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_MAIN, mo, np, plt):
+    def _slab_B(L, N):
+        n = np.arange(N)
+        m, k = n[:, None], n[None, :]
+        with np.errstate(divide="ignore", invalid="ignore"):
+            B = (L / np.pi**2) * ((((-1.0) ** (m - k)) - 1) / (m - k) ** 2 + (((-1.0) ** (m + k)) - 1) / (m + k) ** 2)
+            j = np.maximum(m, k)
+            B0 = np.sqrt(2) * L * (((-1.0) ** j) - 1) / (j * np.pi) ** 2
+        B = np.where((m == 0) | (k == 0), B0, B)
+        return np.where(m == k, 0.0, B)
+
+    _B = _slab_B(8.0, 16)
+    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(9.5, 3.6), gridspec_kw={"width_ratios": [1, 1.2]})
+    _im = _a1.imshow(np.log10(np.abs(_B) + 1e-12), cmap="Blues", vmin=-3, vmax=1)
+    _a1.set(xlabel="m", ylabel="n", title="log₁₀ |B_nm|, L = 8 µm", xticks=range(0, 16, 3), yticks=range(0, 16, 3))
+    _a1.grid(False)
+    _fig.colorbar(_im, ax=_a1, fraction=0.046)
+    _n = np.arange(1, 16, 2)
+    _a2.loglog(_n, np.abs(_B[0, 1::2]), "o-", color=C_MAIN, label="|B₀ₙ| (coupling to the uniform mode)")
+    _ne = np.arange(2, 16, 2)
+    _a2.loglog(_ne, np.abs(_B[3, _ne]), "s-", color=C_ALT, ms=4, label="|B₃ₙ| (even n; odd n give zero)")
+    _a2.loglog(_n, np.abs(_B[0, 1]) * _n**-2.0, ":", color="k", lw=1, label="∝ 1/n²")
+    _a2.set(xlabel="n", ylabel="|B| (µm)", title="Couplings fall off as 1/n²")
+    _a2.legend(frameon=False, fontsize=8)
+    _fig.tight_layout()
+    mo.vstack([_fig, mo.md("The checkerboard is the parity rule of Exercise 5(b): $x$ only connects modes of opposite parity, and each mode mostly to its neighbours.")])
     return
 
 
@@ -842,7 +933,7 @@ def _(exercise):
     **(b)** Show that its characteristic function is $\langle e^{iqX}\rangle = \operatorname{sinc}^2(qL/2)$, with $\operatorname{sinc}z = \sin z/z$. Expand $\ln\operatorname{sinc}^2(qL/2)$ to order $q^4$ and read off $\kappa_2$ and $\kappa_4$. Do they agree with (a)?
 
     **(c)** In the figure $K(t)$ is **positive** at short times before it turns negative. Explain both signs.
-    """, "5 · The kurtosis of a slab")
+    """, "6 · The kurtosis of a slab")
     return
 
 
@@ -960,7 +1051,7 @@ def _(exercise):
     (i) a slab with $L = 8$ µm, (ii) a cylinder with **radius** $R = 5$ µm, (iii) a sphere with radius $R = 5$ µm.
 
     A PGSE experiment uses $\Delta = 20$ ms. In which pores has the magnetization explored the whole pore by then? What does that mean for what the signal can tell you about pore *size*?
-    """, "6 · Time scales of three pores")
+    """, "7 · Time scales of three pores")
     return
 
 
@@ -1085,7 +1176,7 @@ def _(exercise):
         **(a)** Derive the modes of a circle of radius $r$: solve $-u''(s) = \lambda u(s)$ on $0 \le s < 2\pi r$ with $u$ periodic, and normalise.
         **(b)** Spins are spread uniformly over a stack of concentric cylindrical surfaces of equal length. Show that layer $i$ contributes with weight $w_i = r_i/\sum_j r_j$.
         **(c)** For $r = 1$ µm and $D = 0.8$ µm²/ms, compare $\tau_1$ on the surface with $\tau_1$ inside a solid cylinder of the same radius.
-        """, "7 · Modes on a cylindrical surface")
+        """, "8 · Modes on a cylindrical surface")
     return
 
 
@@ -1231,7 +1322,7 @@ def _(exercise):
 
         **(c)** Check the limits $\kappa\to 0$ and $\kappa\to\infty$ against what you expect.
         **(d)** For small $\kappa$, show that the slowest odd mode decays at the rate $D\lambda \approx 4\kappa/L$, and interpret it.
-        """, "8 · Eigenmodes with a permeable membrane")
+        """, "9 · Eigenmodes with a permeable membrane")
     return
 
 
@@ -1296,7 +1387,7 @@ def _(exercise):
     exercise(r"""
     With transverse relaxation the equation reads $\partial m/\partial t = D\nabla^2 m - i\gamma\,\mathbf g\cdot\mathbf r\,m - m/T_2$.
     Show that, for a uniform $T_2$, relaxation only multiplies the signal by $e^{-T/T_2}$, so that it cancels in $E = S/S_0$ when $S_0$ is measured at the same echo time.
-    """, "9 · Where did T₂ go?")
+    """, "10 · Where did T₂ go?")
     return
 
 
@@ -1447,7 +1538,7 @@ def _(exercise):
         **(b)** Take $D = 2$ µm²/ms and $T = 60$ ms. Compute $\ell_D$, and $\ell_g$ for $g = 80$ mT/m (clinical) and $g = 300$ mT/m (a strong research scanner). Which regime applies to a 10 µm cell, and to a 1 µm axon?
         **(c)** For the 1 µm case, estimate the attenuation from the motional-narrowing formula for a slab at 300 mT/m. What does it tell you about measuring axon diameters?
         **(d)** With an illustrative relaxivity $\varrho = 10^{-3}$ µm/ms, are 10 µm cells in the fast-diffusion regime?
-        """, "10 · Length scales on real scanners")
+        """, "11 · Length scales on real scanners")
     return
 
 
@@ -1506,7 +1597,7 @@ def _(exercise):
     **(b)** Write $w(x,t+\delta t)$ in terms of $w(\cdot,t)$ for one short step $\delta t$. In that step a walker moves from $y$ to $x$ with the Gaussian step density $p(x-y)$ of variance $2D\,\delta t$, and gains the phase $\gamma g(t)\,y\,\delta t$.
     **(c)** Expand for small $\delta t$ and show that $w$ obeys the Bloch–Torrey equation.
     **(d)** What are the initial and interface conditions for $w$? Conclude that $\int m\,dx = \langle e^{-i\varphi}\rangle$.
-    """, "11 · Derive the Feynman–Kac relation")
+    """, "12 · Derive the Feynman–Kac relation")
     return
 
 
@@ -1570,7 +1661,7 @@ def _(mo):
     | Diffusion equation | $\partial C/\partial t = \nabla\cdot(D\nabla C)$ |
     | Interface conditions | impermeable $\partial C/\partial n = 0$; permeable: continuous flux $= \kappa\times$ jump |
     | Eigenmodes of a pore | $-\nabla^2 u_n = \lambda_n u_n$, $\ \partial u_n/\partial n = 0$; time scales $\tau_n = 1/(D\lambda_n)$ |
-    | Propagator | $P(\mathbf r\,|\,\mathbf r_0,t) = \sum_n u_n(\mathbf r)u_n(\mathbf r_0)e^{-D\lambda_n t}$ |
+    | Propagator | $P(\mathbf r\mid\mathbf r_0,t) = \sum_n u_n(\mathbf r)u_n(\mathbf r_0)e^{-D\lambda_n t}$ |
     | Slab | $u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$, MSD $\to L^2/6$ |
     | Displacement cumulants | $D(t) = \langle X^2\rangle/2t$, $\ K(t) = \langle X^4\rangle/\langle X^2\rangle^2 - 3$; slab: $K>0$ at short times, $K\to-3/5$ at long times |
     | Permeable membrane, relaxing walls | modes of the whole domain; exchange rate $\approx 4\kappa/L$; wall loss $\approx\varrho\,S/V$ |
@@ -1612,7 +1703,7 @@ def _(mo):
 
     **Chapter 5 · Monte Carlo: simulating the random walk**
 
-    - The algorithm from Exercise 11: Gaussian steps, reflection at walls, phase accumulation, and the average $\langle e^{-i\varphi}\rangle$.
+    - The algorithm from Exercise 12: Gaussian steps, reflection at walls, phase accumulation, and the average $\langle e^{-i\varphi}\rangle$.
     - Permeable membranes as a crossing probability; choosing the time step; the $1/\sqrt N$ noise floor, compared with an exact eigenmode solution.
     - *Implementations:* Camino, MC-DC Simulator, Disimpy, RMS.
     """)
