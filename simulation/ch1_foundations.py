@@ -166,7 +166,7 @@ def _(mo):
     | Ch | Topic | Status |
     | --- | --- | --- |
     | **1** | **Foundations:** notation, diffusion equation, interface and boundary conditions, eigenmodes; Bloch–Torrey; phases and Feynman–Kac | this notebook |
-    | 2 | Series expansions: (a) the eigenmodes of 1a coupled by the gradient, i.e. matrix methods; (b) the cumulant expansion in powers of the gradient; (c) how the two connect | coming |
+    | 2 | Series expansions: (a) the eigenmodes of 1a coupled by the gradient, i.e. matrix methods; (b) the cumulant expansion in powers of the gradient; (c) how the two connect | next notebook |
     | 3 | Analytical formulas: a map of the $(q,t)$ plane, and the regions where the signal has a closed form | coming |
     | 4 | Solving the PDE on a grid or a mesh: finite differences and finite elements | coming |
     | 5 | Monte Carlo: simulating the random walk | coming |

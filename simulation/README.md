@@ -7,7 +7,7 @@ Interactive [marimo](https://marimo.io) notebooks with exercises, worked answers
 | Ch | Topic | Run in your browser |
 |----|-------|---------------------|
 | 1 | Foundations: notation, diffusion equation, interface and boundary conditions, eigenmodes, displacement cumulants, Bloch–Torrey, length scales, Feynman–Kac | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/ChantalTax/dMRI_forward_approaches/blob/main/simulation/ch1_foundations.py/wasm) |
-| 2 | Series expansions: matrix methods (eigenmodes coupled by the gradient) and the cumulant expansion | coming |
+| 2 | Series expansions: matrix methods (MCF, multiple propagator, number of modes) and the cumulant expansion (Gaussian phase, kurtosis, finite pulses) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/ChantalTax/dMRI_forward_approaches/blob/main/simulation/ch2_series_expansions.py/wasm) |
 | 3 | Analytical formulas: a map of the (q,t) plane | coming |
 | 4 | Finite differences and finite elements | coming |
 | 5 | Monte Carlo | coming |
@@ -22,6 +22,7 @@ Answers are folded under each exercise. The **Teacher view** switch at the top s
 pip install marimo numpy matplotlib
 marimo run simulation/ch1_foundations.py    # lesson view, code hidden
 marimo edit simulation/ch1_foundations.py   # editing view
+marimo run simulation/ch2_series_expansions.py
 ```
 
 With [uv](https://docs.astral.sh/uv/) the dependencies listed at the top of the notebook are installed for you:
