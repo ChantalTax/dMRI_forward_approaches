@@ -6,9 +6,9 @@ Interactive [marimo](https://marimo.io) notebooks with exercises, worked answers
 
 | Ch | Topic | Run in your browser |
 |----|-------|---------------------|
-| 1 | Foundations: notation, diffusion equation, interface and boundary conditions, eigenmodes, Bloch–Torrey, length scales, Feynman–Kac | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/ChantalTax/dMRI_forward_approaches/blob/main/simulation/ch1_foundations.py/wasm) |
-| 2 | Analytical formulas: the regimes where the signal has a closed form | coming |
-| 3 | Matrix methods: eigenmodes coupled by the gradient | coming |
+| 1 | Foundations: notation, diffusion equation, interface and boundary conditions, eigenmodes, displacement cumulants, Bloch–Torrey, length scales, Feynman–Kac | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/ChantalTax/dMRI_forward_approaches/blob/main/simulation/ch1_foundations.py/wasm) |
+| 2 | Series expansions: matrix methods (eigenmodes coupled by the gradient) and the cumulant expansion | coming |
+| 3 | Analytical formulas: a map of the (q,t) plane | coming |
 | 4 | Finite differences and finite elements | coming |
 | 5 | Monte Carlo | coming |
 
