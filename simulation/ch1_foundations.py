@@ -168,7 +168,7 @@ def _(mo):
     | **1** | **Foundations:** notation, diffusion equation, interface and boundary conditions, eigenmodes; Bloch–Torrey; phases and Feynman–Kac | this notebook |
     | 2 | Series expansions: (a) the eigenmodes of 1a coupled by the gradient, i.e. matrix methods; (b) the cumulant expansion in powers of the gradient; (c) how the two connect | next notebook |
     | 3 | Analytical formulas: the PGSE box, the narrow-pulse $(q,t)$ map, the long-pulse $(g,T)$ map, the inside of the box, relaxing walls and exchange | done |
-    | 4 | Solving the PDE on a grid or a mesh: finite differences and finite elements | coming |
+    | 4 | Grids and meshes: the method of lines, finite differences, time stepping and stability, periodic cells, finite elements, curved walls | done |
     | 5 | Monte Carlo: simulating the random walk | coming |
 
     Chapters 2–5 each follow the same pattern: the **principle** (with its assumptions), then how different **toolboxes implement it**, then exercises.

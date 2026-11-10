@@ -170,7 +170,7 @@ def _(mo):
     | 1 | Foundations: notation, diffusion equation, interface and boundary conditions, eigenmodes, displacement cumulants; Bloch–Torrey; length scales; Feynman–Kac | done |
     | **2** | **Series expansions:** (a) the eigenmodes coupled by the gradient, i.e. matrix methods; (b) the cumulant expansion in powers of the gradient; (c) how the two connect | this notebook |
     | 3 | Analytical formulas: the PGSE box, the narrow-pulse $(q,t)$ map, the long-pulse $(g,T)$ map, the inside of the box, relaxing walls and exchange | next |
-    | 4 | Solving the PDE on a grid or a mesh: finite differences and finite elements | coming |
+    | 4 | Grids and meshes: the method of lines, finite differences, time stepping and stability, periodic cells, finite elements, curved walls | done |
     | 5 | Monte Carlo: simulating the random walk | coming |
 
     **Units:** lengths in µm, times in ms, gradients in mT/m. In this chapter $D = 2$ µm²/ms throughout. All examples use a **slab** of width $L$ with the gradient across it: its modes are known in closed form, so every number can be checked by hand. Cylinders and spheres work the same way with the modes from the Chapter 1 tables.
