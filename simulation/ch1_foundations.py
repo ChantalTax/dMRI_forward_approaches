@@ -222,7 +222,7 @@ def _(mo):
     | $\int_\Omega\cdots d\mathbf r$, $\oint_S\cdots dS$ | volume integral; integral over a closed surface |
     | $\delta(x)$ | Dirac delta: zero except at 0, $\int\delta(x)\,dx = 1$, $\int f(x)\delta(x-a)\,dx = f(a)$ |
     | $\delta_{mn}$ | Kronecker delta: 1 if $m=n$, else 0 |
-    | $\langle X\rangle$ | expectation (average over many spins or many random paths) |
+    | $\langle X\rangle$ | expectation: the average over many spins or random paths, $\langle X\rangle = \lim_{N\to\infty}\frac1N\sum_{j=1}^N X_j$; for a quantity with probability density $p$, $\langle X\rangle = \int X\,p(X)\,dX$, and $\langle f(X)\rangle = \int f(X)\,p(X)\,dX$ |
     | $i$ | imaginary unit, $i^2=-1$ |
 
     **Relationships used in the derivations**
@@ -578,7 +578,7 @@ def _(mo):
     mo.md(r"""
     ### See it: modes and the propagator in a slab
 
-    Left: the first four modes and how fast each fades. Right: a molecule released at $x_0$, built from $N$ modes. Make $t$ short and $N$ small, and watch the sum fail.
+    Left: the $N$ terms of the mode sum, $u_n(x_0)\,e^{-D\lambda_nt}\,u_n(x)$: each mode, weighted by where the molecule started and by how much it has faded. Right: their sum, the propagator of a molecule released at $x_0$. Make $t$ short and $N$ small, and watch the sum fail; make $t$ long, and see the higher terms vanish.
     """)
     return
 
@@ -620,13 +620,21 @@ def _(
     _x0 = x01.value * _L
     _x = np.linspace(0, _L, 600)
 
-    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(10, 3.9))
-    _U, _lam = slab_modes(_x, _L, 4)
-    for _n in range(4):
-        _tau = "∞" if _n == 0 else f"{1 / (_D * _lam[_n]):.2f} ms"
-        _a1.plot(_x, _U[_n] * np.sqrt(_L), lw=2 if _n == 1 else 1.3, label=f"n = {_n}, τ = {_tau}")
-    _a1.set(xlabel="x (µm)", ylabel="u_n(x) · √L", title="Slab modes: finer pattern, faster fade", ylim=(-1.7, 1.7))
-    _a1.legend(frameon=False, fontsize=8, loc="lower left")
+    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(10, 4.6))
+    _U, _lam = slab_modes(_x, _L, _N)
+    _u0 = slab_modes(np.array([_x0]), _L, _N)[0][:, 0]
+    _terms = (_u0 * np.exp(-_D * _lam * _t))[:, None] * _U
+    for _n in range(_N):
+        _shade = plt.cm.Blues(0.95 - 0.6 * _n / max(_N - 1, 1))
+        _tau = "∞" if _n == 0 else f"{1 / (_D * _lam[_n]):.3g} ms"
+        _lab = f"n = {_n}, τₙ = {_tau}" if (_n < 3 or _n == _N - 1) else None
+        _a1.plot(_x, _terms[_n], color=_shade, lw=1.6 if _n < 3 else 1.0, label=_lab)
+    _a1.axvline(_x0, color="k", lw=0.8, ls=":")
+    _ylim1 = 1.15 * max(np.abs(_terms).max(), 1.0 / _L)
+    _a1.set(xlabel="x (µm)", ylabel=r"$u_n(x_0)\,e^{-D\lambda_n t}\,u_n(x)$  (1/µm)", ylim=(-_ylim1, _ylim1),
+            title=f"The {_N} terms of the sum (dark: n = 0, light: n = {_N - 1})")
+    _a1.legend(frameon=False, fontsize=7.5, loc="upper center", bbox_to_anchor=(0.5, -0.17), ncol=2,
+               title=None if _N <= 4 else f"(+ {_N - 4} more terms, not labelled)", title_fontsize=7.5)
 
     _P_N = slab_propagator(_x, _x0, _t, _L, _D, _N)
     _P_ref = slab_propagator(_x, _x0, _t, _L, _D, 600)
@@ -1663,12 +1671,12 @@ def _(mo):
     | Eigenmodes of a pore | $-\nabla^2 u_n = \lambda_n u_n$, $\ \partial u_n/\partial n = 0$; time scales $\tau_n = 1/(D\lambda_n)$ |
     | Propagator | $P(\mathbf r\mid\mathbf r_0,t) = \sum_n u_n(\mathbf r)u_n(\mathbf r_0)e^{-D\lambda_n t}$ |
     | Slab | $u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$, MSD $\to L^2/6$ |
-    | Displacement cumulants | $D(t) = \langle X^2\rangle/2t$, $\ K(t) = \langle X^4\rangle/\langle X^2\rangle^2 - 3$; slab: $K>0$ at short times, $K\to-3/5$ at long times |
+    | Displacement cumulants | $D(t) = \langle X^2\rangle/2t$, $\ K(t) = \langle X^4\rangle/\langle X^2\rangle^2 - 3$, with $\langle X^k\rangle = \int X^k\,\bar P(X,t)\,dX$ and $\bar P(X,t) = \frac1V\int_V P(\mathbf r_0 + X\mid\mathbf r_0,t)\,d\mathbf r_0$ (uniform start); slab: $K>0$ at short times, $K\to-3/5$ at long times |
     | Permeable membrane, relaxing walls | modes of the whole domain; exchange rate $\approx 4\kappa/L$; wall loss $\approx\varrho\,S/V$ |
     | Cylindrical surface | $\lambda_n = n^2/r^2$ (periodic, no wall); concentric layers weighted by $r_i/\sum r_j$ |
     | Length scales | $\ell_D = \sqrt{DT}$, $\ell_g = (D/\gamma g)^{1/3}$, $\ell_\varrho = D/\varrho$; the shortest of $L$, $\ell_D$, $\ell_g$ sets the regime |
     | Bloch–Torrey | $\partial m/\partial t = D\nabla^2 m - i\gamma\,\mathbf g(t)\cdot\mathbf r\,m$, $\ E = \frac{1}{S_0}\int m\,d\mathbf r$ |
-    | Path picture (Feynman–Kac) | $E = \langle e^{-i\varphi}\rangle$, $\ \varphi = \gamma\int \mathbf g\cdot\mathbf r\,dt$ |
+    | Path picture (Feynman–Kac) | $E = \langle e^{-i\varphi}\rangle = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int \mathbf g\cdot\mathbf r_j\,dt$ over the random paths $\mathbf r_j(t)$ of $N$ spins |
 
     ---
     ## Coming next

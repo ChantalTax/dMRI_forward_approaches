@@ -246,12 +246,14 @@ def _(mo):
     | Idea | Formula |
     | --- | --- |
     | Length scales | pore size $L$; diffusion length $\ell_D = \sqrt{Dt}$; gradient length $\ell_g = (D/\gamma g)^{1/3}$; phase wavelength $1/q$ |
-    | Displacement cumulants | $\langle X^2\rangle = 2D(t)\,t$, $\ K(t) = \langle X^4\rangle/\langle X^2\rangle^2 - 3$ |
+    | Averages $\langle\cdot\rangle$ | the mean over many spins, each starting at a uniformly random $x_0$ in the pore (volume $V$) and following its own random path: $\langle f\rangle = \lim_{N\to\infty}\frac1N\sum_{j=1}^N f_j$ |
+    | … of the displacement | $X = x(t) - x_0$: $\ \langle f(X)\rangle = \int f(X)\,\bar P(X,t)\,dX$, with the average propagator $\bar P(X,t) = \frac1V\int_V P(x_0 + X\mid x_0,t)\,dx_0$ |
+    | Displacement cumulants | $\langle X^2\rangle = \int X^2\bar P(X,t)\,dX = 2D(t)\,t$, $\ K(t) = \langle X^4\rangle/\langle X^2\rangle^2 - 3$, with $\langle X^4\rangle = \int X^4\bar P(X,t)\,dX$ |
     | Slab, limits | $D(t)\to D$ and $K\to0$ for $t\to0$; $\ \langle X^2\rangle\to L^2/6$ and $K\to-3/5$ for $t\to\infty$ |
     | Slab modes | $u_0 = 1/\sqrt L$, $\ u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$, $\ \tau_1 = L^2/(\pi^2D)$ |
-    | Path picture | $E = \langle e^{-i\varphi}\rangle$, $\ \varphi = \gamma\int_0^T g(t)\,x(t)\,dt$ |
+    | Path picture | $E = \langle e^{-i\varphi}\rangle = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ |
     | Exact PGSE (MCF) | $E = [e^{-(D\Lambda - i\gamma G\mathbf B)\delta}\,e^{-D\Lambda(\Delta-\delta)}\,e^{-(D\Lambda + i\gamma G\mathbf B)\delta}]_{00}$ |
-    | Gaussian phase (GPA) | $\ln E \approx -\frac12\langle\varphi^2\rangle$, $\ \langle\varphi^2\rangle = \gamma^2\iint g\,g\sum_n B_{0n}^2\,e^{-D\lambda_n\lvert t_1-t_2\rvert}$ |
+    | Gaussian phase (GPA) | $\ln E \approx -\frac12\langle\varphi^2\rangle$, $\ \langle\varphi^2\rangle = \gamma^2\iint g(t_1)g(t_2)\,\langle x(t_1)x(t_2)\rangle\,dt_1dt_2$, with $\langle x(t_1)x(t_2)\rangle = \frac1V\iint x_0\,x\,P(x\mid x_0,\lvert t_2-t_1\rvert)\,dx\,dx_0 = \sum_n B_{0n}^2\,e^{-D\lambda_n\lvert t_1-t_2\rvert}$ |
     | Verified in Ch 2 | GPA 5% off at $G \approx 205$ mT/m for $\delta = 10$, $\Delta = 20$ ms; complex zero of $E(G)$ near $463 + 20i$ mT/m |
 
     **Refresh first**
@@ -1486,7 +1488,9 @@ def _(mo):
 
     with $\mathbf m(0) = (p_1, p_2)$ and detailed balance $k_1p_1 = k_2p_2$. The signal is $E = (1,1)\,e^{-(b\mathbf D + \mathbf K\Delta)}\,\mathbf p$, with $b = q^2\Delta$. *Your notes:* a linear system $\dot{\mathbf x} = A\mathbf x$, solved by $e^{tA}$ and its eigenvalues, as on your ODE sheets.
 
-    The new axis is $\Delta/\tau_{\text{ex}}$, with $1/\tau_{\text{ex}} = k_1 + k_2$. From Chapter 1, a barrier-limited membrane with permeability $\kappa$ gives $k_1 = \kappa\,(S/V)_1$. The model needs $\kappa L/D\ll1$ (the same condition as for tortuosity in ②), and each compartment must be inside its own cumulant region (3a ④). Filter-exchange imaging (FEXI) measures $\tau_{\text{ex}}$ this way ([Lasič et al. 2011](https://doi.org/10.1002/mrm.22782)).
+    The new axis is $\Delta/\tau_{\text{ex}}$, with $1/\tau_{\text{ex}} = k_1 + k_2$. From Chapter 1, a barrier-limited membrane with permeability $\kappa$ gives $k_1 = \kappa\,(S/V)_1$.
+
+    → *Chapter 1 already contains this model as a set of slab modes* (the permeable-membrane figure and Exercise 9). With a membrane in the middle of a slab, the uniform mode stays, and the slowest odd mode, one half high and the other low, decays at $D\lambda\approx4\kappa/L$. That is $k_1 + k_2$: each half has $S/V = 2/L$, so $k_1 = k_2 = 2\kappa/L$. Kärger's two magnetizations are the projections on these two modes; the faster modes, which he neglects, are the ones that need $\kappa L/D\ll1$ to die out first. The model needs $\kappa L/D\ll1$ (the same condition as for tortuosity in ②), and each compartment must be inside its own cumulant region (3a ④). Filter-exchange imaging (FEXI) measures $\tau_{\text{ex}}$ this way ([Lasič et al. 2011](https://doi.org/10.1002/mrm.22782)).
     """)
     return
 
@@ -1613,7 +1617,7 @@ def _(mo):
     | Idea | Formula |
     | --- | --- |
     | The PGSE box | $\tilde\Delta = D\Delta/L^2$, $\ \tilde\delta = D\delta/L^2$, $\ \Gamma = \gamma gL^3/D = (L/\ell_g)^3$ |
-    | Narrow-pulse face | $E(q,t) = \langle e^{iqX}\rangle = \sum_n e^{-D\lambda_nt}\lvert\tilde u_n(q)\rvert^2/L\ \ge0$ |
+    | Narrow-pulse face | $E(q,t) = \langle e^{iqX}\rangle = \int\bar P(X,t)\,e^{iqX}dX = \sum_n e^{-D\lambda_nt}\lvert\tilde u_n(q)\rvert^2/L\ \ge0$ |
     | Its four regions | free; short times ($S/V$); form factor; Gaussian cumulant, edge $qX_{\text{rms}}\approx1$ |
     | Long-pulse face | free $g^2T^3$; motional narrowing $g^2T$; localisation $g^{2/3}T$; triple point $\ell_D = \ell_g = L$ |
     | Inside the box | GPA safe for $H_2 = \gamma g\ell\min(\delta, \ell^2/D)\lesssim1$, $\ell = \min(\sqrt{D\Delta}, L)$ |

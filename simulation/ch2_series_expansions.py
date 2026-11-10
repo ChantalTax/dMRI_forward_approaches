@@ -128,6 +128,7 @@ def _(mo):
     4. The **cumulant expansion** of the signal, with the Gaussian phase approximation as its first term, built from the mode weights of Chapter 1.
     5. Why finite gradient pulses change the meaning of the measured $D$ and $K$.
     6. How the two series are connected: every cumulant is a product of the same matrices.
+    7. How far the cumulant series reaches (its radius of convergence, set by the nearest complex zero of the signal), and how to compute cumulants of any order in practice.
 
     Every exercise has hints and a worked answer, folded away. Try the exercise first, then open the hint, then the answer.
     """
@@ -187,9 +188,10 @@ def _(mo):
     | Eigenmodes of a pore | $-\nabla^2u_n = \lambda_nu_n$, $\ \partial u_n/\partial n = 0$ on the walls, $\ \int u_nu_m = \delta_{nm}$ |
     | Slab | $u_0 = 1/\sqrt L$, $\ u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$ |
     | Propagator | $P(x\mid x_0,t) = \sum_n u_n(x)u_n(x_0)e^{-D\lambda_nt}$ |
-    | MSD weights in a slab | $\langle(x-x_0)^2\rangle = \frac{L^2}{6} - 2\sum_{n\ \text{odd}} \frac{8L^2}{(n\pi)^4}e^{-D\lambda_nt}$ |
+    | Averages $\langle\cdot\rangle$ | the mean over many spins, each starting at a uniformly random $x_0$ and following its own random path: $\langle f\rangle = \lim_{N\to\infty}\frac1N\sum_{j=1}^N f_j$. For start and end points only: $\langle f(x_0, x)\rangle = \frac1L\iint f(x_0, x)\,P(x\mid x_0,t)\,dx\,dx_0$ |
+    | MSD weights in a slab | $\langle(x-x_0)^2\rangle = \frac1L\iint(x-x_0)^2P(x\mid x_0,t)\,dx\,dx_0 = \frac{L^2}{6} - 2\sum_{n\ \text{odd}} \frac{8L^2}{(n\pi)^4}e^{-D\lambda_nt}$ |
     | Bloch–Torrey | $\partial m/\partial t = D\nabla^2m - i\gamma\,g(t)\,x\,m$, $\ E = \int m\,dx\big/\int m(x,0)\,dx$ |
-    | Path picture | $E = \langle e^{-i\varphi}\rangle$, $\ \varphi = \gamma\int_0^T g(t)\,x(t)\,dt$ |
+    | Path picture | $E = \langle e^{-i\varphi}\rangle = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ |
     | Gradient length | $\ell_g = (D/\gamma g)^{1/3}$ |
 
     ## Two kinds of series
@@ -199,7 +201,7 @@ def _(mo):
     | | **2a · Eigenmode expansion (matrix methods)** | **2b · Cumulant expansion** |
     | --- | --- | --- |
     | What is expanded | the magnetization $m(x,t)$, in the eigenmodes $u_n$ | $\ln E$, in powers of the gradient |
-    | Small parameter | none: keep enough modes | the phase spread, $\langle\varphi^2\rangle \lesssim 1$ |
+    | Small parameter | none: keep enough modes | the phase spread, $\langle\varphi^2\rangle = \lim\frac1N\sum_j\varphi_j^2\lesssim 1$ |
     | Result | exact (to any precision) at any gradient | an approximation for weak gradients |
     | Output | numbers | closed formulas you can fit and interpret |
     | First term | — | the Gaussian phase approximation |
@@ -943,6 +945,295 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
+    ## How far does the cumulant series reach? The radius of convergence, and computing it in practice
+
+    Exercises 5c and 7c showed *that* the cumulant series stops somewhere. This section shows **where**, and how to compute the cumulants of any order in practice.
+
+    **The radius of convergence.** $\ln E(G)$ is analytic wherever $E\ne0$, so its power series around $G = 0$ converges inside the largest disc that contains no zero of $E$. Two symmetries place the zeros:
+
+    - $E$ is **even** in $G$: reversing the gradient is the same as mirroring the slab. So $\ln E$ is a series in $G^2$, i.e. in $b$.
+    - $E$ is **real** for real $G$ (a symmetric pore), so $E(\bar G) = \overline{E(G)}$.
+
+    → Zeros come in fours, $\pm G^*$ and $\pm\bar G^*$, and the radius is $R = \lvert G^*\rvert$, the modulus of the nearest one. In $b$-units, $b^* = \gamma^2\lvert G^*\rvert^2\delta^2(\Delta - \delta/3)$.
+
+    **What the zero does to the coefficients.** Write $\ln E = \sum_k c_{2k}G^{2k}$. Close to its nearest zeros, $\ln E$ behaves like $\ln(1 - G^2/G^{*2}) + \ln(1 - G^2/\bar G^{*2})$ plus a part that is analytic in a larger disc. Expanding $\ln(1-u) = -\sum_k u^k/k$ gives, for large $k$ (Darboux 1878),
+
+    $$c_{2k}\approx-\frac2k\,\lvert G^*\rvert^{-2k}\cos(2k\theta^*),\qquad \theta^* = \arg G^* .$$
+
+    → The coefficients shrink like $R^{-2k}$: the cumulant series behaves like a geometric series in $(G/R)^2$. Truncating it after the $G^{2K}$ term leaves an error of order $(G/R)^{2K+2}/K$. That is tiny for $G\ll R$ and useless near $R$, however many terms you keep.
+
+    **Three ways to get the cumulants**
+
+    | Route | How | Strength | Weakness |
+    | --- | --- | --- | --- |
+    | Fit a polynomial in $b$ to $\ln E$ | DKI-style, on $[0, b_{\max}]$ | works on measured data | biased by the omitted higher terms; ill-conditioned beyond 2–3 terms |
+    | Nested time integrals (2c) | $k$-fold integrals of $\mathbf Be^{-D\Lambda\tau}\mathbf B\cdots$ | exact, and each term has a meaning | the cost grows fast with the order; impractical beyond the 4th |
+    | Cauchy integral on a circle | $E$ at $M$ complex $G$ on a circle, then an FFT of $\ln E$ | every order at once, to rounding error; also reveals $R$ | needs a model that accepts complex $G$ |
+
+    **Recipe: cumulants from a circle in the complex plane** ([Lyness & Moler 1967](https://doi.org/10.1137/0704019))
+
+    ① **Find the nearest zero $G^*$.** Look for a dip of $\lvert E\rvert$ along real $G$, or for dark spots of $\lvert E\rvert$ in the complex plane, and refine with Newton's method in complex $G$. The MCF needs no change for a complex $G$: it is the same matrix exponential.
+
+    ② **Choose a circle inside the disc**, $r < R$ (here $r = 0.7R$), with $M$ points $G_j = r\,e^{2\pi ij/M}$ ($M = 64$).
+
+    ③ **Compute $\ln E(G_j)$** with its phase unwrapped along the circle.
+
+    ④ **FFT:** $c_k = \mathrm{FFT}(\ln E)_k\big/(M\,r^k)$. This is the trapezoidal rule for Cauchy's integral $c_k = \frac1{2\pi i}\oint\ln E(G)\,G^{-k-1}dG$. On a circle it converges geometrically, with an error of order $(r/R)^M$ ([Trefethen & Weideman 2014](https://doi.org/10.1137/130932132)).
+
+    ⑤ **Check:** $c_0\approx0$ (since $E(0) = 1$) and all odd $c_k\approx0$. If the circle encloses a zero, the unwrapped phase does not return to its start: it gains $2\pi$ per zero inside (the argument principle), and both checks fail.
+
+    ⑥ **Convert.** With $b = \beta G^2$ and $\beta = \gamma^2\delta^2(\Delta-\delta/3)$: $\ D_{\text{app}} = -c_2/\beta$ and $K_{\text{app}} = 6c_4/(\beta^2D_{\text{app}}^2)$, and so on for the higher orders.
+
+    The figures use the PGSE sliders at the top of 2a.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(D0, GAMMA, np, slab_B):
+    def pgse_complex(Gs, L, delta, Delta, N=20, D=D0):
+        """Exact PGSE echo (MCF) for an array of real or complex gradients G (mT/m).
+
+        Each lobe is exponentiated with an eigendecomposition, for all G at once."""
+        Gs = np.atleast_1d(np.asarray(Gs, complex))
+        lam, B = slab_B(L, N)
+
+        def lobe(sign):
+            A = D * np.diag(lam)[None] + sign * 1j * GAMMA * Gs[:, None, None] * B[None]
+            mu, V = np.linalg.eig(A)
+            return V, mu, np.linalg.inv(V)
+
+        Vp, mp, Wp = lobe(+1.0)
+        Vm, mm, Wm = lobe(-1.0)
+        c = np.einsum("mij,mj->mi", Vp, np.exp(-mp * delta) * Wp[:, :, 0])    # first lobe acting on e0
+        c = np.exp(-D * lam * (Delta - delta)) * c                              # gap
+        c = np.einsum("mij,mj->mi", Wm, c)                                      # second lobe
+        return np.einsum("mj,mj->m", Vm[:, 0, :], np.exp(-mm * delta) * c)
+
+    def nearest_zero(L, delta, Delta, Gmax=2000.0, N=20):
+        """Nearest zero of E(G) in the first quadrant, or None if there is none with |G| < Gmax."""
+        re = np.linspace(Gmax / 60, Gmax, 60)
+        im = np.linspace(0.0, Gmax / 2, 31)
+        RE, IM = np.meshgrid(re, im)
+        A = np.abs(pgse_complex((RE + 1j * IM).ravel(), L, delta, Delta, N)).reshape(RE.shape)
+        P = np.pad(A, 1, constant_values=np.inf)
+        is_min = np.ones(A.shape, bool)
+        for di in (-1, 0, 1):
+            for dj in (-1, 0, 1):
+                if di or dj:
+                    is_min &= A <= P[1 + di : 1 + di + A.shape[0], 1 + dj : 1 + dj + A.shape[1]]
+        cands = (RE + 1j * IM)[is_min]
+        cands = cands[np.argsort(np.abs(cands))][:6]
+        best = None
+        for g in cands:
+            g = complex(g) + 1e-3j * Gmax                                       # start just off the real axis
+            ok = False
+            for _ in range(50):                                                 # Newton in complex G
+                h = 1e-4 * abs(g)
+                f, fp, fm = pgse_complex([g, g + h, g - h], L, delta, Delta, N)
+                step = f / ((fp - fm) / (2 * h))
+                g = g - step
+                if abs(step) < 1e-10 * abs(g):
+                    ok = True
+                    break
+            g = complex(abs(g.real), abs(g.imag))
+            if ok and abs(g) < Gmax and (best is None or abs(g) < abs(best) - 1e-6):
+                best = g
+        return best
+
+    def cauchy_coeffs(L, delta, Delta, r, M=64, N=20):
+        """Taylor coefficients c_k of ln E(G) from M points on the circle |G| = r, and the winding number."""
+        Gc = r * np.exp(2j * np.pi * np.arange(M) / M)
+        E = pgse_complex(Gc, L, delta, Delta, N)
+        phase = np.unwrap(np.angle(E))
+        wind = int(np.round((phase[-1] + np.angle(E[0] / E[-1]) - phase[0]) / (2 * np.pi)))
+        lnE = np.log(np.abs(E)) + 1j * phase
+        c = np.fft.fft(lnE) / M / r ** np.arange(M, dtype=float)
+        return c, wind
+
+    return cauchy_coeffs, nearest_zero, pgse_complex
+
+
+@app.cell(hide_code=True)
+def _(Delta_a, L_a, cauchy_coeffs, delta_a, nearest_zero):
+    rc_L, rc_de = L_a.value, delta_a.value
+    rc_De = max(Delta_a.value, rc_de)
+    rc_zero = nearest_zero(rc_L, rc_de, rc_De)
+    rc_R = abs(rc_zero) if rc_zero is not None else 2000.0
+    rc_r = 0.7 * rc_R
+    rc_c, rc_wind = cauchy_coeffs(rc_L, rc_de, rc_De, rc_r)
+    return rc_De, rc_L, rc_R, rc_c, rc_de, rc_r, rc_wind, rc_zero
+
+
+@app.cell(hide_code=True)
+def _(
+    C_ALT,
+    C_FREE,
+    C_MAIN,
+    D0,
+    GAMMA,
+    mo,
+    np,
+    pgse_complex,
+    plt,
+    rc_De,
+    rc_L,
+    rc_R,
+    rc_c,
+    rc_de,
+    rc_r,
+    rc_wind,
+    rc_zero,
+):
+    _re = np.linspace(0.0, 1.5 * rc_R, 64)
+    _im = np.linspace(-0.5 * rc_R, 0.5 * rc_R, 41)
+    _RE, _IM = np.meshgrid(_re, _im)
+    _A = np.abs(pgse_complex((_RE + 1j * _IM).ravel(), rc_L, rc_de, rc_De)).reshape(_RE.shape)
+
+    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(11, 4.2), gridspec_kw={"width_ratios": [1.25, 1]})
+    _pc = _a1.pcolormesh(_re, _im, np.log10(np.clip(_A, 1e-4, 1e2)), cmap="Blues_r", vmin=-4, vmax=2, shading="gouraud", rasterized=True)
+    _cb = _fig.colorbar(_pc, ax=_a1, pad=0.02)
+    _cb.set_label("log₁₀ |E(G)|")
+    _th = np.linspace(-np.pi / 2, np.pi / 2, 200)
+    _a1.plot(rc_R * np.cos(_th), rc_R * np.sin(_th), color=C_ALT, lw=1.6, ls="--", label="|G| = R (radius of convergence)")
+    _a1.plot(rc_r * np.cos(_th), rc_r * np.sin(_th), color="w", lw=1.2, ls=":", label="Cauchy circle, r = 0.7R")
+    _tj = 2 * np.pi * np.arange(64) / 64
+    _keep = np.cos(_tj) >= 0
+    _a1.plot(rc_r * np.cos(_tj[_keep]), rc_r * np.sin(_tj[_keep]), ".", color="w", ms=3)
+    _a1.axhline(0, color="k", lw=0.8)
+    if rc_zero is not None:
+        _a1.plot([rc_zero.real] * 2, [rc_zero.imag, -rc_zero.imag], "x", color=C_ALT, ms=9, mew=2.2, label="zeros G*, Ḡ*")
+    _a1.set(xlim=(0, 1.5 * rc_R), ylim=(-0.5 * rc_R, 0.5 * rc_R), xlabel="Re G (mT/m)", ylabel="Im G (mT/m)", title="|E| in the complex gradient plane")
+    _a1.set_aspect("equal")
+    _a1.grid(False)
+    _a1.legend(frameon=True, framealpha=0.85, fontsize=7.5, loc="upper left")
+
+    _k = np.arange(1, 21)
+    _c2k = rc_c[2 * _k].real
+    _a2.semilogy(2 * _k, np.abs(_c2k) * rc_R ** (2 * _k), "o", color=C_MAIN, ms=5, label="|c₂ₖ| R²ᵏ from the circle")
+    if rc_zero is not None:
+        _thz = np.angle(rc_zero)
+        _a2.semilogy(2 * _k, (2 / _k) * np.abs(np.cos(2 * _k * _thz)), "-", color=C_ALT, lw=1.4, label="Darboux: (2/k)·|cos 2kθ*|")
+    _a2.set(xlabel="order 2k", ylabel="|c₂ₖ| · R²ᵏ", title="The nearest zero sets the coefficients", ylim=(1e-3, 10))
+    _a2.legend(frameon=False, fontsize=8, loc="lower left")
+    _fig.tight_layout()
+
+    _beta = GAMMA**2 * rc_de**2 * (rc_De - rc_de / 3)
+    _Dapp = -rc_c[2].real / _beta
+    _Kapp = 6 * rc_c[4].real / (_beta**2 * _Dapp**2)
+    _odd = np.abs(rc_c[1:40:2]).max() * rc_r
+    if rc_zero is None:
+        _ztxt = "No zero of E(G) with |G| < 2000 mT/m: the series reaches at least that far (motional narrowing keeps the phase nearly Gaussian)."
+    else:
+        _ztxt = (f"Nearest zero **G\\* = {rc_zero.real:.1f} + {rc_zero.imag:.1f}i mT/m**, so R = **{rc_R:.1f} mT/m**; "
+                 f"in b-units b\\* = **{_beta * rc_R**2:.2f} ms/µm²**, and b\\*·D_app = **{_beta * rc_R**2 * _Dapp:.2f}**.")
+    mo.vstack([_fig, mo.md(
+        _ztxt + f" From the circle: D_app/D = **{_Dapp / D0:.4f}**, K_app = **{_Kapp:+.3f}**. "
+        f"Checks: |c₀| = {abs(rc_c[0]):.1e}, largest odd |cₖ|·r = {_odd:.1e}, winding number = {rc_wind}."
+    )])
+    return
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_FREE, C_MAIN, D0, GAMMA, mo, np, pgse_complex, plt, rc_De, rc_L, rc_R, rc_c, rc_de):
+    _G = np.linspace(1.0, 1.3 * rc_R, 220)
+    _E = pgse_complex(_G, rc_L, rc_de, rc_De).real
+    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(11, 3.9))
+    _a1.semilogy(_G, np.abs(_E), color="k", lw=2.4, label="exact (MCF)")
+    _cols = [C_FREE, "#8fb3ea", C_MAIN, "#1c4fa3", C_ALT]
+    for _K, _col in zip((1, 2, 4, 8, 16), _cols):
+        _s = np.zeros_like(_G)
+        for _j in range(1, _K + 1):
+            _s = _s + rc_c[2 * _j].real * _G ** (2 * _j)
+        _lab = "Gaussian phase (G²)" if _K == 1 else f"up to G^{2 * _K}"
+        _a1.semilogy(_G, np.exp(np.clip(_s, -50, 50)), color=_col, lw=1.3, ls="--", label=_lab)
+    _a1.axvline(rc_R, color=C_ALT, lw=1.0, ls=":")
+    _a1.text(rc_R * 1.01, 0.4, "R", color=C_ALT, fontsize=9)
+    _a1.set(ylim=(1e-4, 1.5), xlabel="G (mT/m)", ylabel="|E|", title="Partial sums of the cumulant series")
+    _a1.legend(frameon=False, fontsize=7.5, loc="lower left")
+
+    _beta = GAMMA**2 * rc_de**2 * (rc_De - rc_de / 3)
+    _Dapp = -rc_c[2].real / _beta
+    _Kapp = 6 * rc_c[4].real / (_beta**2 * _Dapp**2)
+    _bstarD = _beta * rc_R**2 * _Dapp
+    _xs = np.logspace(-2, np.log10(0.6 * _bstarD), 12)            # b_max · D_app
+    _Kfit = []
+    for _x in _xs:
+        _Gm = np.sqrt(_x / _Dapp / _beta)
+        _Gs = np.linspace(_Gm / 12, _Gm, 12)
+        _y = np.log(pgse_complex(_Gs, rc_L, rc_de, rc_De).real)
+        _p = np.polyfit(_beta * _Gs**2, _y, 2)
+        _Kfit.append(6 * _p[0] / _p[1] ** 2)
+    _a2.semilogx(_xs, _Kfit, "o-", color=C_MAIN, ms=4, label="K from a quadratic fit on [0, b_max]")
+    _a2.axhline(_Kapp, color="k", lw=1.2, ls="--", label=f"exact K_app (circle) = {_Kapp:+.3f}")
+    _a2.set(xlabel="b_max · D_app", ylabel="fitted K_app", title="Fitting a truncated series biases K")
+    _a2.legend(frameon=False, fontsize=8)
+    _fig.tight_layout()
+    _i = int(np.argmin(np.abs(_xs - 0.3)))
+    mo.vstack([_fig, mo.md(
+        f"Inside R the partial sums converge to the exact curve, slowly near R; beyond R they diverge. "
+        f"Right: at b_max·D_app = {_xs[_i]:.2f} the quadratic fit gives K = {_Kfit[_i]:+.3f}, "
+        f"{100 * (_Kfit[_i] / _Kapp - 1):+.0f}% from the exact value. The bias grows with b_max/b\\* (here b\\*·D_app = {_bstarD:.2f})."
+    )])
+    return
+
+
+@app.cell(hide_code=True)
+def _(exercise):
+    exercise(r"""
+    **(a)** Show that the zeros of $E(G)$ come in fours, $\pm G^*$ and $\pm\bar G^*$, and conclude that the cumulant series has only even powers of $G$ and radius $\lvert G^*\rvert$.
+
+    **(b)** Derive the Darboux estimate $c_{2k}\approx-\frac2k\lvert G^*\rvert^{-2k}\cos(2k\theta^*)$. Check it against the right-hand panel of the first figure. Why does the "root test" $\lvert c_{2k}\rvert^{-1/2k}$ approach $R$ only slowly?
+
+    **(c)** With the defaults ($L = 8$ µm, $\delta = 10$, $\Delta = 20$ ms), how many terms of the series do you need for $\lvert E\rvert$ to 1% at $G = 300$ mT/m, and at $450$ mT/m? Use the partial sums.
+
+    **(d)** A DKI protocol on this sample goes up to $b = 2.5$ ms/µm². Is it inside the radius of convergence? How biased is the fitted kurtosis, and why is it biased even though the series converges there?
+
+    **(e)** In the recipe, what goes wrong if the Cauchy circle encloses a zero? How could you turn that failure into a way of counting zeros?
+    """, "8 · The radius of convergence in practice")
+    return
+
+
+@app.cell(hide_code=True)
+def _(hint):
+    hint(r"""
+    - **(a)** Mirroring the slab, $x\to-x$, flips the sign of $\mathbf B$. And for real $G$ the echo of a symmetric pore is real.
+    - **(b)** Near $G^*$: $\ln E = \ln(G - G^*) + $ (analytic). Pair the four zeros as $(1 - G^2/G^{*2})(1 - G^2/\bar G^{*2})$. For the root test, take the $2k$-th root of $2/k$.
+    - **(d)** The quadratic fit has no $b^3$ term, so the $b^3$ coefficient leaks into the $b^2$ one.
+    - **(e)** The argument principle: $\frac1{2\pi}\oint d\arg E$ = number of zeros inside.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(answer):
+    answer(r"""
+    **(a)** ⇒ Mirroring $x\to-x$ maps the slab onto itself and $\mathbf B\to-\mathbf B$, which is the same as $G\to-G$. So $E(-G) = E(G)$: if $G^*$ is a zero, so is $-G^*$.
+
+    ⇒ For real $G$, $E$ is real. The power series of $E$ then has real coefficients, so $E(\bar G) = \overline{E(G)}$: if $G^*$ is a zero, so is $\bar G^*$.
+
+    → $E$ even ⇒ $\ln E$ even ⇒ only even powers, a series in $G^2$ (in $b$). The four zeros all have modulus $\lvert G^*\rvert$, which is the radius.
+
+    **(b)** ⇒ Near the zeros, $\ln E \approx \ln(1 - G^2/G^{*2}) + \ln(1 - G^2/\bar G^{*2})$. With $\ln(1-u) = -\sum_k u^k/k$, the coefficient of $G^{2k}$ is $-\frac1k\big(G^{*-2k} + \bar G^{*-2k}\big) = -\frac2k\lvert G^*\rvert^{-2k}\cos(2k\theta^*)$. ✓ The other singularities are further away, so their contributions die faster with $k$. In the figure the estimate matches the exact coefficients to four digits from order 16 on.
+
+    ⇒ Root test: $\lvert c_{2k}\rvert^{-1/2k} = R\,\big(k/2\lvert\cos2k\theta^*\rvert\big)^{1/2k}\approx R\,(1 + \frac{\ln k}{2k})$. The factor $k^{1/2k}$ tends to 1 only logarithmically slowly: at $2k = 30$ it is still about 10% above $R$. Fitting the Darboux form, as in the figure, is much more accurate.
+
+    **(c)** ⇒ At 300 mT/m, $(G/R)^2 = 0.42$: the terms fall by a factor of 2.4 per order, and up to $G^8$ (4 terms) gives $\lvert E\rvert$ to 1%. At 450 mT/m, $(G/R)^2 = 0.94$: the terms hardly fall, and even 16 terms (up to $G^{32}$) are about 15% off. Close to $R$ the series is correct but useless.
+
+    **(d)** ⇒ $b = 2.5$ against $b^* = 25.6$ ms/µm²: well inside, $b/b^*\approx0.1$. The quadratic fit still returns $K\approx-0.56$ against the exact $-0.51$, about 10% too negative (right-hand panel).
+
+    → Convergence of the full series does not make a two-term fit unbiased. The fit has no $b^3$ term, and the omitted $c_6$ term, of relative size about $b/b^*$, is absorbed into the $b^2$ coefficient. Keeping $b_{\max}\ll b^*$ makes the bias small. Adding a cubic term reduces it, at the cost of more noise.
+
+    **(e)** ⇒ If the circle encloses zeros, $\ln E$ is not single-valued on it: the unwrapped phase gains $2\pi$ per zero inside, so the samples are not periodic. The FFT then returns nonsense, $c_0\ne0$ and the odd coefficients are no longer zero.
+
+    → The same quantity is a zero counter: the winding number $\frac1{2\pi}\oint d\arg E$ (printed under the first figure) is the number of zeros inside the circle. Increase $r$ until it jumps from 0 to 4 (the four symmetric zeros): the jump brackets $R$, without any Newton iteration.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
     ---
     ## Summary of Chapter 2
 
@@ -953,10 +1244,11 @@ def _(mo):
     | Grebenkov's MCF (PGSE) | $E = [e^{-(D\Lambda - i\gamma G\mathbf B)\delta}e^{-D\Lambda(\Delta-\delta)}e^{-(D\Lambda + i\gamma G\mathbf B)\delta}]_{00}$ |
     | Multiple propagator | $e^{-D\Lambda\tau/2}e^{-i\gamma g\tau\mathbf B}e^{-D\Lambda\tau/2}$ per step; error $\propto\tau^2$ |
     | Number of modes | mirrored $m$ has a jump in $\partial_x^3$: error $\sim N^{-5}$; $D\lambda_N \gg \gamma gL$; double $N$ to check |
-    | Cumulant expansion | $\ln E = -\frac12\langle\varphi^2\rangle + \frac1{24}\kappa_4 - \dots$; GPA keeps the first term |
-    | GPA from the modes | $\langle\varphi^2\rangle = \gamma^2\iint g\,g\sum_n B_{0n}^2e^{-D\lambda_n\lvert t_1-t_2\rvert}$ |
+    | Cumulant expansion | $\ln E = -\frac12\langle\varphi^2\rangle + \frac1{24}\kappa_4 - \dots$, $\ \kappa_4 = \langle\varphi^4\rangle - 3\langle\varphi^2\rangle^2$, averages over spins (their random paths); GPA keeps the first term |
+    | GPA from the modes | $\langle\varphi^2\rangle = \gamma^2\iint g(t_1)g(t_2)\langle x(t_1)x(t_2)\rangle dt_1dt_2$, $\ \langle x(t_1)x(t_2)\rangle = \frac1L\iint x_0\,x\,P(x\mid x_0,\lvert t_2-t_1\rvert)\,dx\,dx_0 = \sum_n B_{0n}^2e^{-D\lambda_n\lvert t_1-t_2\rvert}$ |
     | Limits of the GPA | large pore: $e^{-bD}$; small pore: $\ln E = -\gamma^2G^2L^4T/(120D)$ |
-    | Radius of the cumulant series | the nearest complex zero of $E(G)$ |
+    | Radius of the cumulant series | $R = \lvert G^*\rvert$, the nearest complex zero of $E(G)$; zeros in fours $\pm G^*, \pm\bar G^*$; $c_{2k}\approx-\frac2k R^{-2k}\cos2k\theta^*$ |
+    | Cumulants in practice | $c_k = \mathrm{FFT}(\ln E)_k/(Mr^k)$ on a circle $r < R$; check $c_0\approx0$ and the winding number; polynomial fits in $b$ are biased by the omitted terms |
     | Finite pulses | $D_{\text{app}}$, $K_{\text{app}}$ depend on $\delta$: the centre-of-mass effect |
     | Diffusion spectrum | $\langle\varphi^2\rangle = \frac2\pi\int_0^\infty\lvert Q\rvert^2\mathcal D(\omega)d\omega$, $\ \mathcal D = \sum w_nD\lambda_n\,\omega^2/((D\lambda_n)^2 + \omega^2)$ |
     | The link | Dyson series of $c_0(T)$: products $[\mathbf B e^{-D\Lambda\tau}\mathbf B\cdots]_{00}$ = multi-time correlation functions |
@@ -989,11 +1281,13 @@ def _(mo):
 
     | Year | Reference | What it introduced |
     | --- | --- | --- |
+    | 1878 | G. Darboux, *J. Math. Pures Appl.* (3) 4:5 | large-order coefficients of a series from its nearest singularities |
     | 1911 | D. Jackson, dissertation, Göttingen | error of the best trigonometric approximation against smoothness |
     | 1912 | S. Bernstein, *Mém. Acad. Roy. Belgique* | the converse: fast approximation implies smoothness |
     | 1912 | [H. Weyl, *Math. Ann.* 71:441](https://doi.org/10.1007/BF01456804) | how the number of eigenvalues grows |
     | 1965 | [E. O. Stejskal & J. E. Tanner, *J. Chem. Phys.* 42:288](https://doi.org/10.1063/1.1695690) | the PGSE sequence and its $b$-value |
     | 1966 | [B. Robertson, *Phys. Rev.* 151:273](https://doi.org/10.1103/PhysRev.151.273) | eigenmode solution for a slab; motional narrowing |
+    | 1967 | [J. N. Lyness & C. B. Moler, *SIAM J. Numer. Anal.* 4:202](https://doi.org/10.1137/0704019) | Taylor coefficients of analytic functions from points on a circle in the complex plane |
     | 1968 | J. S. Murday & R. M. Cotts, *J. Chem. Phys.* 48:4938 | the Gaussian phase approximation for a sphere |
     | 1968 | [G. Strang, *SIAM J. Numer. Anal.* 5:506](https://doi.org/10.1137/0705041) | symmetric operator splitting |
     | 1974 | C. H. Neuman, *J. Chem. Phys.* 60:4508 | GPA formulas for slab, cylinder and sphere |
@@ -1007,6 +1301,7 @@ def _(mo):
     | 2001 | S. Axelrod & P. N. Sen, *J. Chem. Phys.* 114:6878 | systematic expansions and asymptotic regimes for restricted diffusion |
     | 2005 | [J. H. Jensen et al., *Magn. Reson. Med.* 53:1432](https://doi.org/10.1002/mrm.20508) | diffusion kurtosis imaging |
     | 2007 | [D. S. Grebenkov, *Rev. Mod. Phys.* 79:1077](https://doi.org/10.1103/RevModPhys.79.1077) | review; the multiple correlation function (MCF) approach |
+    | 2014 | [L. N. Trefethen & J. A. C. Weideman, *SIAM Rev.* 56:385](https://doi.org/10.1137/130932132) | why the trapezoidal rule on a circle converges geometrically |
     | 2026 | [E. J. Canales-Rodríguez, C. M. W. Tax et al., *Phys. Med. Biol.*](https://doi.org/10.1088/1361-6560/aeb2a0) | exact PGSE signal on a cylindrical surface |
     """)
     return
