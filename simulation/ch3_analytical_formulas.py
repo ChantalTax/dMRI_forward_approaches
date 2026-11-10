@@ -225,7 +225,7 @@ def _(mo):
 
     | Ch | Topic | Status |
     | --- | --- | --- |
-    | 1 | Foundations: notation, diffusion equation, interface and boundary conditions, eigenmodes, displacement cumulants; Bloch–Torrey; length scales; Feynman–Kac | done |
+    | 1 | Foundations: notation, diffusion equation, interface and boundary conditions, eigenmodes, displacement cumulants; Bloch–Torrey; the full multi-compartment problem and its weak form; length scales; Feynman–Kac | done |
     | 2 | Series expansions: matrix methods (MCF, multiple propagator, number of modes) and the cumulant expansion (Gaussian phase, kurtosis, finite pulses) | done |
     | **3** | **Analytical formulas:** the PGSE box, the narrow-pulse $(q,t)$ map, the long-pulse $(g,T)$ map, the inside of the box, relaxing walls and exchange | this notebook |
     | 4 | Grids and meshes: the method of lines, finite differences, time stepping and stability, periodic cells, finite elements, curved walls | done |
@@ -1630,7 +1630,7 @@ def _(mo):
     **Chapter 4 · Solving the PDE on a grid or a mesh**
 
     - **Finite differences:** the domain as voxels; the Laplacian as jumps to neighbours; explicit time steps and their stability limit; periodic boundaries with a phase shift. *Implementation:* MATI.
-    - **Finite elements:** the weak form, mass and stiffness matrices, a mesh that follows the cell walls; permeable membranes as interface conditions; the mesh-based modes used by the matrix formalism. *Implementation:* SpinDoctor.
+    - **Finite elements:** the weak form of Chapter 1 with hat functions, mass and stiffness matrices, a mesh that follows the cell walls; permeable membranes as double nodes; the mesh-based modes used by the matrix formalism. *Implementation:* SpinDoctor.
     - Every solver is checked against the closed forms of this chapter: the form factor, motional narrowing and localisation.
 
     **Chapter 5 · Monte Carlo: simulating the random walk**
