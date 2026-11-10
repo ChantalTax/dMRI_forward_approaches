@@ -478,7 +478,7 @@ def _(mo):
 
     → **Why the factors $c_{nm}$?** Compartments can hold different amounts of water at equilibrium, $\rho_n\ne\rho_m$. The plain condition $\kappa(C_m - C_n)$ would then drive a flux even at equilibrium and slowly even out the two densities, which real tissue does not do. The factors make the equilibrium state, $C_n = \rho_n$ in every compartment, a state without flux: $c_{nm}\rho_m - c_{mn}\rho_n = 0$ (check it). For equal densities $c_{nm} = 1$, and the condition is the one in the table.
 
-    → **The step to one compartment.** Most of this chapter, and Chapters 2 and 3, work with a single pore: uniform $D$, reflecting walls, $\rho = 1$. That is the full problem with every interface made impermeable: each compartment then evolves on its own, and the block is a collection of single pores. Membranes come back where they are the point: the exchange mode below (Exercise 9), exchange in Chapter 3, and the simulators of Chapters 4 and 5, which solve the full problem.
+    → **The step to one compartment.** Most of this chapter, and Chapters 2 and 3, work with a single pore: uniform $D$, reflecting walls, $\rho = 1$. That is the full problem with every interface made impermeable: each compartment then evolves on its own, and the block is a collection of single pores. Membranes come back where they are the point: the exchange mode below (Exercise 10), exchange in Chapter 3, and the simulators of Chapters 4 and 5, which solve the full problem.
     """)
     return
 
@@ -960,15 +960,21 @@ def _(C_ALT, C_FREE, C_MAIN, D1, L1, mo, np, plt, slab_cumulants):
     _t = np.logspace(-2, 2.7, 300)
     _d, _K = slab_cumulants(_D * _t / _L**2)
 
-    _fig, _a1 = plt.subplots(figsize=(6.5, 3.6))
+    _fig, _a1 = plt.subplots(figsize=(6.5, 4.6))
     _a1.semilogx(_t, _d, color=C_MAIN, lw=2, label="D(t) / D")
     _a1.semilogx(_t, _K, color=C_ALT, lw=2, label="K(t)")
+    _tau = _D * _t / _L**2
+    _sh = _tau < 0.1
+    _a1.semilogx(_t[_sh], 1 - 8 / (3 * np.sqrt(np.pi)) * np.sqrt(_tau[_sh]), color="k", lw=1.0, ls=(0, (4, 3)),
+                 zorder=4, label="short times: 1 − (8/3√π)√(Dt)/L (on top of D)")
+    _a1.semilogx(_t[_sh], 16 / (5 * np.sqrt(np.pi)) * np.sqrt(_tau[_sh]), color=C_ALT, lw=1.1, ls="--",
+                 label="short times: (16/5√π)√(Dt)/L")
     _a1.axhline(0, color=C_FREE, lw=0.8)
     _a1.axhline(-0.6, color=C_ALT, lw=0.8, ls=":", label="−3/5")
     _a1.axvline(_L**2 / (np.pi**2 * _D), color="k", lw=0.8, ls=":")
     _a1.text(_L**2 / (np.pi**2 * _D), 0.9, " τ₁", fontsize=9)
     _a1.set(xlabel="t (ms)", ylim=(-0.7, 1.05), title="Diffusivity and kurtosis of the displacement in a slab")
-    _a1.legend(frameon=False, fontsize=8, loc="lower left", bbox_to_anchor=(0.0, 0.12))
+    _a1.legend(frameon=False, fontsize=7.5, loc="upper center", bbox_to_anchor=(0.5, -0.17), ncol=2)
     _fig.tight_layout()
     mo.vstack([_fig, mo.md("Uses L and D from the sliders above the propagator plot.")])
     return
@@ -1022,6 +1028,97 @@ def _(answer):
     ⇒ **Long times.** Every molecule feels both walls, and the bounded triangle of (a) takes over: $K\to-3/5$.
 
     → In between, $K$ peaks at about $+0.2$ near $Dt \approx 0.03\,L^2$ and crosses zero near $Dt \approx 0.08\,L^2$. The same geometry gives both signs: a kurtosis measured at one diffusion time cannot tell heterogeneity from restriction on its own.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Short times: the walls are felt through $S/V$
+
+    At short times a molecule notices a wall only if it starts within a few $\sqrt{Dt}$ of it. Seen from that close, any smooth wall looks flat, and the share of molecules that close to a wall is proportional to the **surface-to-volume ratio** $S/V$ of the pore space. The result holds for every pore shape ([Mitra, Sen, Schwartz & Le Doussal 1992](https://doi.org/10.1103/PhysRevLett.68.3555)):
+
+    $$\frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t)\qquad\text{in } d \text{ dimensions}.$$
+
+    | Pore | $S/V$ | $d$ | $D(t)/D$ at short times |
+    | --- | --- | --- | --- |
+    | slab, width $L$ | $2/L$ | 1 | $1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}L$ |
+    | cylinder, radius $R$ (cross-section) | $2/R$ | 2 | $1 - \frac{4}{3\sqrt\pi}\frac{\sqrt{Dt}}R$ |
+    | sphere, radius $R$ | $3/R$ | 3 | $1 - \frac{4}{3\sqrt\pi}\frac{\sqrt{Dt}}R$ |
+
+    → The first correction knows only $S/V$, nothing else about the shape. Curvature and absorbing walls appear one order later, in the $O(t)$ term ([Mitra, Sen & Schwartz 1993](https://doi.org/10.1103/PhysRevB.47.8565)). Measuring $D(t)$ at short times therefore gives $S/V$ directly; this was first done in porous rocks ([Latour et al. 1993](https://doi.org/10.1006/jmra.1993.1056)).
+
+    → The kurtosis grows at the same order: for a slab $K(t)\approx\frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}L$, the positive short-time kurtosis of Exercise 6(c). Both slab laws are the dashed lines in the figure above. Exercise 7 derives them with the method of images.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(exercise):
+    exercise(r"""
+    Take one flat reflecting wall at $x = 0$, a molecule starting at height $x_0 > 0$, and a free Brownian increment $W\sim\mathcal N(0, 2Dt)$. By the method of images the reflected walker ends at $\lvert x_0 + W\rvert$, so its displacement is $X = \lvert x_0 + W\rvert - x_0$.
+
+    **(a)** Show that $X^2 - W^2 = 4x_0^2 + 4x_0W$ when $x_0 + W < 0$, and $0$ otherwise. Average over $W$ and over $x_0$ (uniform, per unit wall area) to find the deficit $\int_0^\infty\langle X^2 - W^2\rangle\,dx_0$. Then put two such walls on a slab of width $L$, with the molecules spread uniformly, and recover $D(t)/D = 1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
+
+    **(b)** *Any shape, any dimension.* Take a pore in $d$ dimensions with a smooth wall, and define $D(t) = \langle\lvert\mathbf X\rvert^2\rangle/(2dt)$. Argue that at short times (i) only molecules within a few $\sqrt{Dt}$ of the wall are affected, (ii) each of them sees a flat wall, and (iii) only the displacement component normal to that wall changes. Use the deficit of (a) to derive Mitra's law.
+
+    **(c)** Do the same as in (a) for $X^4 - W^4$, and show that the slab kurtosis grows as $K(t) \approx \frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
+
+    **(d)** In the figure above, up to which $Dt/L^2$ does each dashed line stay within 5% of the exact curve? (Read $Dt/L^2$ off with the sliders: for $L = 10$ µm and $D = 2$ µm²/ms, $Dt/L^2 = 0.01$ is $t = 0.5$ ms.) Why does the kurtosis line fail first?
+    """, "7 · The surface-to-volume law")
+    return
+
+
+@app.cell(hide_code=True)
+def _(hint):
+    hint(r"""
+    - Scale lengths by $\sigma = \sqrt{2Dt}$: $x_0 = \sigma u$, $W = \sigma w$. The deficits become $\sigma^3 I_2$ and $\sigma^5 I_4$, with pure numbers $I_2$ and $I_4$.
+    - Swap the order of integration: for each $w < 0$, integrate over $u$ from 0 to $-w$ first. You need $\int_{-\infty}^0 \lvert w\rvert^k\,\phi(w)\,dw$ with $\phi$ the standard normal density: $\frac12, \frac1{\sqrt{2\pi}}, \frac12, \frac{2}{\sqrt{2\pi}}, \frac32, \frac{8}{\sqrt{2\pi}}$ for $k = 0..5$.
+    - (b) With uniform density $1/V$, the number of molecules per unit wall area, within reach of the wall, is the same as in (a). How much wall is there per unit volume?
+    - (c) Expand $\langle X^4\rangle/\langle X^2\rangle^2 - 3$ to first order in the small deficits.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(answer):
+    answer(r"""
+    **(a)** ⇒ If $x_0 + W\ge0$ nothing is reflected and $X = W$. If $x_0 + W < 0$, $X = -2x_0 - W$, so $X^2 - W^2 = 4x_0^2 + 4x_0W$.
+
+    ⇒ Scale with $\sigma$: deficit $= \sigma^3 I_2$, $\ I_2 = \int_{-\infty}^0\phi(w)\int_0^{-w}(4u^2 + 4uw)\,du\,dw$. The inner integral is $\frac43\lvert w\rvert^3 - 2\lvert w\rvert^3 = -\frac23\lvert w\rvert^3$, so $I_2 = -\frac23\cdot\frac{2}{\sqrt{2\pi}} = -\frac{4}{3\sqrt{2\pi}}$.
+
+    ⇒ Two walls, molecules spread over $L$ with density $1/L$: $\langle X^2\rangle = \sigma^2 + 2\sigma^3I_2/L$, so
+
+    $$\frac{D(t)}{D} = \frac{\langle X^2\rangle}{\sigma^2} = 1 + \frac{2\sigma I_2}{L} = 1 - \frac{8}{3\sqrt{2\pi}}\frac{\sqrt{2Dt}}{L} = 1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}{L}. \checkmark$$
+
+    → The deficit per unit wall area, $\sigma^3I_2 = -\frac{8}{3\sqrt\pi}(Dt)^{3/2}$, is all that (b) needs.
+
+    **(b)** ⇒ (i) A molecule further than a few $\sigma$ from the wall does not reach it: the Gaussian tail beyond is exponentially small. (ii) On the scale $\sigma$ a smooth wall with radius of curvature $\gg\sigma$ is flat. (iii) Split the step into a normal part and $d - 1$ tangential parts. They are independent, and a flat wall reflects only the normal part, so each tangential part keeps its free $2Dt$ and the normal part gives $2Dt$ plus the deficit of (a).
+
+    ⇒ With density $1/V$, the molecules near a piece of wall of area $dS$ give the deficit $\sigma^3I_2\,dS/V$. Summed over the wall:
+
+    $$\langle\lvert\mathbf X\rvert^2\rangle = 2dDt + \frac SV\,\sigma^3I_2 = 2dDt - \frac{8}{3\sqrt\pi}\,\frac SV\,(Dt)^{3/2}.$$
+
+    ⇒ Divide by $2dDt$:
+
+    $$\frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt}. \checkmark$$
+
+    ⇒ Slab: $S/V = 2/L$ and $d = 1$ give (a) back. ✓
+
+    → The steps (i)–(iii) are exactly what fails one order later: curvature on the scale $\sigma$, and corners, give the $O(t)$ term. For a flat wall that term vanishes, and the slab line is exact until molecules from one wall reach the other.
+
+    **(c)** ⇒ For $x_0 + W < 0$: $X^4 - W^4 = (2x_0 + W)^4 - W^4$. The inner integral over $u\in[0,\lvert w\rvert]$ of $(2u + w)^4 - w^4$ is $\frac{(2u+w)^5}{10}\Big|_0^{\lvert w\rvert} - \lvert w\rvert^5 = \frac{\lvert w\rvert^5}{10} + \frac{\lvert w\rvert^5}{10} - \lvert w\rvert^5 = -\frac45\lvert w\rvert^5$, so $I_4 = -\frac45\cdot\frac{8}{\sqrt{2\pi}} = -\frac{32}{5\sqrt{2\pi}}$.
+
+    ⇒ $\langle X^4\rangle = 3\sigma^4 + 2\sigma^5I_4/L$ and $\langle X^2\rangle^2 = \sigma^4(1 + 4\sigma I_2/L + \dots)$, so
+
+    $$K = \frac{3 + 2\sigma I_4/L}{1 + 4\sigma I_2/L} - 3 \approx \frac{2\sigma}{L}\big(I_4 - 6I_2\big) = \frac{2\sigma}{L}\cdot\frac{8/5}{\sqrt{2\pi}} = \frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}{L} = 1.805\,\frac{\sqrt{Dt}}{L}.$$
+
+    The mode sums give 1.79 at $Dt = 10^{-4}L^2$ and 1.75 at $10^{-3}L^2$, approaching 1.805.
+
+    **(d)** ⇒ $D(t)$: the line is exact (to $10^{-6}$) up to $Dt\approx0.03\,L^2$ and still within 0.2% at $0.08\,L^2$. The two walls act independently until the molecules from one wall reach the other. $K(t)$: within 5% only up to $Dt\approx 2\times10^{-3}L^2$; it peaks at $+0.20$ near $0.03\,L^2$ and changes sign near $0.08\,L^2$, on its way to $-3/5$.
+
+    → The kurtosis is a small excess divided by $\langle X^2\rangle^2$. Its next correction is already of relative order $\sqrt{Dt}/L$, while for $D(t)$ next to a flat wall the next correction is exponentially small.
     """)
     return
 
@@ -1102,7 +1199,7 @@ def _(exercise):
     (i) a slab with $L = 8$ µm, (ii) a cylinder with **radius** $R = 5$ µm, (iii) a sphere with radius $R = 5$ µm.
 
     In which pores have the molecules explored the whole pore after 20 ms? What does that mean for what any observation at 20 ms can tell you about pore *size*?
-    """, "7 · Time scales of three pores")
+    """, "8 · Time scales of three pores")
     return
 
 
@@ -1227,7 +1324,7 @@ def _(exercise):
         **(a)** Derive the modes of a circle of radius $r$: solve $-u''(s) = \lambda u(s)$ on $0 \le s < 2\pi r$ with $u$ periodic, and normalise.
         **(b)** Molecules are spread uniformly over a stack of concentric cylindrical surfaces of equal length. Show that layer $i$ holds a share $w_i = r_i/\sum_j r_j$ of them.
         **(c)** For $r = 1$ µm and $D = 0.8$ µm²/ms, compare $\tau_1$ on the surface with $\tau_1$ inside a solid cylinder of the same radius.
-        """, "8 · Modes on a cylindrical surface")
+        """, "9 · Modes on a cylindrical surface")
     return
 
 
@@ -1373,7 +1470,7 @@ def _(exercise):
 
         **(c)** Check the limits $\kappa\to 0$ and $\kappa\to\infty$ against what you expect.
         **(d)** For small $\kappa$, show that the slowest odd mode decays at the rate $D\lambda \approx 4\kappa/L$, and interpret it.
-        """, "9 · Eigenmodes with a permeable membrane")
+        """, "10 · Eigenmodes with a permeable membrane")
     return
 
 
@@ -1509,7 +1606,7 @@ def _(mo):
     | The geometry enters as | interface conditions, through the eigenmodes of 1a | walls that reflect the walkers, or let them through |
     | Methods in this course | eigenmodes and matrices (Ch 2a), formulas (Ch 3), grids and meshes (Ch 4) | the cumulant expansion (Ch 2b), Monte Carlo (Ch 5) |
 
-    The two routes give exactly the same $E$. That is the **Feynman–Kac relation**, which you derive at the end of the path picture (Exercise 12). The next two sections take the routes one at a time.
+    The two routes give exactly the same $E$. That is the **Feynman–Kac relation**, which you derive at the end of the path picture (Exercise 13). The next two sections take the routes one at a time.
     """)
     return
 
@@ -1557,11 +1654,11 @@ def _(mo):
 
     The simulators of Chapters 4 and 5 solve this problem as it stands. The exact methods of Chapter 2 and the formulas of Chapter 3 simplify it in three steps:
 
-    ① **Uniform $T_2$:** relaxation then multiplies the signal by $e^{-T/T_2}$, which cancels in $E$ (Exercise 10). Drop the $T_2$ term.
+    ① **Uniform $T_2$:** relaxation then multiplies the signal by $e^{-T/T_2}$, which cancels in $E$ (Exercise 11). Drop the $T_2$ term.
     ② **Equal densities:** $c_{nm} = 1$; with $\rho = 1$ the start is $m = 1$.
     ③ **One compartment:** impermeable interfaces, so each pore is solved on its own. This is the boxed equation above.
 
-    → Each step is a statement about the tissue, and each can be false: compartments do relax differently (Exercise 10), and membranes do leak. Chapters 4 and 5 are how to find out what a simplification costs.
+    → Each step is a statement about the tissue, and each can be false: compartments do relax differently (Exercise 11), and membranes do leak. Chapters 4 and 5 are how to find out what a simplification costs.
     """)
     return
 
@@ -1571,7 +1668,7 @@ def _(exercise):
     exercise(r"""
     With transverse relaxation the equation reads $\partial m/\partial t = D\nabla^2 m - i\gamma\,\mathbf g\cdot\mathbf r\,m - m/T_2$.
     Show that, for a uniform $T_2$, relaxation only multiplies the signal by $e^{-T/T_2}$, so that it cancels in $E = S/S_0$ when $S_0$ is measured at the same echo time.
-    """, "10 · Where did T₂ go?")
+    """, "11 · Where did T₂ go?")
     return
 
 
@@ -1612,7 +1709,7 @@ def _(mo):
     | --- | --- | --- |
     | impermeable | $D\,\partial m/\partial n = 0$ | $0$: **nothing to add** |
     | relaxing | $D\,\partial m/\partial n = -\varrho\,m$ | $-\varrho\oint w\,m\,dS$ |
-    | membrane between $\Omega_n$ and $\Omega_m$ | continuous flux $= \kappa_{nm}(c_{nm}m_m - c_{mn}m_n)$ | a term on $\Gamma_{nm}$ that couples the two sides; for equal densities $-\kappa\oint(m_n - m_m)(w_n - w_m)\,dS$ (Exercise 11) |
+    | membrane between $\Omega_n$ and $\Omega_m$ | continuous flux $= \kappa_{nm}(c_{nm}m_m - c_{mn}m_n)$ | a term on $\Gamma_{nm}$ that couples the two sides; for equal densities $-\kappa\oint(m_n - m_m)(w_n - w_m)\,dS$ (Exercise 12) |
     | fixed value $m = m_0$ (Dirichlet) | — | not in the boundary term: must be imposed on $m$ directly |
 
     → The first three are **natural** conditions: they enter through the boundary term, and every solution of the weak form satisfies them automatically. A fixed value is an **essential** condition, imposed by hand. Diffusion MRI needs only natural ones.
@@ -1625,7 +1722,7 @@ def _(mo):
     | hat functions on a mesh: 1 at one node, 0 at all others, linear in between | a sparse system with mass, stiffness and gradient matrices | finite elements, Chapter 4 |
     | indicator functions of grid cells (the equation integrated over each cell) | the change in each cell equals the fluxes through its faces | finite volumes and finite differences, Chapter 4 |
 
-    → The weak form is not a finite-element trick. The matrix method of Chapter 2 is the weak form in the basis of eigenmodes (Exercise 11b).
+    → The weak form is not a finite-element trick. The matrix method of Chapter 2 is the weak form in the basis of eigenmodes (Exercise 12b).
     """)
     return
 
@@ -1640,7 +1737,7 @@ def _(exercise):
     **(c)** For a membrane at $x = 0$ between $[a, 0]$ and $[0, b]$, equal densities, with $m$ and $w$ allowed to jump there: collect the two boundary terms at $x = 0$ and show that they combine into $-\kappa(m_1 - m_2)(w_1 - w_2)$, where 1 and 2 label the two sides.
 
     **(d)** *Unequal densities.* Redo (c) with the general condition $D\,\partial_{n}m_n = \kappa(c_{nm}m_m - c_{mn}m_n)$, compartment $n$ on the left and $m$ on the right. Show that, moved to the left-hand side, the membrane term is $(w_n, w_m)\,\mathbf Q\,(m_n, m_m)^{\mathsf T}$ with $\mathbf Q = \kappa\begin{pmatrix}c_{mn}&-c_{nm}\\-c_{mn}&c_{nm}\end{pmatrix}$. Check that the columns of $\mathbf Q$ sum to zero and that $(\rho_n, \rho_m)$ is in its null space. What does each property guarantee?
-    """, "11 · The weak form")
+    """, "12 · The weak form")
     return
 
 
@@ -1730,7 +1827,7 @@ def _(exercise):
     **(b)** Write $w(x,t+\delta t)$ in terms of $w(\cdot,t)$ for one short step $\delta t$. In that step a walker moves from $y$ to $x$ with the Gaussian step density $p(x-y)$ of variance $2D\,\delta t$, and gains the phase $\gamma g(t)\,y\,\delta t$.
     **(c)** Expand for small $\delta t$ and show that $w$ obeys the Bloch–Torrey equation.
     **(d)** What are the initial and interface conditions for $w$? Conclude that $\int m\,dx = \langle e^{-i\varphi}\rangle$.
-    """, "12 · Derive the Feynman–Kac relation")
+    """, "13 · Derive the Feynman–Kac relation")
     return
 
 
@@ -1916,7 +2013,7 @@ def _(exercise):
         **(b)** Take $D = 2$ µm²/ms and $T = 60$ ms. Compute $\ell_D$, and $\ell_g$ for $g = 80$ mT/m (clinical) and $g = 300$ mT/m (a strong research scanner). Which regime applies to a 10 µm cell, and to a 1 µm axon?
         **(c)** For the 1 µm case, estimate the attenuation from the motional-narrowing formula for a slab at 300 mT/m. What does it tell you about measuring axon diameters?
         **(d)** With an illustrative relaxivity $\varrho = 10^{-3}$ µm/ms, are 10 µm cells in the fast-diffusion regime?
-        """, "13 · Length scales on real scanners")
+        """, "14 · Length scales on real scanners")
     return
 
 
@@ -1990,7 +2087,7 @@ def _(mo):
 
     **Chapter 5 · Monte Carlo: simulating the random walk**
 
-    - The algorithm from Exercise 12: Gaussian steps, reflection at walls, phase accumulation, and the average $\langle e^{-i\varphi}\rangle$.
+    - The algorithm from Exercise 13: Gaussian steps, reflection at walls, phase accumulation, and the average $\langle e^{-i\varphi}\rangle$.
     - Permeable membranes as a crossing probability; choosing the time step; the $1/\sqrt N$ noise floor, compared with an exact eigenmode solution.
     - Walker histories as reusable data: replay packs that answer any later sequence as an inner product ([Fick 2026](https://arxiv.org/abs/2611.01758)).
     - *Implementations:* Camino, MC-DC Simulator, Disimpy, RMS.

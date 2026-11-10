@@ -1033,7 +1033,7 @@ def _(mo):
     | $\mathbf S$, stiffness | $\int D_n\nabla\varphi_k\cdot\nabla\varphi_l$ | diffusion |
     | $\mathbf R$, relaxation | $\frac1{T_{2,n}}\int_{\Omega_n}\varphi_k\varphi_l$: each compartment's mass matrix divided by its $T_2$ | relaxation |
     | $\mathbf J(\mathbf g)$, gradient | $\int\varphi_k\,(\mathbf g\cdot\mathbf r)\,\varphi_l$ | the gradient |
-    | $\mathbf Q$, interface | $\kappa_{nm}\int_{\Gamma_{nm}}\varphi_k\varphi_l$, weighted by $c_{mn}$ or $-c_{nm}$ (Chapter 1, Exercise 11) | the membrane term of the weak form |
+    | $\mathbf Q$, interface | $\kappa_{nm}\int_{\Gamma_{nm}}\varphi_k\varphi_l$, weighted by $c_{mn}$ or $-c_{nm}$ (Chapter 1, Exercise 12) | the membrane term of the weak form |
 
     → In the 1D notation of ③, $\mathbf K = \mathbf S + \mathbf Q$, $f(t)\,\mathbf J(\mathbf g)$ is $g(t)\,\mathbf J$, and $\mathbf R = 0$.
 
@@ -1122,7 +1122,7 @@ def _(mo):
     mo.md(r"""
     ## ⑥ Membranes, and the check against Chapter 1
 
-    Chapter 1 (Exercise 9) found the exchange mode of a slab $[-a, a]$ with a membrane in the middle: its rate $Dk^2$ follows from $k\tan(ka) = 2\kappa/D$. Both discrete operators of this chapter should reproduce it: the finite-difference one through the membrane conductance of 4a ②, the finite-element one through the double node.
+    Chapter 1 (Exercise 10) found the exchange mode of a slab $[-a, a]$ with a membrane in the middle: its rate $Dk^2$ follows from $k\tan(ka) = 2\kappa/D$. Both discrete operators of this chapter should reproduce it: the finite-difference one through the membrane conductance of 4a ②, the finite-element one through the double node.
 
     ## ⑦ Modes on the mesh: the matrix method for any shape
 

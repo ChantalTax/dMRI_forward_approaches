@@ -261,7 +261,7 @@ def _(mo):
     - Fourier transform of a box of width $L$: $\int_0^L e^{iqx}dx\,/L = e^{iqL/2}\,\operatorname{sinc}(qL/2)$, with $\operatorname{sinc}z = \sin z/z$. Its zeros are at $qL = 2\pi, 4\pi, \dots$
     - $\ln(1+\epsilon) = \epsilon - \epsilon^2/2 + \dots$, so a 5% error in $E$ is an error of 0.05 in $\ln E$.
     - The Airy function $\mathrm{Ai}(\xi)$ solves $y'' = \xi y$ and decays for $\xi\to+\infty$. The first zero of $\mathrm{Ai}'$ is at $a_1' = -1.0188$.
-    - *Your notes:* 03-PDE, the fundamental solution and the method of images (short times); heat conduction through layers in series (tortuosity).
+    - From Chapter 1: the fundamental solution, the method of images and the surface-to-volume law at short times (Exercise 7).
     """)
     return
 
@@ -640,15 +640,15 @@ def _(mo):
 
     $$E = e^{-\mathbf b:\mathbf D} = \exp\Big(-\sum_{ij}b_{ij}D_{ij}\Big),\qquad b_{ij} = q_iq_j\,t ,$$
 
-    the **$b$-matrix** of DTI ([Basser, Mattiello & LeBihan 1994](https://doi.org/10.1006/jmrb.1994.1037)). *Your notes:* the anisotropic membrane diffusion $D_{11}\ll D_{22}$ of the physiology course is this tensor.
+    the **$b$-matrix** of DTI ([Basser, Mattiello & LeBihan 1994](https://doi.org/10.1006/jmrb.1994.1037)).
 
     **Walls, to first order.** At short times only spins within about $\ell_D$ of a wall notice it, and they move less. Their fraction is proportional to the surface-to-volume ratio $S/V$, which gives the result of [Mitra, Sen, Schwartz & Le Doussal (1992)](https://doi.org/10.1103/PhysRevLett.68.3555) and [Mitra, Sen & Schwartz (1993)](https://doi.org/10.1103/PhysRevB.47.8565):
 
     $$\frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t),$$
 
-    in $d$ dimensions, for any pore shape. Slab: $S/V = 2/L$, $d = 1$. Cylinder (in the cross-section): $S/V = 2/R$, $d = 2$. Sphere: $S/V = 3/R$, $d = 3$. The first measurements of $S/V$ this way were in porous media ([Latour et al. 1993](https://doi.org/10.1006/jmra.1993.1056)).
+    in $d$ dimensions, for any pore shape (derived in Chapter 1, Exercise 7). Slab: $S/V = 2/L$, $d = 1$. Cylinder (in the cross-section): $S/V = 2/R$, $d = 2$. Sphere: $S/V = 3/R$, $d = 3$. The first measurements of $S/V$ this way were in porous media ([Latour et al. 1993](https://doi.org/10.1006/jmra.1993.1056)).
 
-    **The kurtosis appears at the same order.** A slab at short times is a mixture: a bulk that diffuses freely, and a thin layer at each wall whose displacements are narrower. A mixture of Gaussian-like distributions of different widths has **positive** excess kurtosis. Exercise 2 derives, for a slab,
+    **The kurtosis appears at the same order.** A slab at short times is a mixture: a bulk that diffuses freely, and a thin layer at each wall whose displacements are narrower. A mixture of Gaussian-like distributions of different widths has **positive** excess kurtosis. Chapter 1 (Exercise 7) derives, for a slab,
 
     $$K(t) \approx \frac{16}{5\sqrt\pi}\,\frac{\sqrt{Dt}}{L} = 1.805\,\frac{\sqrt{Dt}}{L}.$$
 
@@ -708,26 +708,17 @@ def _(C_ALT, C_FREE, C_GREEN, C_MAIN, mo, np, plt, slab_cumulants, st_E, st_logt
 @app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
-    Take one wall at $x = 0$, a spin starting at height $x_0$, and free Brownian increments $W\sim\mathcal N(0, 2Dt)$. By the method of images (your 03-PDE notes) the reflected walker ends at $\lvert x_0 + W\rvert$, so its displacement is $X = \lvert x_0 + W\rvert - x_0$.
+    Chapter 1 (Exercise 7) derived the two short-time laws in the left panel, and how far they reach. Here is the same physics seen locally.
 
-    **(a)** Show that $X^2 - W^2 = 4x_0^2 + 4x_0W$ when $x_0 + W < 0$, and $0$ otherwise. Average over $W$ and over $x_0$ (uniform, per unit wall area) to find the excess $\int_0^\infty\langle X^2 - W^2\rangle dx_0$. Then put two such walls on a slab of width $L$ and recover Mitra's $D(t)/D = 1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
-
-    **(b)** Do the same for $X^4 - W^4$ and show that $K(t) \approx \frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
-
-    **(c)** In the left panel, up to which $Dt/L^2$ is each short-time line within 5% of the exact curve? Why does the kurtosis line fail first?
-
-    **(d)** Move the profile sliders. How thick is the bright layer? Show that for a spin starting exactly at the wall the real part of its signal equals the bulk value $e^{-q^2Dt}$. Where does the extra echo come from, then?
-    """, "2 · Short times from the method of images")
+    Move the profile sliders. How thick is the bright layer? Show that for a spin starting exactly at the wall the real part of its signal equals the bulk value $e^{-q^2Dt}$. Where does the extra echo come from, then?
+    """, "2 · Edge enhancement")
     return
 
 
 @app.cell(hide_code=True)
 def _(hint):
     hint(r"""
-    - Scale lengths by $\sigma = \sqrt{2Dt}$: $x_0 = \sigma u$, $W = \sigma w$. The excesses become $\sigma^3 I_2$ and $\sigma^5 I_4$ with pure numbers $I_2$, $I_4$.
-    - Swap the order of integration: integrate over $u$ from 0 to $-w$ first, for each $w < 0$. You need $\int_{-\infty}^0 \lvert w\rvert^k\,\phi(w)\,dw$ with $\phi$ the standard normal density: $\frac12, \frac1{\sqrt{2\pi}}, \frac12, \frac{2}{\sqrt{2\pi}}, \frac32, \frac{8}{\sqrt{2\pi}}$ for $k = 0..5$.
-    - For $K$, expand $\langle X^4\rangle/\langle X^2\rangle^2 - 3$ to first order in the small excesses.
-    - (d) At $x_0 = 0$, $X = \lvert W\rvert$. Compare $\langle\cos(q\lvert W\rvert)\rangle$ with $\langle\cos(qW)\rangle$.
+    - At $x_0 = 0$, $X = \lvert W\rvert$. Compare $\langle\cos(q\lvert W\rvert)\rangle$ with $\langle\cos(qW)\rangle$.
     """)
     return
 
@@ -735,29 +726,7 @@ def _(hint):
 @app.cell(hide_code=True)
 def _(answer):
     answer(r"""
-    **(a)** ⇒ If $x_0 + W\ge0$ nothing is reflected and $X = W$. If $x_0 + W < 0$, $X = -2x_0 - W$, so $X^2 - W^2 = 4x_0^2 + 4x_0W$.
-
-    ⇒ Scale with $\sigma$: excess $= \sigma^3 I_2$, $\ I_2 = \int_{-\infty}^0\phi(w)\int_0^{-w}(4u^2 + 4uw)\,du\,dw$. The inner integral is $\frac43\lvert w\rvert^3 - 2\lvert w\rvert^3 = -\frac23\lvert w\rvert^3$, so $I_2 = -\frac23\cdot\frac{2}{\sqrt{2\pi}} = -\frac{4}{3\sqrt{2\pi}}$.
-
-    ⇒ Two walls, spins spread over $L$: $\langle X^2\rangle = \sigma^2 + 2\sigma^3I_2/L$, so
-
-    $$\frac{D(t)}{D} = \frac{\langle X^2\rangle}{\sigma^2} = 1 + \frac{2\sigma I_2}{L} = 1 - \frac{8}{3\sqrt{2\pi}}\frac{\sqrt{2Dt}}{L} = 1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}{L}. \checkmark$$
-
-    → In Mitra's form: $\frac{4}{3\sqrt\pi\,d}\frac SV = \frac{4}{3\sqrt\pi}\cdot\frac2L$. ✓
-
-    **(b)** ⇒ For $x_0 + W < 0$: $X^4 - W^4 = (2x_0 + W)^4 - W^4$. The inner integral over $u\in[0,\lvert w\rvert]$ of $(2u + w)^4 - w^4$ is $\frac{(2u+w)^5}{10}\Big|_0^{\lvert w\rvert} - \lvert w\rvert^5 = \frac{\lvert w\rvert^5}{10} + \frac{\lvert w\rvert^5}{10} - \lvert w\rvert^5 = -\frac45\lvert w\rvert^5$, so $I_4 = -\frac45\cdot\frac{8}{\sqrt{2\pi}} = -\frac{32}{5\sqrt{2\pi}}$.
-
-    ⇒ $\langle X^4\rangle = 3\sigma^4 + 2\sigma^5I_4/L$ and $\langle X^2\rangle^2 = \sigma^4(1 + 4\sigma I_2/L + \dots)$, so
-
-    $$K = \frac{3 + 2\sigma I_4/L}{1 + 4\sigma I_2/L} - 3 \approx \frac{2\sigma}{L}\big(I_4 - 6I_2\big) = \frac{2\sigma}{L}\cdot\frac{8/5}{\sqrt{2\pi}} = \frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}{L} = 1.805\,\frac{\sqrt{Dt}}{L}.$$
-
-    The modes of Chapter 1 give 1.79 at $Dt = 10^{-4}L^2$ and 1.75 at $10^{-3}L^2$, approaching 1.805.
-
-    **(c)** ⇒ $D(t)$: the line is exact (to $10^{-6}$) up to $Dt\approx0.03\,L^2$ and still within 0.2% at $0.08\,L^2$. The two walls are independent until the spins from one wall reach the other. $K(t)$: within 5% only up to $Dt\approx 2\times10^{-3}L^2$; it peaks at $+0.20$ near $0.03\,L^2$ and changes sign near $0.08\,L^2$, on its way to $-3/5$.
-
-    → The kurtosis is a ratio of a small excess to $\langle X^2\rangle^2$. Its leading correction is of relative order $\sqrt{Dt}/L$ already, while for $D(t)$ the $O(t)$ term vanishes for a flat wall (it involves the curvature and the surface relaxivity, [Mitra et al. 1993](https://doi.org/10.1103/PhysRevB.47.8565)).
-
-    **(d)** ⇒ The bright layer is about $\ell_D$ thick (the shaded bands); the real part peaks at roughly $x_0\approx\ell_D/2$ to $\ell_D$.
+    ⇒ The bright layer is about $\ell_D$ thick (the shaded bands); the real part peaks at roughly $x_0\approx\ell_D/2$ to $\ell_D$.
 
     ⇒ At $x_0 = 0$ the displacement is $X = \lvert W\rvert$. The cosine is even, so $\langle\cos(q\lvert W\rvert)\rangle = \langle\cos qW\rangle = e^{-q^2Dt}$: the real part is exactly the bulk value. The magnitude is larger only because $\langle\sin(q\lvert W\rvert)\rangle\ne0$. The displacement is one-sided, which gives a phase, and the phases from the two walls cancel in the echo.
 
@@ -779,7 +748,7 @@ def _(mo):
 
     → **Motional narrowing is not on this face.** "Motional narrowing" means the phase is averaged *while the gradient is on*. With $\delta\to0$ nothing is averaged during a pulse. The long-time narrow-pulse limit is the form factor; motional narrowing belongs to the long-pulse face (Section 3b).
 
-    **A connected medium.** If spins can leave the pore, through permeable membranes or through gaps between obstacles, $D(t)$ does not go to zero but to a finite $D_\infty < D$. The ratio $D/D_\infty$ is the **tortuosity**. For a stack of membranes with spacing $L$ and permeability $\kappa$ (the interface condition of Chapter 1), the resistances to flux add in series (*your notes:* heat conduction through layers in series):
+    **A connected medium.** If spins can leave the pore, through permeable membranes or through gaps between obstacles, $D(t)$ does not go to zero but to a finite $D_\infty < D$. The ratio $D/D_\infty$ is the **tortuosity**. For a stack of membranes with spacing $L$ and permeability $\kappa$ (the interface condition of Chapter 1), the resistances to flux add in series, as for heat conduction through layers:
 
     $$\frac1{D_\infty} = \frac1D + \frac1{\kappa L} .$$
 
@@ -812,7 +781,7 @@ def _(exercise):
 @app.cell(hide_code=True)
 def _(hint):
     hint(r"""
-    - (a) The density of a sum (or difference) of independent variables is the convolution of their densities. The Fourier transform of a convolution is the product of the transforms (*your notes:* physiology, convolution theorem).
+    - (a) The density of a sum (or difference) of independent variables is the convolution of their densities. The Fourier transform of a convolution is the product of the transforms.
     - (b) In one cell of width $L$: $\Delta C_{\text{water}} = JL/D$ and $\Delta C_{\text{membrane}} = J/\kappa$. Define $D_\infty$ by $J = D_\infty\,\Delta C_{\text{cell}}/L$.
     - (c) From Chapter 1, $\langle X^2\rangle/L^2 = \frac16 - \frac{16}{\pi^4}e^{-\pi^2Dt/L^2} - \dots$, and $D(t)/D = \langle X^2\rangle/(2Dt)$.
     """)
@@ -1214,7 +1183,7 @@ def _(answer):
 
     ⇒ The rate is $0.509\,D/\ell_g^2 = 0.509\,D\,(\gamma g/D)^{2/3} = 0.509\,D^{1/3}(\gamma g)^{2/3}$: it scales as $g^{2/3}$, against $g^2$ in every other regime. Doubling the gradient raises the decay rate by only $2^{2/3} = 1.59$.
 
-    → *Your notes* (QM, the triangular well; 03-PDE, similarity variables): the operator $-\partial_\xi^2 + i\xi$ is the Schrödinger operator of a particle in a linear potential, with an imaginary slope. Its eigenvalues are the Airy zeros rotated by $e^{\pm i\pi/3}$ in the complex plane. The real part, $\lvert a_1'\rvert\cos(\pi/3) = \lvert a_1'\rvert/2$, is the decay rate. The operator is not self-adjoint, which is why the modes are complex ([Stoller et al. 1991](https://doi.org/10.1103/PhysRevA.44.7459)).
+    → The operator $-\partial_\xi^2 + i\xi$ is the Schrödinger operator of a particle in a linear potential (the triangular well of quantum mechanics), with an imaginary slope. Its eigenvalues are the Airy zeros rotated by $e^{\pm i\pi/3}$ in the complex plane. The real part, $\lvert a_1'\rvert\cos(\pi/3) = \lvert a_1'\rvert/2$, is the decay rate. The operator is not self-adjoint, which is why the modes are complex ([Stoller et al. 1991](https://doi.org/10.1103/PhysRevA.44.7459)).
 
     **(b)** ⇒ The surviving magnetization lives in a layer of thickness $\sim\ell_g$ at each wall. Its share of the total is $\sim2\ell_g/L$. The bulk, further than a few $\ell_g$ from a wall, has dephased completely. $C = 5.89$ collects the factor 2 and the shape of the Airy layer.
 
@@ -1470,7 +1439,7 @@ def _(answer):
 
     ⇒ $\rho L/D\gg1$: $y\tan y$ is large only near the pole, $y\to\pi/2$, so $Dk^2\to D\pi^2/L^2$. The wall acts as a perfect sink (a Dirichlet condition).
 
-    **(b)** ⇒ $\frac{d}{dt}\int_Vm = D\oint_S\partial_nm\,dS = -\rho\oint_Sm\,dS$, by the divergence theorem (*your notes:* it is pinned on several of your sheets) and the Robin condition. With $m\approx\bar m$ uniform: $V\dot{\bar m} = -\rho S\bar m$, so $\bar m\propto e^{-\rho(S/V)t}$. ✓
+    **(b)** ⇒ $\frac{d}{dt}\int_Vm = D\oint_S\partial_nm\,dS = -\rho\oint_Sm\,dS$, by the divergence theorem and the Robin condition. With $m\approx\bar m$ uniform: $V\dot{\bar m} = -\rho S\bar m$, so $\bar m\propto e^{-\rho(S/V)t}$. ✓
 
     **(c)** ⇒ When diffusion is fast compared with the wall, $m$ stays uniform, and a uniform $m$ is almost exactly the slowest mode. The weight is 0.99999 at $\rho L/D = 0.04$ and 0.83 at 100, approaching $8/\pi^2 = 0.81$ for a perfect sink. The rest is spread over faster modes: the decay becomes multi-exponential.
     """)
@@ -1486,11 +1455,11 @@ def _(mo):
 
     $$\frac{d\mathbf m}{dt} = -\big(q^2\mathbf D + \mathbf K\big)\,\mathbf m,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},$$
 
-    with $\mathbf m(0) = (p_1, p_2)$ and detailed balance $k_1p_1 = k_2p_2$. The signal is $E = (1,1)\,e^{-(b\mathbf D + \mathbf K\Delta)}\,\mathbf p$, with $b = q^2\Delta$. *Your notes:* a linear system $\dot{\mathbf x} = A\mathbf x$, solved by $e^{tA}$ and its eigenvalues, as on your ODE sheets.
+    with $\mathbf m(0) = (p_1, p_2)$ and detailed balance $k_1p_1 = k_2p_2$. The signal is $E = (1,1)\,e^{-(b\mathbf D + \mathbf K\Delta)}\,\mathbf p$, with $b = q^2\Delta$. It is a linear system $\dot{\mathbf x} = A\mathbf x$, solved by $e^{tA}$ and its eigenvalues.
 
     The new axis is $\Delta/\tau_{\text{ex}}$, with $1/\tau_{\text{ex}} = k_1 + k_2$. From Chapter 1, a barrier-limited membrane with permeability $\kappa$ gives $k_1 = \kappa\,(S/V)_1$.
 
-    → *Chapter 1 already contains this model as a set of slab modes* (the permeable-membrane figure and Exercise 9). With a membrane in the middle of a slab, the uniform mode stays, and the slowest odd mode, one half high and the other low, decays at $D\lambda\approx4\kappa/L$. That is $k_1 + k_2$: each half has $S/V = 2/L$, so $k_1 = k_2 = 2\kappa/L$. Kärger's two magnetizations are the projections on these two modes; the faster modes, which he neglects, are the ones that need $\kappa L/D\ll1$ to die out first. The model needs $\kappa L/D\ll1$ (the same condition as for tortuosity in ②), and each compartment must be inside its own cumulant region (3a ④). Filter-exchange imaging (FEXI) measures $\tau_{\text{ex}}$ this way ([Lasič et al. 2011](https://doi.org/10.1002/mrm.22782)).
+    → *Chapter 1 already contains this model as a set of slab modes* (the permeable-membrane figure and Exercise 10). With a membrane in the middle of a slab, the uniform mode stays, and the slowest odd mode, one half high and the other low, decays at $D\lambda\approx4\kappa/L$. That is $k_1 + k_2$: each half has $S/V = 2/L$, so $k_1 = k_2 = 2\kappa/L$. Kärger's two magnetizations are the projections on these two modes; the faster modes, which he neglects, are the ones that need $\kappa L/D\ll1$ to die out first. The model needs $\kappa L/D\ll1$ (the same condition as for tortuosity in ②), and each compartment must be inside its own cumulant region (3a ④). Filter-exchange imaging (FEXI) measures $\tau_{\text{ex}}$ this way ([Lasič et al. 2011](https://doi.org/10.1002/mrm.22782)).
     """)
     return
 
@@ -1591,7 +1560,7 @@ def _(mo):
 
     → **Mnemonics.** The cylinder's 1.22 is the Airy disk of optics. The three long-pulse exponents are $6, 4{+}2, 2$ powers of $1/\ell_g$: free $(\ell_D/\ell_g)^6$, narrowing $(L/\ell_g)^4(\ell_D/\ell_g)^2$, localisation $(\ell_D/\ell_g)^2$.
 
-    **Open questions (BEWIJS).** The kurtosis coefficient $16/(5\sqrt\pi)$ is derived here for a slab only; the general-$d$ version with $S/V$ is not. The refined rule $H_2$ is tested for the slab only, not yet for cylinders and spheres.
+    **Open questions.** The kurtosis coefficient $16/(5\sqrt\pi)$ is derived (Chapter 1, Exercise 7) for a slab only; the general-$d$ version with $S/V$ is not. The refined rule $H_2$ is tested for the slab only, not yet for cylinders and spheres.
     """)
     return
 
