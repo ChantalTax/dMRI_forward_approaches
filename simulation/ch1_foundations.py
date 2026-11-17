@@ -206,6 +206,7 @@ def _(mo):
     | $\mathbf q(t) = \gamma\int_0^t\mathbf g\,dt'$, $b = \int_0^T q^2dt$ | phase-winding wave vector; $b$-value | rad/µm; ms/µm² |
     | $\delta$, $\Delta$ | gradient pulse duration and separation (PGSE) | ms |
     | $\varphi$ | phase gathered by one spin | rad |
+    | $\xi$ | Fourier variable of a characteristic function $\langle e^{i\xi X}\rangle$ (1a); in 1b it becomes $q$ | 1/µm |
     | $S$, $S_0$, $E = S/S_0$ | signal with and without diffusion weighting; normalised signal | |
     | $\lambda_n$, $u_n(\mathbf r)$, $\tau_n$ | eigenvalue, eigenmode, decay time $1/(D\lambda_n)$ | 1/µm², –, ms |
     | $P(\mathbf r\mid\mathbf r_0,t)$ | propagator: probability density to be at $\mathbf r$ at $t$ after starting at $\mathbf r_0$ | 1/µm³ |
@@ -334,7 +335,7 @@ def _(exercise):
 
     **(b)** Show that its variance is $\langle x^2\rangle_{x\mid 0} = 2Dt$.
 
-    **(c)** The **characteristic function** of a distribution is its Fourier transform, $\langle e^{iqx}\rangle_{x\mid 0} = \int e^{iqx}\,G(x,t)\,dx$, with $q$ the Fourier variable. Show that for $G$ it equals $e^{-q^2Dt}$. Its logarithm generates the cumulants (see "Beyond the mean-squared displacement" below): what does the result tell you about all cumulants beyond the variance?
+    **(c)** The **characteristic function** of a distribution is its Fourier transform, $\langle e^{i\xi x}\rangle_{x\mid 0} = \int e^{i\xi x}\,G(x,t)\,dx$, with $\xi$ the Fourier variable (a wavenumber, in 1/µm). Show that for $G$ it equals $e^{-\xi^2Dt}$. Its logarithm generates the cumulants (see "Beyond the mean-squared displacement" below): what does the result tell you about all cumulants beyond the variance?
     """, "1 · The free Gaussian")
     return
 
@@ -346,7 +347,7 @@ def _(hint):
 
     (b) Compare $G$ with a normal distribution $\frac{1}{\sqrt{2\pi\sigma^2}}e^{-x^2/2\sigma^2}$ and read off $\sigma^2$.
 
-    (c) Complete the square in the exponent: $iqx - \frac{x^2}{4Dt} = -\frac{(x - 2iqDt)^2}{4Dt} - q^2Dt$. The remaining Gaussian integrates to 1.
+    (c) Complete the square in the exponent: $i\xi x - \frac{x^2}{4Dt} = -\frac{(x - 2i\xi Dt)^2}{4Dt} - \xi^2Dt$. The remaining Gaussian integrates to 1.
     """)
     return
 
@@ -362,9 +363,9 @@ def _(answer):
 
     **(b)** $G$ is a normal distribution with $2\sigma^2 = 4Dt$, so $\langle x^2\rangle_{x\mid 0} = \sigma^2 = 2Dt$ (per axis; $6Dt$ in 3D).
 
-    **(c)** ⇒ Complete the square: $\langle e^{iqx}\rangle_{x\mid 0} = e^{-q^2Dt}\int\frac{1}{\sqrt{4\pi Dt}}e^{-(x - 2iqDt)^2/4Dt}\,dx = e^{-q^2Dt}$.
+    **(c)** ⇒ Complete the square: $\langle e^{i\xi x}\rangle_{x\mid 0} = e^{-\xi^2Dt}\int\frac{1}{\sqrt{4\pi Dt}}e^{-(x - 2i\xi Dt)^2/4Dt}\,dx = e^{-\xi^2Dt}$.
 
-    ⇒ Its logarithm, $-q^2Dt = -\frac{q^2}{2}\,(2Dt)$, stops at $q^2$. Only the second cumulant, the variance $2Dt$, is nonzero; every higher cumulant is zero.
+    ⇒ Its logarithm, $-\xi^2Dt = -\frac{\xi^2}{2}\,(2Dt)$, stops at $\xi^2$. Only the second cumulant, the variance $2Dt$, is nonzero; every higher cumulant is zero.
 
     → Free diffusion has zero kurtosis at all times. Any nonzero kurtosis must come from the walls and the structure around the molecules.
 
@@ -1248,7 +1249,7 @@ def _(mo):
 
     The cumulants are the Taylor coefficients of the logarithm of the **characteristic function**:
 
-    $$\ln\big\langle e^{iqX}\big\rangle_{x,x_0} = \sum_{n\ge1}\frac{(iq)^n}{n!}\,\kappa_n = -\frac{q^2}{2}\langle X^2\rangle_{x,x_0} + \frac{q^4}{24}\,\kappa_4 - \dots$$
+    $$\ln\big\langle e^{i\xi X}\big\rangle_{x,x_0} = \sum_{n\ge1}\frac{(i\xi)^n}{n!}\,\kappa_n = -\frac{\xi^2}{2}\langle X^2\rangle_{x,x_0} + \frac{\xi^4}{24}\,\kappa_4 - \dots$$
 
     Keep this line in mind: 1b shows that a measurement can give you exactly this characteristic function.
     """)
@@ -1328,7 +1329,7 @@ def _(exercise):
     exercise(r"""
     **(a)** At long times the start and end positions are independent, and each is uniform in the slab. Show that $X = x - x_0$ then has a **triangular** distribution on $[-L, L]$, and that its excess kurtosis is $K_\infty = -3/5$.
 
-    **(b)** Show that its characteristic function is $\langle e^{iqX}\rangle_{x,x_0} = \operatorname{sinc}^2(qL/2)$, with $\operatorname{sinc}z = \sin z/z$. Expand $\ln\operatorname{sinc}^2(qL/2)$ to order $q^4$ and read off $\kappa_2$ and $\kappa_4$. Do they agree with (a)?
+    **(b)** Show that its characteristic function is $\langle e^{i\xi X}\rangle_{x,x_0} = \operatorname{sinc}^2(\xi L/2)$, with $\operatorname{sinc}z = \sin z/z$. Expand $\ln\operatorname{sinc}^2(\xi L/2)$ to order $\xi^4$ and read off $\kappa_2$ and $\kappa_4$. Do they agree with (a)?
 
     **(c)** In the figure $K(t)$ is **positive** at short times before it turns negative. Explain both signs.
     """, "8 · The kurtosis of a slab")
@@ -1360,11 +1361,11 @@ def _(answer):
 
     → Negative: compared with a Gaussian of the same variance, the triangle has a broad shoulder and no tails at all. Every bounded distribution leans this way.
 
-    **(b)** ⇒ $\langle e^{iqX}\rangle_{x,x_0} = \langle e^{iqx}\rangle_x\,\langle e^{-iqx_0}\rangle_{x_0} = \big|\langle e^{iqx}\rangle_x\big|^2$, and $\langle e^{iqx}\rangle_x = \frac1L\int_0^L e^{iqx}dx = e^{iqL/2}\operatorname{sinc}(qL/2)$. So $\langle e^{iqX}\rangle_{x,x_0} = \operatorname{sinc}^2(qL/2)$.
+    **(b)** ⇒ $\langle e^{i\xi X}\rangle_{x,x_0} = \langle e^{i\xi x}\rangle_x\,\langle e^{-i\xi x_0}\rangle_{x_0} = \big|\langle e^{i\xi x}\rangle_x\big|^2$, and $\langle e^{i\xi x}\rangle_x = \frac1L\int_0^L e^{i\xi x}dx = e^{i\xi L/2}\operatorname{sinc}(\xi L/2)$. So $\langle e^{i\xi X}\rangle_{x,x_0} = \operatorname{sinc}^2(\xi L/2)$.
 
-    ⇒ With $z = qL/2$: $\ln\operatorname{sinc}^2z = -\frac{z^2}{3} - \frac{z^4}{90} - \dots = -\frac{q^2L^2}{12} - \frac{q^4L^4}{1440} - \dots$
+    ⇒ With $z = \xi L/2$: $\ln\operatorname{sinc}^2z = -\frac{z^2}{3} - \frac{z^4}{90} - \dots = -\frac{\xi^2L^2}{12} - \frac{\xi^4L^4}{1440} - \dots$
 
-    ⇒ Compare with $-\frac{q^2}{2}\kappa_2 + \frac{q^4}{24}\kappa_4$: $\kappa_2 = L^2/6$ and $\kappa_4 = -L^4/60$, so $K = \kappa_4/\kappa_2^2 = -36/60 = -3/5$. ✓
+    ⇒ Compare with $-\frac{\xi^2}{2}\kappa_2 + \frac{\xi^4}{24}\kappa_4$: $\kappa_2 = L^2/6$ and $\kappa_4 = -L^4/60$, so $K = \kappa_4/\kappa_2^2 = -36/60 = -3/5$. ✓
 
     **(c)** ⇒ **Short times.** Most molecules are far from the walls and diffuse freely, with variance $2Dt$. Molecules within about $\sqrt{Dt}$ of a wall are held back and spread less. A mixture of zero-mean Gaussians with different variances $\sigma^2$ has $K = 3\,\mathrm{Var}(\sigma^2)/\langle\sigma^2\rangle^2 > 0$: a sharper peak and heavier tails than one Gaussian. The hindered fraction is about $(S/V)\sqrt{Dt}$, so $K$ grows like $\sqrt t$ at first, just as $D(t)$ first drops like $\sqrt t$ ([Mitra et al. 1992](https://doi.org/10.1103/PhysRevLett.68.3555)).
 
@@ -1636,17 +1637,35 @@ def _(mo):
     mo.md(r"""
     ## Two compartments that exchange: the Kärger model
 
-    The exchange mode above has one number that matters at long times: the rate $4\kappa/L$ at which the two halves even out. When the membrane is the bottleneck ($\kappa L/D\ll1$), each compartment is well mixed long before a molecule crosses, and its shape stops mattering. [Kärger (1985)](<https://doi.org/10.1016/0001-8686(85)80018-X>) kept only what is left: two compartments, each with free diffusion at its own $D_i$, and molecules that hop between them at rates $k_1$ (out of 1) and $k_2$ (out of 2).
+    ### From the modes to two numbers
+
+    Go back to the slab with a membrane in the middle (Exercise 10). Its modes are exact, and the figure below shows how fast each of them fades as the membrane becomes more permeable.
+
+    ⇒ **One mode never fades:** the uniform mode, $\lambda = 0$.
+
+    ⇒ **One mode fades slowly:** the exchange mode, one half high and the other low, at the rate $\approx4\kappa/L$. It is the only mode that needs molecules to cross the membrane.
+
+    ⇒ **All other modes fade fast:** they are patterns *inside* a half, and the slowest of them fades at $D(2\pi/L)^2$. When the membrane is the bottleneck, $\kappa L/D\ll1$, there is a wide gap between $4\kappa/L$ and these rates.
+
+    → After a time of order $L^2/(4\pi^2D)$ only the first two modes are left. The concentration is then flat inside each half, and two numbers describe everything: the amounts in the two halves. Their equation is the mode equation cut down to those two modes. **The two slowest modes of the full problem become a 2×2 rate matrix** (Exercise 11a).
+
+    ### From closed halves to Gaussian compartments
+
+    In the slab each half is closed, so a molecule's displacement stays bounded and is not Gaussian. Kärger's model is meant for a medium with many units of each kind, such as a tissue of many cells. Watched over distances much larger than one unit, a molecule that stays within one kind of compartment adds up many independent steps, and its displacement is Gaussian again, with an effective diffusivity $D_i$ (the argument of Exercise 1). Molecules shut inside closed units have an effective $D_i$ near zero on that scale.
+
+    [Kärger (1985)](<https://doi.org/10.1016/0001-8686(85)80018-X>) combines the two limits. *Which* compartment a molecule is in follows the two-mode rate equation, with rates $k_1$ (out of 1) and $k_2$ (out of 2). *How far* it gets while in compartment $i$ is free diffusion with $D_i$.
+
+    ### The model
 
     ⇒ At equilibrium the fractions $p_1$, $p_2$ do not change: as many molecules leave 1 as enter it, $k_1p_1 = k_2p_2$ (**detailed balance**). One time scale is left, the exchange time $\tau_{\text{ex}} = 1/(k_1 + k_2)$.
 
     ⇒ Given the sequence of compartments it visited, a molecule's displacement is Gaussian, with variance $2\int_0^tD(s)\,ds$; $D(s)$ jumps between $D_1$ and $D_2$. The distribution of displacements is a **mixture of Gaussians**, with widths set by how long each molecule spent where.
 
-    ⇒ Keep track of the characteristic function separately for the molecules that are in compartment $i$ at time $t$, $f_i(q,t)$. Diffusion inside and hopping between give a linear system (Exercise 11a):
+    ⇒ Keep track of the characteristic function separately for the molecules that are in compartment $i$ at time $t$, $f_i(\xi,t)$. Diffusion inside and hopping between give a linear system (Exercise 11b):
 
-    $$\frac{d\mathbf f}{dt} = -\big(q^2\mathbf D + \mathbf K\big)\,\mathbf f,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},\quad \mathbf f(0) = \mathbf p,$$
+    $$\frac{d\mathbf f}{dt} = -\big(\xi^2\mathbf D + \mathbf K\big)\,\mathbf f,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},\quad \mathbf f(0) = \mathbf p,$$
 
-    so that $\langle e^{iqX}\rangle_{x,x_0} = (1,1)\,e^{-(q^2\mathbf D + \mathbf K)t}\,\mathbf p$. (Bold $\mathbf K$ is the matrix of rates; italic $K$ stays the kurtosis.)
+    so that $\langle e^{i\xi X}\rangle_{x,x_0} = (1,1)\,e^{-(\xi^2\mathbf D + \mathbf K)t}\,\mathbf p$. (Bold $\mathbf K$ is the matrix of rates; italic $K$ stays the kurtosis.)
 
     → **Short times**, $t\ll\tau_{\text{ex}}$: nobody has switched yet. Two Gaussians side by side, with positive kurtosis $K_0 = 3p_1p_2(D_1 - D_2)^2/\bar D^2$.
 
@@ -1654,6 +1673,38 @@ def _(mo):
 
     → **The mean-squared displacement does not see exchange at all**: $\langle X^2\rangle_{x,x_0} = 2\bar Dt$ at every time. Only the kurtosis does: it falls from $K_0$ to zero, as $1/t$ at long times. Compare the slab of Exercise 8, where $D(t)$ falls and $K$ goes to $-3/5$. Restriction and exchange leave different fingerprints in $D(t)$ and $K(t)$.
     """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_FREE, C_MAIN, brentq, np, plt):
+    _L, _D = 8.0, 2.0
+    _a = _L / 2
+    _kap = np.logspace(-4, 1.5, 120)
+
+    def _odd(kappa, n):
+        """n-th odd mode of the slab [-a, a] with a membrane at 0: k tan(ka) = 2κ/D."""
+        f = lambda z: z * np.tan(z) - 2 * kappa * _a / _D      # z = k a
+        return brentq(f, n * np.pi + 1e-12, n * np.pi + np.pi / 2 - 1e-12) / _a
+
+    _ex = np.array([_D * _odd(k, 0) ** 2 for k in _kap])
+    _odd1 = np.array([_D * _odd(k, 1) ** 2 for k in _kap])
+    _even1 = np.full(_kap.size, _D * (np.pi / _a) ** 2)
+
+    _fig, _ax = plt.subplots(figsize=(6.6, 4.4))
+    _ax.loglog(_kap, _ex, color=C_MAIN, lw=2.4, label="exchange mode (one half high, one low)")
+    _ax.loglog(_kap, _even1, color=C_FREE, lw=1.6, label="first pattern inside a half")
+    _ax.loglog(_kap, _odd1, color=C_FREE, lw=1.6, ls="--", label="second odd mode")
+    _ax.loglog(_kap, 4 * _kap / _L, color=C_ALT, lw=1.1, ls=":", label="4κ/L")
+    _ax.axvline(_D / _L, color="k", lw=0.8, ls=":")
+    _ax.text(_D / _L * 1.15, 6, "κL/D = 1", fontsize=8.5)
+    _ax.fill_between(_kap, _ex, _even1, where=_kap < 0.1 * _D / _L, color=C_MAIN, alpha=0.08, lw=0)
+    _ax.text(3e-4, 0.03, "the gap", fontsize=9, color=C_MAIN)
+    _ax.set(xlabel="membrane permeability κ (µm/ms)", ylabel="decay rate Dλ (1/ms)", ylim=(1e-4, 20),
+            title=f"Mode rates of a slab with a membrane (L = {_L:g} µm, D = {_D:g} µm²/ms)")
+    _ax.legend(frameon=False, fontsize=7.5, loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=2)
+    _fig.tight_layout()
+    _fig
     return
 
 
@@ -1719,15 +1770,17 @@ def _(C_ALT, C_FREE, C_MAIN, kx_p, kx_t, kx_tau, mo, np, plt):
 @app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
-    **(a)** Over a short time $dt$, a molecule in compartment 1 either stays (probability $1 - k_1dt$) and takes a Gaussian step of variance $2D_1dt$, or hops to compartment 2 (probability $k_1dt$). Use this to derive $d\mathbf f/dt = -(q^2\mathbf D + \mathbf K)\mathbf f$ with $\mathbf f(0) = \mathbf p$.
+    **(a)** For the slab with a membrane, the amounts in the two halves obey $d\mathbf n/dt = -\mathbf K\mathbf n$ with $k_1 = k_2 = 2\kappa/L$. Find the eigenvalues and eigenvectors of $\mathbf K$ and match them with the two slowest modes of Exercise 10.
 
-    **(b)** Show that $\langle X^2\rangle_{x,x_0} = 2\bar Dt$ at every time, whatever the exchange rate.
+    **(b)** Over a short time $dt$, a molecule in compartment 1 either stays (probability $1 - k_1dt$) and takes a Gaussian step of variance $2D_1dt$, or hops to compartment 2 (probability $k_1dt$). Use this to derive $d\mathbf f/dt = -(\xi^2\mathbf D + \mathbf K)\mathbf f$ with $\mathbf f(0) = \mathbf p$.
 
-    **(c)** Given its history, a molecule's displacement is Gaussian with variance $2Y$, where $Y = \int_0^tD(s)\,ds$. Show that $K(t) = 3\,\mathrm{Var}(Y)/(\bar Dt)^2$. Then use the correlation of a two-state switch, $\langle(D(s) - \bar D)(D(s') - \bar D)\rangle_{\text{paths}} = p_1p_2(D_1 - D_2)^2e^{-\lvert s - s'\rvert/\tau_{\text{ex}}}$, to derive
+    **(c)** Show that $\langle X^2\rangle_{x,x_0} = 2\bar Dt$ at every time, whatever the exchange rate.
+
+    **(d)** Given its history, a molecule's displacement is Gaussian with variance $2Y$, where $Y = \int_0^tD(s)\,ds$. Show that $K(t) = 3\,\mathrm{Var}(Y)/(\bar Dt)^2$. Then use the correlation of a two-state switch, $\langle(D(s) - \bar D)(D(s') - \bar D)\rangle_{\text{paths}} = p_1p_2(D_1 - D_2)^2e^{-\lvert s - s'\rvert/\tau_{\text{ex}}}$, to derive
 
     $$K(t) = K_0\,\frac{2\big(x - 1 + e^{-x}\big)}{x^2},\qquad x = \frac{t}{\tau_{\text{ex}}},\qquad K_0 = \frac{3p_1p_2(D_1 - D_2)^2}{\bar D^2}.$$
 
-    **(d)** With the sliders: at which $t/\tau_{\text{ex}}$ has $K$ dropped to half of $K_0$? Does it depend on $p_1$? How does $K$ fall at long times, and what would you measure over a range of times to tell exchange from restriction (Exercise 8)?
+    **(e)** With the sliders: at which $t/\tau_{\text{ex}}$ has $K$ dropped to half of $K_0$? Does it depend on $p_1$? How does $K$ fall at long times, and what would you measure over a range of times to tell exchange from restriction (Exercise 8)?
     """, "11 · Two compartments that exchange")
     return
 
@@ -1735,9 +1788,10 @@ def _(exercise):
 @app.cell(hide_code=True)
 def _(hint):
     hint(r"""
-    - (a) $f_1(q, t + dt) = (1 - k_1dt)\,e^{-q^2D_1dt}f_1(q,t) + k_2dt\,f_2(q,t)$. Expand to first order in $dt$.
-    - (b) Two facts: $\mathbf K\mathbf p = 0$ (detailed balance) and $(1,1)\,\mathbf K = 0$ (hops lose no molecules). Expand $(1,1)\,e^{-(q^2\mathbf D + \mathbf K)t}\,\mathbf p$ to first order in $q^2$. Or think: at every moment the population is at equilibrium, so its average diffusivity is $\bar D$.
-    - (c) For a Gaussian of variance $\sigma^2$, $\langle X^4\rangle = 3\sigma^4$. And $\int_0^t\!\int_0^te^{-\lvert s - s'\rvert/\tau}\,ds\,ds' = 2\tau^2\big(x - 1 + e^{-x}\big)$.
+    - (a) $\mathbf K = k\begin{pmatrix}1&-1\\-1&1\end{pmatrix}$: try the vectors $(1,1)$ and $(1,-1)$.
+    - (b) $f_1(\xi, t + dt) = (1 - k_1dt)\,e^{-\xi^2D_1dt}f_1(\xi,t) + k_2dt\,f_2(\xi,t)$. Expand to first order in $dt$.
+    - (c) Two facts: $\mathbf K\mathbf p = 0$ (detailed balance) and $(1,1)\,\mathbf K = 0$ (hops lose no molecules). Expand $(1,1)\,e^{-(\xi^2\mathbf D + \mathbf K)t}\,\mathbf p$ to first order in $\xi^2$. Or think: at every moment the population is at equilibrium, so its average diffusivity is $\bar D$.
+    - (d) For a Gaussian of variance $\sigma^2$, $\langle X^4\rangle = 3\sigma^4$. And $\int_0^t\!\int_0^te^{-\lvert s - s'\rvert/\tau}\,ds\,ds' = 2\tau^2\big(x - 1 + e^{-x}\big)$.
     """)
     return
 
@@ -1745,17 +1799,21 @@ def _(hint):
 @app.cell(hide_code=True)
 def _(answer):
     answer(r"""
-    **(a)** ⇒ To first order in $dt$: $f_1(t + dt) = (1 - k_1dt)(1 - q^2D_1dt)f_1 + k_2dt\,f_2$, so $\dot f_1 = -(q^2D_1 + k_1)f_1 + k_2f_2$. In the same way $\dot f_2 = k_1f_1 - (q^2D_2 + k_2)f_2$. ✓ At $t = 0$ nobody has moved, $X = 0$, so $f_i(q, 0) = p_i$.
+    **(a)** ⇒ $\mathbf K(1,1)^{\mathsf T} = 0$: eigenvalue 0, both halves equal, the **uniform mode**. $\mathbf K(1,-1)^{\mathsf T} = 2k\,(1,-1)^{\mathsf T}$: eigenvalue $2k = 4\kappa/L$, one half high and the other low, the **exchange mode** with the rate of Exercise 10(d). ✓
 
-    → The same structure as the mode equations of the eigenmodes section: something that happens inside each compartment ($q^2\mathbf D$, diagonal) and a coupling between them ($\mathbf K$).
+    → The 2×2 matrix keeps exactly the two slowest modes and drops all patterns inside the halves. With unequal halves the same holds with $k_1p_1 = k_2p_2$, and the eigenvalues are $0$ and $k_1 + k_2$.
 
-    **(b)** ⇒ Derivative with respect to $q^2$ at $q = 0$: $-\int_0^t(1,1)\,e^{-\mathbf K(t - s)}\,\mathbf D\,e^{-\mathbf Ks}\,\mathbf p\,ds$. With $e^{-\mathbf Ks}\mathbf p = \mathbf p$ and $(1,1)e^{-\mathbf K(t-s)} = (1,1)$, this is $-t\,(1,1)\mathbf D\mathbf p = -\bar Dt$.
+    **(b)** ⇒ To first order in $dt$: $f_1(t + dt) = (1 - k_1dt)(1 - \xi^2D_1dt)f_1 + k_2dt\,f_2$, so $\dot f_1 = -(\xi^2D_1 + k_1)f_1 + k_2f_2$. In the same way $\dot f_2 = k_1f_1 - (\xi^2D_2 + k_2)f_2$. ✓ At $t = 0$ nobody has moved, $X = 0$, so $f_i(\xi, 0) = p_i$.
 
-    ⇒ So $\ln\langle e^{iqX}\rangle_{x,x_0} = -q^2\bar Dt + O(q^4)$, and $\langle X^2\rangle_{x,x_0} = 2\bar Dt$. ✓
+    → The same structure as the mode equations of the eigenmodes section: something that happens inside each compartment ($\xi^2\mathbf D$, diagonal) and a coupling between them ($\mathbf K$).
+
+    **(c)** ⇒ Derivative with respect to $\xi^2$ at $\xi = 0$: $-\int_0^t(1,1)\,e^{-\mathbf K(t - s)}\,\mathbf D\,e^{-\mathbf Ks}\,\mathbf p\,ds$. With $e^{-\mathbf Ks}\mathbf p = \mathbf p$ and $(1,1)e^{-\mathbf K(t-s)} = (1,1)$, this is $-t\,(1,1)\mathbf D\mathbf p = -\bar Dt$.
+
+    ⇒ So $\ln\langle e^{i\xi X}\rangle_{x,x_0} = -\xi^2\bar Dt + O(\xi^4)$, and $\langle X^2\rangle_{x,x_0} = 2\bar Dt$. ✓
 
     → Each molecule's diffusivity changes, but the population as a whole stays at equilibrium, so its average diffusivity is $\bar D$ at every moment.
 
-    **(c)** ⇒ $\langle X^2\rangle = 2\langle Y\rangle = 2\bar Dt$ and $\langle X^4\rangle = 3\langle(2Y)^2\rangle = 12\langle Y^2\rangle$, so
+    **(d)** ⇒ $\langle X^2\rangle = 2\langle Y\rangle = 2\bar Dt$ and $\langle X^4\rangle = 3\langle(2Y)^2\rangle = 12\langle Y^2\rangle$, so
 
     $$K = \frac{12\langle Y^2\rangle}{4\bar D^2t^2} - 3 = \frac{3\big(\langle Y^2\rangle - \langle Y\rangle^2\big)}{(\bar Dt)^2} = \frac{3\,\mathrm{Var}(Y)}{(\bar Dt)^2} .$$
 
@@ -1767,7 +1825,7 @@ def _(answer):
 
     → Where the correlation comes from: at equal times $D(s) - \bar D$ has variance $p_1p_2(D_1 - D_2)^2$, and a two-state switch forgets its state at the total rate $k_1 + k_2 = 1/\tau_{\text{ex}}$.
 
-    **(d)** ⇒ $K = K_0/2$ at $x\approx2.6$, for every $p_1$: the shape $2(x - 1 + e^{-x})/x^2$ does not depend on $p_1$, $D_1$ or $D_2$; they only set $K_0$.
+    **(e)** ⇒ $K = K_0/2$ at $x\approx2.6$, for every $p_1$: the shape $2(x - 1 + e^{-x})/x^2$ does not depend on $p_1$, $D_1$ or $D_2$; they only set $K_0$.
 
     ⇒ At long times $K$ falls as $1/t$ towards zero, and $D(t)$ stays at $\bar D$ throughout. In a closed pore $D(t)$ falls and $K$ goes negative. Measure both over a range of times: a constant $D(t)$ with a kurtosis that decays to zero points to exchange; a falling $D(t)$ with a kurtosis that turns negative points to restriction. Chapter 3 shows the same model in the measured signal.
     """)
@@ -2073,7 +2131,7 @@ def _(mo):
 
     $$E = \big\langle e^{i\mathbf q\cdot\mathbf X}\big\rangle_{\mathbf r,\mathbf r_0} ,$$
 
-    the characteristic function of the displacements. Its logarithm has the cumulants of 1a as coefficients, so in this limit $D(t)$ and $K(t)$ are what diffusion and kurtosis imaging estimate. Chapter 3 maps where the limit holds; Chapter 2 shows what changes when the pulses are not short.
+    the characteristic function of the displacements of 1a, with the Fourier variable $\xi$ set by the gradient: $\xi = q$. Its logarithm has the cumulants of 1a as coefficients, so in this limit $D(t)$ and $K(t)$ are what diffusion and kurtosis imaging estimate. Chapter 3 maps where the limit holds; Chapter 2 shows what changes when the pulses are not short.
 
     **The two routes agree.** The field and path pictures give exactly the same $E$. This is an example of the **Feynman–Kac relation** between parabolic PDEs and averages over random paths. [Carr & Purcell (1954)](https://doi.org/10.1103/PhysRev.94.630) already computed echo attenuation this way, as an average phase over random walks; the general relation is due to [Kac (1949)](https://doi.org/10.1090/S0002-9947-1949-0027960-X), inspired by [Feynman's (1948)](https://doi.org/10.1103/RevModPhys.20.367) path integrals. You can derive it yourself in a few lines.
     """)
@@ -2330,7 +2388,7 @@ def _(mo):
     | Bloch–Torrey | $\partial m/\partial t = D\nabla^2 m - i\gamma\,\mathbf g(t)\cdot\mathbf r\,m$, $\ E = \frac{1}{S_0}\int m\,d\mathbf r$ |
     | Full problem | per compartment $\partial_tm_n = \nabla\cdot(D_n\nabla m_n) - m_n/T_{2,n} - i\gamma f(t)(\mathbf g\cdot\mathbf r)m_n$, $\ m_n(0) = \rho_n$; simplified by uniform $T_2$, equal densities, one compartment |
     | Weak form | $\int w\,\partial_tm + \int D\nabla w\cdot\nabla m + i\gamma f\int w(\mathbf g\cdot\mathbf r)m = \oint wD\,\partial m/\partial n$ for all $w$; walls natural; modes as test functions give Chapter 2, hats give finite elements |
-    | Exchange (Kärger) | two Gaussian compartments with hop rates $k_1p_1 = k_2p_2$: $\langle e^{iqX}\rangle_{x,x_0} = (1,1)\,e^{-(q^2\mathbf D + \mathbf K)t}\,\mathbf p$; $\langle X^2\rangle_{x,x_0} = 2\bar Dt$ always; $K(t) = K_0\,2(x - 1 + e^{-x})/x^2$, $x = t/\tau_{\text{ex}}$ |
+    | Exchange (Kärger) | two Gaussian compartments with hop rates $k_1p_1 = k_2p_2$: $\langle e^{i\xi X}\rangle_{x,x_0} = (1,1)\,e^{-(\xi^2\mathbf D + \mathbf K)t}\,\mathbf p$, $\mathbf K$ = the two slowest modes; $\langle X^2\rangle_{x,x_0} = 2\bar Dt$ always; $K(t) = K_0\,2(x - 1 + e^{-x})/x^2$, $x = t/\tau_{\text{ex}}$ |
     | Path picture (Feynman–Kac) | short pulses: $E = \langle e^{i\mathbf q\cdot\mathbf X}\rangle_{\mathbf r,\mathbf r_0}$; in general $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int \mathbf g\cdot\mathbf r_j\,dt$ over the random paths $\mathbf r_j(t)$ of $N$ spins |
 
     ---
