@@ -1487,6 +1487,43 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
+def _(maths):
+    maths(r"""
+    The slab modes of Exercise 2 came from one smooth function on one interval. With a membrane, the domain is cut into pieces, and the recipe gains one step: gluing the pieces together. In 1D, for a slab with a membrane at $x = 0$ between $[-a, 0]$ and $[0, a]$:
+
+    ① **Solve piece by piece.** On each piece $D$ is constant and $-u'' = \lambda u$, so with $k = \sqrt\lambda$
+
+    $$u = A_1\cos kx + B_1\sin kx\ \ (x < 0),\qquad u = A_2\cos kx + B_2\sin kx\ \ (x > 0).$$
+
+    Four unknowns, $A_1, B_1, A_2, B_2$, and one eigenvalue to find.
+
+    ② **Outer walls: one condition each.**
+
+    | Wall | Condition at $x = \pm a$ |
+    | --- | --- |
+    | reflecting | $u' = 0$ |
+    | partially absorbing | $D\,\partial u/\partial n = -\varrho\,u$, i.e. $Du'(a) = -\varrho u(a)$ and $Du'(-a) = +\varrho u(-a)$ |
+    | perfect sink | $u = 0$ |
+    | periodic | $u(-a) = u(a)$ and $u'(-a) = u'(a)$ (two conditions, no membrane needed) |
+
+    ③ **The membrane: two conditions.** The flux is continuous, $Du'(0^-) = Du'(0^+)$, and it is driven by the jump, $-Du'(0) = \kappa\,\big(u(0^-) - u(0^+)\big)$.
+
+    ④ **The eigenvalue condition.** Four conditions on four unknowns, all linear and with no right-hand side: $\mathbf M(k)\,\mathbf c = 0$. A mode exists only if the system has a nonzero solution, $\det\mathbf M(k) = 0$. That is a **transcendental equation** for $k$, with infinitely many roots $k_0 < k_1 < \dots$, and $\lambda_n = k_n^2$. Symmetry halves the work: for a membrane in the middle, the even modes do not see it and the odd ones give $k\tan(ka) = 2\kappa/D$ (Exercise 10). One absorbing wall on each side of a plain slab gives $k\tan(ka) = \varrho/D$ for the even modes.
+
+    ⑤ **Normalise** over all pieces together: $\int_{-a}^0u^2\,dx + \int_0^au^2\,dx = 1$.
+
+    ⑥ **Orthogonality comes for free.** Integrate $u_mu_n'' - u_nu_m''$ over each piece: what is left are boundary terms $[u_mu_n' - u_nu_m']$. At a reflecting, absorbing or periodic wall they cancel, because both modes obey the same condition. At the membrane write $f_n = -Du_n'(0)$ for the flux of mode $n$. The two sides together give $-\frac1D\big[f_n(u_m^- - u_m^+) - f_m(u_n^- - u_n^+)\big] = -\frac1D\big[\frac{f_nf_m}{\kappa} - \frac{f_mf_n}{\kappa}\big] = 0$. So $(\lambda_m - \lambda_n)\int u_mu_n = 0$, and modes with different eigenvalues are orthogonal.
+
+    ⑦ **Propagator, as before:** $P(x\mid x_0,t) = \sum_nu_n(x)\,u_n(x_0)\,e^{-D\lambda_nt}$.
+
+    → With a different $D$ on each side, solve $-(Du')' = \mu u$ instead; $\mu_n$ are then the decay rates themselves, and the same steps go through.
+
+    → **What the figure does instead.** Cut $[0, L]$ into small cells and let each face between two cells carry a conductance: $D/h$ in the bulk, $1/(h/D + 1/\kappa)$ at the membrane (the two half cells and the membrane as resistances in series), $1/(h/2D + 1/\varrho)$ at an absorbing wall. The eigenvectors of the resulting matrix are the modes, without solving any transcendental equation. Chapter 4 explains this method in full.
+    """, title="Recipe: modes with membranes and absorbing walls")
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     outer3 = mo.ui.dropdown(
         options=["reflecting", "partially absorbing (Robin)", "perfect sink (Dirichlet)", "periodic"],
