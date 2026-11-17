@@ -1455,7 +1455,7 @@ def _(mo):
 
     $$\frac{d\mathbf m}{dt} = -\big(q^2\mathbf D + \mathbf K\big)\,\mathbf m,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},$$
 
-    with $\mathbf m(0) = (p_1, p_2)$ and detailed balance $k_1p_1 = k_2p_2$. The signal is $E = (1,1)\,e^{-(b\mathbf D + \mathbf K\Delta)}\,\mathbf p$, with $b = q^2\Delta$. It is a linear system $\dot{\mathbf x} = A\mathbf x$, solved by $e^{tA}$ and its eigenvalues.
+    with $\mathbf m(0) = (p_1, p_2)$ and detailed balance $k_1p_1 = k_2p_2$. The signal is $E = (1,1)\,e^{-(b\mathbf D + \mathbf K\Delta)}\,\mathbf p$, with $b = q^2\Delta$. It is a linear system $\dot{\mathbf x} = A\mathbf x$, solved by $e^{tA}$ and its eigenvalues. Chapter 1 (Exercise 11) derives it as the characteristic function of the displacement, and shows that exchange leaves the mean-squared displacement unchanged and shows up only in the kurtosis.
 
     The new axis is $\Delta/\tau_{\text{ex}}$, with $1/\tau_{\text{ex}} = k_1 + k_2$. From Chapter 1, a barrier-limited membrane with permeability $\kappa$ gives $k_1 = \kappa\,(S/V)_1$.
 

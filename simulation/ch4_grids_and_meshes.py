@@ -1034,7 +1034,7 @@ def _(mo):
     | $\mathbf S$, stiffness | $\int D_n\nabla\varphi_k\cdot\nabla\varphi_l$ | diffusion |
     | $\mathbf R$, relaxation | $\frac1{T_{2,n}}\int_{\Omega_n}\varphi_k\varphi_l$: each compartment's mass matrix divided by its $T_2$ | relaxation |
     | $\mathbf J(\mathbf g)$, gradient | $\int\varphi_k\,(\mathbf g\cdot\mathbf r)\,\varphi_l$ | the gradient |
-    | $\mathbf Q$, interface | $\kappa_{nm}\int_{\Gamma_{nm}}\varphi_k\varphi_l$, weighted by $c_{mn}$ or $-c_{nm}$ (Chapter 1, Exercise 12) | the membrane term of the weak form |
+    | $\mathbf Q$, interface | $\kappa_{nm}\int_{\Gamma_{nm}}\varphi_k\varphi_l$, weighted by $c_{mn}$ or $-c_{nm}$ (Chapter 1, Exercise 13) | the membrane term of the weak form |
 
     → In the 1D notation of ③, $\mathbf K = \mathbf S + \mathbf Q$, $f(t)\,\mathbf J(\mathbf g)$ is $g(t)\,\mathbf J$, and $\mathbf R = 0$.
 

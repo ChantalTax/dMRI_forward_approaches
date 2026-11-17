@@ -528,7 +528,7 @@ def _(mo):
 
     → **Why the factors $c_{nm}$?** Compartments can hold different amounts of water at equilibrium, $\rho_n\ne\rho_m$. The plain condition $\kappa(C_m - C_n)$ would then drive a flux even at equilibrium and slowly even out the two densities, which real tissue does not do. The factors make the equilibrium state, $C_n = \rho_n$ in every compartment, a state without flux: $c_{nm}\rho_m - c_{mn}\rho_n = 0$ (check it). For equal densities $c_{nm} = 1$, and the condition is the one in the table.
 
-    → **The step to one compartment.** Most of this chapter, and Chapters 2 and 3, work with a single pore: uniform $D$, reflecting walls, $\rho = 1$. That is the full problem with every interface made impermeable: each compartment then evolves on its own, and the block is a collection of single pores. Membranes come back where they are the point: the exchange mode below (Exercise 10), exchange in Chapter 3, and the simulators of Chapters 4 and 5, which solve the full problem.
+    → **The step to one compartment.** Most of this chapter, and Chapters 2 and 3, work with a single pore: uniform $D$, reflecting walls, $\rho = 1$. That is the full problem with every interface made impermeable: each compartment then evolves on its own, and the block is a collection of single pores. Membranes come back where they are the point: the exchange mode below (Exercises 10 and 11), exchange in Chapter 3, and the simulators of Chapters 4 and 5, which solve the full problem.
     """)
     return
 
@@ -1634,6 +1634,149 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
+    ## Two compartments that exchange: the Kärger model
+
+    The exchange mode above has one number that matters at long times: the rate $4\kappa/L$ at which the two halves even out. When the membrane is the bottleneck ($\kappa L/D\ll1$), each compartment is well mixed long before a molecule crosses, and its shape stops mattering. [Kärger (1985)](<https://doi.org/10.1016/0001-8686(85)80018-X>) kept only what is left: two compartments, each with free diffusion at its own $D_i$, and molecules that hop between them at rates $k_1$ (out of 1) and $k_2$ (out of 2).
+
+    ⇒ At equilibrium the fractions $p_1$, $p_2$ do not change: as many molecules leave 1 as enter it, $k_1p_1 = k_2p_2$ (**detailed balance**). One time scale is left, the exchange time $\tau_{\text{ex}} = 1/(k_1 + k_2)$.
+
+    ⇒ Given the sequence of compartments it visited, a molecule's displacement is Gaussian, with variance $2\int_0^tD(s)\,ds$; $D(s)$ jumps between $D_1$ and $D_2$. The distribution of displacements is a **mixture of Gaussians**, with widths set by how long each molecule spent where.
+
+    ⇒ Keep track of the characteristic function separately for the molecules that are in compartment $i$ at time $t$, $f_i(q,t)$. Diffusion inside and hopping between give a linear system (Exercise 11a):
+
+    $$\frac{d\mathbf f}{dt} = -\big(q^2\mathbf D + \mathbf K\big)\,\mathbf f,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},\quad \mathbf f(0) = \mathbf p,$$
+
+    so that $\langle e^{iqX}\rangle_{x,x_0} = (1,1)\,e^{-(q^2\mathbf D + \mathbf K)t}\,\mathbf p$. (Bold $\mathbf K$ is the matrix of rates; italic $K$ stays the kurtosis.)
+
+    → **Short times**, $t\ll\tau_{\text{ex}}$: nobody has switched yet. Two Gaussians side by side, with positive kurtosis $K_0 = 3p_1p_2(D_1 - D_2)^2/\bar D^2$.
+
+    → **Long times**, $t\gg\tau_{\text{ex}}$: every molecule has sampled both compartments many times. One Gaussian, with $\bar D = p_1D_1 + p_2D_2$.
+
+    → **The mean-squared displacement does not see exchange at all**: $\langle X^2\rangle_{x,x_0} = 2\bar Dt$ at every time. Only the kurtosis does: it falls from $K_0$ to zero, as $1/t$ at long times. Compare the slab of Exercise 8, where $D(t)$ falls and $K$ goes to $-3/5$. Restriction and exchange leave different fingerprints in $D(t)$ and $K(t)$.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    kx_t = mo.ui.slider(-0.5, 3.0, step=0.05, value=1.0, label="log₁₀ t (ms)", show_value=True)
+    kx_tau = mo.ui.slider(0.0, 2.5, step=0.05, value=1.3, label="log₁₀ τ_ex (ms)", show_value=True)
+    kx_p = mo.ui.slider(0.1, 0.9, step=0.05, value=0.4, label="fraction p₁ in the fast compartment", show_value=True)
+    mo.vstack([kx_t, kx_tau, kx_p])
+    return kx_p, kx_t, kx_tau
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_FREE, C_MAIN, kx_p, kx_t, kx_tau, mo, np, plt):
+    _D1, _D2 = 2.0, 0.5
+    _t, _tau, _p1 = 10**kx_t.value, 10**kx_tau.value, kx_p.value
+    _p = np.array([_p1, 1 - _p1])
+    _k1, _k2 = _p[1] / _tau, _p[0] / _tau            # k1 + k2 = 1/τ_ex and k1 p1 = k2 p2
+    _Db = _p1 * _D1 + (1 - _p1) * _D2
+    _K0 = 3 * _p1 * (1 - _p1) * (_D1 - _D2) ** 2 / _Db**2
+
+    # characteristic function on a q grid, then back to the distribution of displacements
+    _q = np.linspace(0, np.sqrt(40 / (_D2 * _t)), 1500)
+    _A = np.zeros((_q.size, 2, 2))
+    _A[:, 0, 0] = _q**2 * _D1 + _k1
+    _A[:, 0, 1] = -_k2
+    _A[:, 1, 0] = -_k1
+    _A[:, 1, 1] = _q**2 * _D2 + _k2
+    _w, _V = np.linalg.eig(-_A * _t)
+    _M = np.einsum("qij,qj,qjk->qik", _V, np.exp(_w), np.linalg.inv(_V)).real
+    _f = _M.sum(1) @ _p
+    _X = np.linspace(-4 * np.sqrt(2 * _D1 * _t), 4 * np.sqrt(2 * _D1 * _t), 301)
+    _wq = np.full(_q.size, _q[1]); _wq[[0, -1]] /= 2
+    _P = (np.cos(np.outer(_X, _q)) @ (_wq * _f)) / np.pi
+    _gauss = lambda d: np.exp(-_X**2 / (4 * d * _t)) / np.sqrt(4 * np.pi * d * _t)
+
+    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(10.5, 3.9))
+    _a1.semilogy(_X, np.clip(_P, 1e-12, None), color=C_MAIN, lw=2.2, label="with exchange")
+    _a1.semilogy(_X, _p1 * _gauss(_D1) + (1 - _p1) * _gauss(_D2), color=C_ALT, lw=1.2, ls="--", label="no exchange: two Gaussians")
+    _a1.semilogy(_X, _gauss(_Db), color=C_FREE, lw=1.2, ls=":", label="fast exchange: one Gaussian, D̄")
+    _a1.set(xlabel="displacement X (µm)", ylabel="density", ylim=(_P.max() * 1e-4, _P.max() * 2),
+            title=f"Distribution of displacements at t = {_t:.3g} ms")
+    _a1.legend(frameon=False, fontsize=7.5, loc="lower center")
+
+    _xx = np.logspace(-2, 3, 300)
+    _shape = 2 * (_xx - 1 + np.exp(-_xx)) / _xx**2
+    _a2.semilogx(_xx, _K0 * _shape, color=C_MAIN, lw=2.2, label="K(t)")
+    _a2.semilogx(_xx[_xx > 3], 2 * _K0 / _xx[_xx > 3], color=C_ALT, lw=1.1, ls="--", label="long times: 2K₀ τ_ex / t")
+    _a2.axhline(_K0, color=C_FREE, lw=0.8, ls=":")
+    _xt = _t / _tau
+    _Kt = _K0 * 2 * (_xt - 1 + np.exp(-_xt)) / _xt**2
+    _a2.plot(_xt, _Kt, "o", color=C_MAIN, ms=7, mec="k", mew=0.5)
+    _a2.set(xlabel="t / τ_ex", ylabel="excess kurtosis K", ylim=(0, _K0 * 1.12), title="The kurtosis is what exchange changes")
+    _a2.legend(frameon=False, fontsize=8, loc="lower left")
+    _fig.tight_layout()
+    mo.vstack([_fig, mo.md(
+        f"D₁ = {_D1}, D₂ = {_D2} µm²/ms, D̄ = **{_Db:.2f}** µm²/ms; τ_ex = **{_tau:.3g} ms**, t/τ_ex = **{_xt:.3g}**. "
+        f"K₀ = **{_K0:.3f}**, K(t) = **{_Kt:.3f}**. The mean-squared displacement is 2D̄t = {2 * _Db * _t:.3g} µm² at every exchange time."
+    )])
+    return
+
+
+@app.cell(hide_code=True)
+def _(exercise):
+    exercise(r"""
+    **(a)** Over a short time $dt$, a molecule in compartment 1 either stays (probability $1 - k_1dt$) and takes a Gaussian step of variance $2D_1dt$, or hops to compartment 2 (probability $k_1dt$). Use this to derive $d\mathbf f/dt = -(q^2\mathbf D + \mathbf K)\mathbf f$ with $\mathbf f(0) = \mathbf p$.
+
+    **(b)** Show that $\langle X^2\rangle_{x,x_0} = 2\bar Dt$ at every time, whatever the exchange rate.
+
+    **(c)** Given its history, a molecule's displacement is Gaussian with variance $2Y$, where $Y = \int_0^tD(s)\,ds$. Show that $K(t) = 3\,\mathrm{Var}(Y)/(\bar Dt)^2$. Then use the correlation of a two-state switch, $\langle(D(s) - \bar D)(D(s') - \bar D)\rangle_{\text{paths}} = p_1p_2(D_1 - D_2)^2e^{-\lvert s - s'\rvert/\tau_{\text{ex}}}$, to derive
+
+    $$K(t) = K_0\,\frac{2\big(x - 1 + e^{-x}\big)}{x^2},\qquad x = \frac{t}{\tau_{\text{ex}}},\qquad K_0 = \frac{3p_1p_2(D_1 - D_2)^2}{\bar D^2}.$$
+
+    **(d)** With the sliders: at which $t/\tau_{\text{ex}}$ has $K$ dropped to half of $K_0$? Does it depend on $p_1$? How does $K$ fall at long times, and what would you measure over a range of times to tell exchange from restriction (Exercise 8)?
+    """, "11 · Two compartments that exchange")
+    return
+
+
+@app.cell(hide_code=True)
+def _(hint):
+    hint(r"""
+    - (a) $f_1(q, t + dt) = (1 - k_1dt)\,e^{-q^2D_1dt}f_1(q,t) + k_2dt\,f_2(q,t)$. Expand to first order in $dt$.
+    - (b) Two facts: $\mathbf K\mathbf p = 0$ (detailed balance) and $(1,1)\,\mathbf K = 0$ (hops lose no molecules). Expand $(1,1)\,e^{-(q^2\mathbf D + \mathbf K)t}\,\mathbf p$ to first order in $q^2$. Or think: at every moment the population is at equilibrium, so its average diffusivity is $\bar D$.
+    - (c) For a Gaussian of variance $\sigma^2$, $\langle X^4\rangle = 3\sigma^4$. And $\int_0^t\!\int_0^te^{-\lvert s - s'\rvert/\tau}\,ds\,ds' = 2\tau^2\big(x - 1 + e^{-x}\big)$.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(answer):
+    answer(r"""
+    **(a)** ⇒ To first order in $dt$: $f_1(t + dt) = (1 - k_1dt)(1 - q^2D_1dt)f_1 + k_2dt\,f_2$, so $\dot f_1 = -(q^2D_1 + k_1)f_1 + k_2f_2$. In the same way $\dot f_2 = k_1f_1 - (q^2D_2 + k_2)f_2$. ✓ At $t = 0$ nobody has moved, $X = 0$, so $f_i(q, 0) = p_i$.
+
+    → The same structure as the mode equations of the eigenmodes section: something that happens inside each compartment ($q^2\mathbf D$, diagonal) and a coupling between them ($\mathbf K$).
+
+    **(b)** ⇒ Derivative with respect to $q^2$ at $q = 0$: $-\int_0^t(1,1)\,e^{-\mathbf K(t - s)}\,\mathbf D\,e^{-\mathbf Ks}\,\mathbf p\,ds$. With $e^{-\mathbf Ks}\mathbf p = \mathbf p$ and $(1,1)e^{-\mathbf K(t-s)} = (1,1)$, this is $-t\,(1,1)\mathbf D\mathbf p = -\bar Dt$.
+
+    ⇒ So $\ln\langle e^{iqX}\rangle_{x,x_0} = -q^2\bar Dt + O(q^4)$, and $\langle X^2\rangle_{x,x_0} = 2\bar Dt$. ✓
+
+    → Each molecule's diffusivity changes, but the population as a whole stays at equilibrium, so its average diffusivity is $\bar D$ at every moment.
+
+    **(c)** ⇒ $\langle X^2\rangle = 2\langle Y\rangle = 2\bar Dt$ and $\langle X^4\rangle = 3\langle(2Y)^2\rangle = 12\langle Y^2\rangle$, so
+
+    $$K = \frac{12\langle Y^2\rangle}{4\bar D^2t^2} - 3 = \frac{3\big(\langle Y^2\rangle - \langle Y\rangle^2\big)}{(\bar Dt)^2} = \frac{3\,\mathrm{Var}(Y)}{(\bar Dt)^2} .$$
+
+    ⇒ $\mathrm{Var}(Y) = \int_0^t\!\int_0^t\langle(D(s) - \bar D)(D(s') - \bar D)\rangle\,ds\,ds' = p_1p_2(D_1 - D_2)^2\cdot2\tau_{\text{ex}}^2\big(x - 1 + e^{-x}\big)$.
+
+    ⇒ Divide by $(\bar Dt)^2 = \bar D^2\tau_{\text{ex}}^2x^2$: $K = K_0\cdot2(x - 1 + e^{-x})/x^2$. ✓
+
+    → Limits: for $x\to0$, $x - 1 + e^{-x}\approx x^2/2$, so $K\to K_0$: the two Gaussians of a mixture (Exercise 8c). For $x\to\infty$, $K\approx2K_0/x = 2K_0\tau_{\text{ex}}/t$.
+
+    → Where the correlation comes from: at equal times $D(s) - \bar D$ has variance $p_1p_2(D_1 - D_2)^2$, and a two-state switch forgets its state at the total rate $k_1 + k_2 = 1/\tau_{\text{ex}}$.
+
+    **(d)** ⇒ $K = K_0/2$ at $x\approx2.6$, for every $p_1$: the shape $2(x - 1 + e^{-x})/x^2$ does not depend on $p_1$, $D_1$ or $D_2$; they only set $K_0$.
+
+    ⇒ At long times $K$ falls as $1/t$ towards zero, and $D(t)$ stays at $\bar D$ throughout. In a closed pore $D(t)$ falls and $K$ goes negative. Measure both over a range of times: a constant $D(t)$ with a kurtosis that decays to zero points to exchange; a falling $D(t)$ with a kurtosis that turns negative points to restriction. Chapter 3 shows the same model in the measured signal.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
     ---
     # 1b · The diffusion MRI signal: what a gradient does, and two routes to it
 
@@ -1729,7 +1872,7 @@ def _(mo):
     | The geometry enters as | interface conditions, through the eigenmodes of 1a | walls that reflect the walkers, or let them through |
     | Methods in this course | eigenmodes and matrices (Ch 2a), formulas (Ch 3), grids and meshes (Ch 4) | the cumulant expansion (Ch 2b), Monte Carlo (Ch 5) |
 
-    The two routes give exactly the same $E$. That is the **Feynman–Kac relation**, which you derive at the end of the path picture (Exercise 13). The next two sections take the routes one at a time.
+    The two routes give exactly the same $E$. That is the **Feynman–Kac relation**, which you derive at the end of the path picture (Exercise 14). The next two sections take the routes one at a time.
     """)
     return
 
@@ -1777,11 +1920,11 @@ def _(mo):
 
     The simulators of Chapters 4 and 5 solve this problem as it stands. The exact methods of Chapter 2 and the formulas of Chapter 3 simplify it in three steps:
 
-    ① **Uniform $T_2$:** relaxation then multiplies the signal by $e^{-T/T_2}$, which cancels in $E$ (Exercise 11). Drop the $T_2$ term.
+    ① **Uniform $T_2$:** relaxation then multiplies the signal by $e^{-T/T_2}$, which cancels in $E$ (Exercise 12). Drop the $T_2$ term.
     ② **Equal densities:** $c_{nm} = 1$; with $\rho = 1$ the start is $m = 1$.
     ③ **One compartment:** impermeable interfaces, so each pore is solved on its own. This is the boxed equation above.
 
-    → Each step is a statement about the tissue, and each can be false: compartments do relax differently (Exercise 11), and membranes do leak. Chapters 4 and 5 are how to find out what a simplification costs.
+    → Each step is a statement about the tissue, and each can be false: compartments do relax differently (Exercise 12), and membranes do leak. Chapters 4 and 5 are how to find out what a simplification costs.
     """)
     return
 
@@ -1791,7 +1934,7 @@ def _(exercise):
     exercise(r"""
     With transverse relaxation the equation reads $\partial m/\partial t = D\nabla^2 m - i\gamma\,\mathbf g\cdot\mathbf r\,m - m/T_2$.
     Show that, for a uniform $T_2$, relaxation only multiplies the signal by $e^{-T/T_2}$, so that it cancels in $E = S/S_0$ when $S_0$ is measured at the same echo time.
-    """, "11 · Where did T₂ go?")
+    """, "12 · Where did T₂ go?")
     return
 
 
@@ -1832,7 +1975,7 @@ def _(mo):
     | --- | --- | --- |
     | impermeable | $D\,\partial m/\partial n = 0$ | $0$: **nothing to add** |
     | relaxing | $D\,\partial m/\partial n = -\varrho\,m$ | $-\varrho\oint w\,m\,dS$ |
-    | membrane between $\Omega_n$ and $\Omega_m$ | continuous flux $= \kappa_{nm}(c_{nm}m_m - c_{mn}m_n)$ | a term on $\Gamma_{nm}$ that couples the two sides; for equal densities $-\kappa\oint(m_n - m_m)(w_n - w_m)\,dS$ (Exercise 12) |
+    | membrane between $\Omega_n$ and $\Omega_m$ | continuous flux $= \kappa_{nm}(c_{nm}m_m - c_{mn}m_n)$ | a term on $\Gamma_{nm}$ that couples the two sides; for equal densities $-\kappa\oint(m_n - m_m)(w_n - w_m)\,dS$ (Exercise 13) |
     | fixed value $m = m_0$ (Dirichlet) | — | not in the boundary term: must be imposed on $m$ directly |
 
     → The first three are **natural** conditions: they enter through the boundary term, and every solution of the weak form satisfies them automatically. A fixed value is an **essential** condition, imposed by hand. Diffusion MRI needs only natural ones.
@@ -1845,7 +1988,7 @@ def _(mo):
     | hat functions on a mesh: 1 at one node, 0 at all others, linear in between | a sparse system with mass, stiffness and gradient matrices | finite elements, Chapter 4 |
     | indicator functions of grid cells (the equation integrated over each cell) | the change in each cell equals the fluxes through its faces | finite volumes and finite differences, Chapter 4 |
 
-    → The weak form is not a finite-element trick. The matrix method of Chapter 2 is the weak form in the basis of eigenmodes (Exercise 12b).
+    → The weak form is not a finite-element trick. The matrix method of Chapter 2 is the weak form in the basis of eigenmodes (Exercise 13b).
     """)
     return
 
@@ -1860,7 +2003,7 @@ def _(exercise):
     **(c)** For a membrane at $x = 0$ between $[a, 0]$ and $[0, b]$, equal densities, with $m$ and $w$ allowed to jump there: collect the two boundary terms at $x = 0$ and show that they combine into $-\kappa(m_1 - m_2)(w_1 - w_2)$, where 1 and 2 label the two sides.
 
     **(d)** *Unequal densities.* Redo (c) with the general condition $D\,\partial_{n}m_n = \kappa(c_{nm}m_m - c_{mn}m_n)$, compartment $n$ on the left and $m$ on the right. Show that, moved to the left-hand side, the membrane term is $(w_n, w_m)\,\mathbf Q\,(m_n, m_m)^{\mathsf T}$ with $\mathbf Q = \kappa\begin{pmatrix}c_{mn}&-c_{nm}\\-c_{mn}&c_{nm}\end{pmatrix}$. Check that the columns of $\mathbf Q$ sum to zero and that $(\rho_n, \rho_m)$ is in its null space. What does each property guarantee?
-    """, "12 · The weak form")
+    """, "13 · The weak form")
     return
 
 
@@ -1953,7 +2096,7 @@ def _(exercise):
     **(c)** Expand for small $\delta t$ and show that $w$ obeys the Bloch–Torrey equation.
 
     **(d)** What are the initial and interface conditions for $w$? Conclude that $\int m\,dx = \langle e^{-i\varphi}\rangle_{\text{paths}}$.
-    """, "13 · Derive the Feynman–Kac relation")
+    """, "14 · Derive the Feynman–Kac relation")
     return
 
 
@@ -2048,7 +2191,7 @@ def _(maths):
 
     $$\ell_g = \left(\frac{D}{\gamma g}\right)^{1/3},\qquad \tau_g = \frac{\ell_g^2}{D}.$$
 
-    → The same length from the table: $\ell_D = \sqrt{DT}$ grows with $T$ and $\ell_q = 1/(\gamma gT)$ shrinks. They are equal at $T = \tau_g$, and there both equal $\ell_g$ (Exercise 14a).
+    → The same length from the table: $\ell_D = \sqrt{DT}$ grows with $T$ and $\ell_q = 1/(\gamma gT)$ shrinks. They are equal at $T = \tau_g$, and there both equal $\ell_g$ (Exercise 15a).
 
     → Closer to a wall than $\ell_g$, a spin is held back by the wall before it can dephase much: that is why magnetization survives there in the localisation regime.
     """, title="Where ℓ_g comes from")
@@ -2144,7 +2287,7 @@ def _(exercise):
         **(c)** For the 1 µm case, estimate the attenuation from the motional-narrowing formula for a slab at 300 mT/m. What does it tell you about measuring axon diameters?
 
         **(d)** With an illustrative relaxivity $\varrho = 10^{-3}$ µm/ms, are 10 µm cells in the fast-diffusion regime?
-        """, "14 · Length scales on real scanners")
+        """, "15 · Length scales on real scanners")
     return
 
 
@@ -2187,6 +2330,7 @@ def _(mo):
     | Bloch–Torrey | $\partial m/\partial t = D\nabla^2 m - i\gamma\,\mathbf g(t)\cdot\mathbf r\,m$, $\ E = \frac{1}{S_0}\int m\,d\mathbf r$ |
     | Full problem | per compartment $\partial_tm_n = \nabla\cdot(D_n\nabla m_n) - m_n/T_{2,n} - i\gamma f(t)(\mathbf g\cdot\mathbf r)m_n$, $\ m_n(0) = \rho_n$; simplified by uniform $T_2$, equal densities, one compartment |
     | Weak form | $\int w\,\partial_tm + \int D\nabla w\cdot\nabla m + i\gamma f\int w(\mathbf g\cdot\mathbf r)m = \oint wD\,\partial m/\partial n$ for all $w$; walls natural; modes as test functions give Chapter 2, hats give finite elements |
+    | Exchange (Kärger) | two Gaussian compartments with hop rates $k_1p_1 = k_2p_2$: $\langle e^{iqX}\rangle_{x,x_0} = (1,1)\,e^{-(q^2\mathbf D + \mathbf K)t}\,\mathbf p$; $\langle X^2\rangle_{x,x_0} = 2\bar Dt$ always; $K(t) = K_0\,2(x - 1 + e^{-x})/x^2$, $x = t/\tau_{\text{ex}}$ |
     | Path picture (Feynman–Kac) | short pulses: $E = \langle e^{i\mathbf q\cdot\mathbf X}\rangle_{\mathbf r,\mathbf r_0}$; in general $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int \mathbf g\cdot\mathbf r_j\,dt$ over the random paths $\mathbf r_j(t)$ of $N$ spins |
 
     ---
@@ -2218,7 +2362,7 @@ def _(mo):
 
     **Chapter 5 · Monte Carlo: simulating the random walk**
 
-    - The algorithm from Exercise 13: Gaussian steps, reflection at walls, phase accumulation, and the average $\langle e^{-i\varphi}\rangle_{\text{paths}}$.
+    - The algorithm from Exercise 14: Gaussian steps, reflection at walls, phase accumulation, and the average $\langle e^{-i\varphi}\rangle_{\text{paths}}$.
     - Permeable membranes as a crossing probability; choosing the time step; the $1/\sqrt N$ noise floor, compared with an exact eigenmode solution.
     - Walker histories as reusable data: replay packs that answer any later sequence as an inner product ([Fick 2026](https://arxiv.org/abs/2611.01758)).
     - *Implementations:* Camino, MC-DC Simulator, Disimpy, RMS.
@@ -2252,6 +2396,7 @@ def _(mo):
     | 1979 | [K. R. Brownstein & C. E. Tarr, *Phys. Rev. A* 19:2446](https://doi.org/10.1103/PhysRevA.19.2446) | eigenmodes with relaxing walls; fast-diffusion and diffusion-limited regimes |
     | 1985 | [J. Kärger, *Adv. Colloid Interface Sci.* 23:129](<https://doi.org/10.1016/0001-8686(85)80018-X>) | exchange between compartments |
     | 1991 | [S. D. Stoller, W. Happer & F. J. Dyson, *Phys. Rev. A* 44:7459](https://doi.org/10.1103/PhysRevA.44.7459) | the localisation regime and its length scale |
+    | 1985 | [J. Kärger, *Adv. Colloid Interface Sci.* 23:129](<https://doi.org/10.1016/0001-8686(85)80018-X>) | two exchanging compartments |
     | 1992 | [P. P. Mitra, P. N. Sen, L. M. Schwartz & P. Le Doussal, *Phys. Rev. Lett.* 68:3555](https://doi.org/10.1103/PhysRevLett.68.3555) | short-time $D(t)$ and the surface-to-volume ratio |
     | 1994 | [T. M. de Swiet & P. N. Sen, *J. Chem. Phys.* 100:5597](https://doi.org/10.1063/1.467127) | bounded diffusion in a constant gradient; regimes set by length scales |
     | 2007 | [D. S. Grebenkov, *Rev. Mod. Phys.* 79:1077](https://doi.org/10.1103/RevModPhys.79.1077) | review: length scales, eigenmode (MCF) description, numerical methods |
