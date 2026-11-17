@@ -539,11 +539,13 @@ def _(mo):
     mo.md(r"""
     ## Eigenmodes: the natural patterns of a pore
 
-    Put the diffusion equation in a closed pore $\Omega$ with reflecting walls. Some concentration patterns keep their **shape** and only fade in amplitude. These are the **eigenmodes** $u_n(\mathbf r)$ of the pore. Any initial concentration can be written as a sum of eigenmodes, and each one fades at its own rate:
+    Put the diffusion equation in a bounded domain $\Omega$: one pore, or several compartments joined by membranes, with any of the interface and boundary conditions of the tables above. Some concentration patterns keep their **shape** and only fade in amplitude. These are the **eigenmodes** $u_n(\mathbf r)$ of the domain. Any initial concentration can be written as a sum of eigenmodes, and each one fades at its own rate:
 
-    $$C(\mathbf r,t) = \sum_n c_n\, u_n(\mathbf r)\, e^{-D\lambda_n t}, \qquad -\nabla^2 u_n = \lambda_n u_n \ \text{in } \Omega, \qquad \frac{\partial u_n}{\partial n}=0 \ \text{on the walls.}$$
+    $$C(\mathbf r,t) = \sum_n c_n\, u_n(\mathbf r)\, e^{-D\lambda_n t}, \qquad -\nabla^2 u_n = \lambda_n u_n \ \text{in } \Omega, \qquad \text{with the same wall and interface conditions as } C.$$
 
-    - $\lambda_0 = 0$ with $u_0$ constant: the uniform state. It never fades, because reflecting walls conserve the total amount.
+    The derivation below shows why the conditions on $C$ carry over to every $u_n$ unchanged. For the reflecting walls of most of this chapter, that is $\partial u_n/\partial n = 0$.
+
+    - With reflecting or periodic walls (membranes allowed): $\lambda_0 = 0$ with $u_0$ constant, the uniform state. It never fades, because no molecules are lost. With absorbing walls or sinks even the slowest mode fades: $\lambda_0 > 0$ (see "When the interfaces are not reflecting").
     - Every other mode fades with time constant $\tau_n = 1/(D\lambda_n)$. Finer patterns have larger $\lambda_n$ and fade faster.
     - The geometry enters **only** through $\lambda_n$ and $u_n$. Once you have them, you have solved diffusion in that pore for every starting condition and every time.
     - Separation of variables and expansion in modes go back to Fourier (1822); the general theory of such eigenproblems is Sturm–Liouville theory (Sturm 1836; Liouville 1836).
@@ -566,9 +568,31 @@ def _(maths):
 
     ⇒ **Time part:** $T' = -D\lambda T$, so $T(t) = e^{-D\lambda t}$.
 
-    ⇒ **Space part:** $-\nabla^2 u = \lambda u$, with the wall condition $\partial u/\partial n = 0$ (it is a condition on $C$, so on $u$). Only special values $\lambda_n$ allow a solution: the eigenvalues.
+    ⇒ **Space part, and this is where the boundary conditions go in:** $-\nabla^2 u = \lambda u$. Every wall and interface condition in the tables above is **linear and homogeneous**: a combination of $C$ and its normal derivative set equal to zero. Put $C = u\,T$ into one of them, for example the absorbing wall:
 
-    ⇒ **Superpose.** The equation is linear, so any sum of such products is again a solution. The eigenmodes are orthonormal, $\int_\Omega u_m u_n\,d\mathbf r = \delta_{mn}$, so the coefficients follow from the initial condition by projection:
+    $$D\frac{\partial C}{\partial n} + \varrho\,C = T(t)\Big[D\frac{\partial u}{\partial n} + \varrho\,u\Big] = 0\quad\text{for all } t\quad\Longrightarrow\quad D\frac{\partial u}{\partial n} + \varrho\,u = 0 .$$
+
+    $T(t)$ drops out, and $u$ inherits exactly the condition of $C$:
+
+    | Condition on $C$ | Condition on every mode $u_n$ |
+    | --- | --- |
+    | reflecting, $\partial C/\partial n = 0$ | $\partial u_n/\partial n = 0$ |
+    | partially absorbing, $D\,\partial C/\partial n + \varrho C = 0$ | $D\,\partial u_n/\partial n + \varrho u_n = 0$ |
+    | perfect sink, $C = 0$ | $u_n = 0$ |
+    | membrane: continuous flux $= \kappa\times$ jump | the same two conditions for $u_n$ on both sides |
+    | periodic | $u_n$ and its derivative match on opposite faces |
+
+    → The initial condition is the one condition that does **not** go into $u$: it is used last, to find the coefficients $c_n$.
+
+    → Homogeneity is what makes this work. A wall held at a fixed nonzero value, $C = C_w$, would not separate; you would first subtract the steady state and solve for the rest.
+
+    ⇒ **The eigenvalues.** The equation $-\nabla^2u = \lambda u$ has a nonzero solution that obeys these conditions only for special values $\lambda_n$: the eigenvalues. The conditions decide which values (Exercise 2 for a reflecting slab, the recipe before Exercise 10 for membranes and absorbing walls). They are never negative: multiply by $u$, integrate, and use Green's identity,
+
+    $$\lambda\int_\Omega u^2\,d\mathbf r = \int_\Omega\lvert\nabla u\rvert^2\,d\mathbf r + \frac\varrho D\oint_{\text{absorbing walls}}u^2\,dS + \frac\kappa D\oint_{\text{membranes}}(u^- - u^+)^2\,dS\ \ge0 .$$
+
+    Each term is zero exactly when its effect is absent: no gradient inside, no absorbing wall, no jump across a membrane. So $\lambda_0 = 0$ needs a constant mode and walls that lose nothing.
+
+    ⇒ **Superpose.** The equation is linear, so any sum of such products is again a solution. The eigenmodes are orthonormal, $\int_\Omega u_m u_n\,d\mathbf r = \delta_{mn}$. (Green's identity again: $(\lambda_m - \lambda_n)\int u_mu_n$ is a sum of boundary terms, and they cancel because both modes obey the same homogeneous conditions.) So the coefficients follow from the initial condition by projection:
 
     $$c_n = \int_\Omega u_n(\mathbf r)\,C(\mathbf r,0)\,d\mathbf r .$$
 
