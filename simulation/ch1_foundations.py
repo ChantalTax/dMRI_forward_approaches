@@ -209,6 +209,7 @@ def _(mo):
     | $S$, $S_0$, $E = S/S_0$ | signal with and without diffusion weighting; normalised signal | |
     | $\lambda_n$, $u_n(\mathbf r)$, $\tau_n$ | eigenvalue, eigenmode, decay time $1/(D\lambda_n)$ | 1/µm², –, ms |
     | $P(\mathbf r\mid\mathbf r_0,t)$ | propagator: probability density to be at $\mathbf r$ at $t$ after starting at $\mathbf r_0$ | 1/µm³ |
+    | $G(x,t)$ | propagator without walls (free diffusion), $P(x\mid x_0,t) = G(x - x_0,t)$ | 1/µm |
 
     **Notation**
 
@@ -222,11 +223,24 @@ def _(mo):
     | $\nabla\cdot\mathbf J = \partial_xJ_x + \partial_yJ_y + \partial_zJ_z$ | divergence of a vector field: net outflow per unit volume |
     | $\nabla^2 C = \nabla\cdot\nabla C = \partial_x^2C + \partial_y^2C + \partial_z^2C$ | Laplacian: how much $C$ differs from its local average |
     | $\partial C/\partial n = \mathbf n\cdot\nabla C$ | normal derivative on a surface |
+    | $\nabla^2$ in cylindrical coordinates $(r,\theta,z)$ | $\dfrac{1}{r}\dfrac{\partial}{\partial r}\Big(r\dfrac{\partial}{\partial r}\Big) + \dfrac{1}{r^2}\dfrac{\partial^2}{\partial\theta^2} + \dfrac{\partial^2}{\partial z^2}$ |
+    | $\nabla^2$ in spherical coordinates $(r,\theta,\phi)$ | $\dfrac{1}{r^2}\dfrac{\partial}{\partial r}\Big(r^2\dfrac{\partial}{\partial r}\Big) + \dfrac{1}{r^2}\Big[\dfrac{1}{\sin\theta}\dfrac{\partial}{\partial\theta}\Big(\sin\theta\dfrac{\partial}{\partial\theta}\Big) + \dfrac{1}{\sin^2\theta}\dfrac{\partial^2}{\partial\phi^2}\Big]$ |
     | $\int_\Omega\cdots d\mathbf r$, $\oint_S\cdots dS$ | volume integral; integral over a closed surface |
     | $\delta(x)$ | Dirac delta: zero except at 0, $\int\delta(x)\,dx = 1$, $\int f(x)\delta(x-a)\,dx = f(a)$ |
     | $\delta_{mn}$ | Kronecker delta: 1 if $m=n$, else 0 |
-    | $\langle X\rangle$ | expectation: the average over many spins or random paths, $\langle X\rangle = \lim_{N\to\infty}\frac1N\sum_{j=1}^N X_j$; for a quantity with probability density $p$, $\langle X\rangle = \int X\,p(X)\,dX$, and $\langle f(X)\rangle = \int f(X)\,p(X)\,dX$ |
     | $i$ | imaginary unit, $i^2=-1$ |
+
+    **Averages: always say over what.** An average $\langle\cdot\rangle$ in this course always carries a subscript that says what it averages over. That is where most confusion comes from: the same symbol can mean one molecule's possible end points, or all molecules, or all random paths.
+
+    | Notation | Average over | Definition |
+    | --- | --- | --- |
+    | $\langle f\rangle_{x\mid x_0}$ | the end point $x$ of a molecule that started at a fixed $x_0$ | $\int f(x)\,P(x\mid x_0,t)\,dx$ |
+    | $\langle f\rangle_{x}$, $\langle f\rangle_{x_0}$ | one position, spread uniformly over the pore (volume $V$) | $\frac1V\int f(x)\,dx$ |
+    | $\langle f\rangle_{x,x_0}$ | start **and** end: every molecule, starting uniformly | $\frac1V\iint f(x, x_0)\,P(x\mid x_0,t)\,dx\,dx_0$ |
+    | $\langle f\rangle_{\text{paths}}$ | whole random paths $x(t')$, $0\le t'\le t$, starting uniformly | $\lim_{N\to\infty}\frac1N\sum_{j=1}^N f_j$ over $N$ walkers |
+    | $\langle f\rangle_s$ | a random variable $s$ with probability density $p$ | $\int f(s)\,p(s)\,ds$ |
+
+    → With a uniform start and reflecting walls the molecules stay uniform, so for a function of the end point alone $\langle f(x)\rangle_{x,x_0} = \langle f(x)\rangle_x$. In 3D, read $\mathbf r$, $\mathbf r_0$ for $x$, $x_0$.
 
     **Relationships used in the derivations**
 
@@ -240,8 +254,28 @@ def _(mo):
     | Euler's formula | $e^{i\theta} = \cos\theta + i\sin\theta$ | phases as rotating arrows |
     | Product of cosines | $\cos a\cos b = \tfrac12[\cos(a-b)+\cos(a+b)]$ | orthogonality of slab modes |
     | Orthonormality | $\int_\Omega u_m u_n\,d\mathbf r = \delta_{mn}$ | projecting onto modes |
-    | Gaussian moments | for $s\sim\mathcal N(0,\sigma^2)$: $\langle s\rangle = 0$, $\langle s^2\rangle = \sigma^2$, $\langle e^{-is}\rangle = e^{-\sigma^2/2}$ | random-walk steps; free-diffusion signal |
+    | Gaussian moments | for $s\sim\mathcal N(0,\sigma^2)$: $\langle s\rangle_s = 0$, $\langle s^2\rangle_s = \sigma^2$, $\langle e^{-is}\rangle_s = e^{-\sigma^2/2}$ | random-walk steps; free-diffusion signal |
     """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(maths):
+    maths(r"""
+    Eigenmodes, projections and propagators are linear algebra with functions in place of vectors. Every step in this course has a finite-dimensional twin:
+
+    | Vectors and matrices | Functions and operators |
+    | --- | --- |
+    | vector $\mathbf v$, components $v_i$ | function $f(x)$, "components" $f$ at each $x$ |
+    | dot product $\mathbf u\cdot\mathbf v = \sum_iu_iv_i$ | inner product $\int f(x)\,g(x)\,dx$ |
+    | matrix times vector $\mathbf A\mathbf v$ | operator on a function: $\nabla^2f$, or $\int K(x,y)\,f(y)\,dy$ |
+    | eigenvectors $\mathbf A\mathbf u_n = \lambda_n\mathbf u_n$ | eigenmodes $-\nabla^2u_n = \lambda_nu_n$, *with* the wall conditions |
+    | symmetric matrix: real $\lambda_n$, orthonormal $\mathbf u_n$ | self-adjoint operator (here: $\nabla^2$ with reflecting walls): real $\lambda_n$, orthonormal $u_n$ |
+    | components in the eigenbasis $c_n = \mathbf u_n\cdot\mathbf v$ | projection $c_n = \int u_n\,f\,dx$ |
+    | inverse, $\mathbf v = \mathbf A^{-1}\mathbf b$ | Green's function: solve once for a point source $\delta(x - x_0)$, then superpose |
+    | $e^{-t\mathbf A}$ via eigenvalues | $e^{tD\nabla^2}$: the propagator $\sum_nu_n(x)\,u_n(x_0)\,e^{-D\lambda_nt}$ |
+    | a matrix in a new basis, $\mathbf U^{\mathsf T}\mathbf A\mathbf U$ | $\int u_n\,x\,u_m\,dx$: the position in the mode basis (Exercise 7) |
+    """, title="Functions as vectors: the linear algebra behind eigenmodes")
     return
 
 
@@ -252,6 +286,8 @@ def _(mo):
     # 1a · Diffusion and the eigenmodes of a pore
 
     ## The diffusion equation
+
+    A water molecule is knocked about by its neighbours roughly every picosecond. Over milliseconds, the times that matter in this course, each molecule therefore performs a random walk: **Brownian motion**. Molecules that start near the same point $\mathbf r_0$ spread out in random directions, with a probability density $P(\mathbf r\mid\mathbf r_0,t)$ to be at $\mathbf r$ at time $t$: the **propagator**. The concentration is what very many such walkers add up to.
 
     Let $C(\mathbf r,t)$ be the concentration of tagged water molecules. Two ingredients give the diffusion equation:
 
@@ -288,12 +324,17 @@ def _(maths):
 @app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
-    In free space (1D) a molecule released at $x=0$ spreads as
+    Without walls (1D) a molecule released at $x=0$ spreads as
 
     $$G(x,t)=\frac{1}{\sqrt{4\pi Dt}}\exp\!\left(-\frac{x^2}{4Dt}\right).$$
 
+    $G$ is the propagator of free diffusion: a molecule released at any $x_0$ spreads as $P(x\mid x_0,t) = G(x - x_0, t)$.
+
     **(a)** Check that $G$ solves $\partial G/\partial t = D\,\partial^2 G/\partial x^2$.
-    **(b)** Show that its variance is $\langle x^2\rangle = 2Dt$.
+
+    **(b)** Show that its variance is $\langle x^2\rangle_{x\mid 0} = 2Dt$.
+
+    **(c)** The **characteristic function** of a distribution is its Fourier transform, $\langle e^{iqx}\rangle_{x\mid 0} = \int e^{iqx}\,G(x,t)\,dx$, with $q$ the Fourier variable. Show that for $G$ it equals $e^{-q^2Dt}$. Its logarithm generates the cumulants (see "Beyond the mean-squared displacement" below): what does the result tell you about all cumulants beyond the variance?
     """, "1 · The free Gaussian")
     return
 
@@ -302,7 +343,10 @@ def _(exercise):
 def _(hint):
     hint(r"""
     (a) Write $G = (4\pi D t)^{-1/2} e^{-u}$ with $u = x^2/(4Dt)$, and differentiate the prefactor and the exponent separately.
+
     (b) Compare $G$ with a normal distribution $\frac{1}{\sqrt{2\pi\sigma^2}}e^{-x^2/2\sigma^2}$ and read off $\sigma^2$.
+
+    (c) Complete the square in the exponent: $iqx - \frac{x^2}{4Dt} = -\frac{(x - 2iqDt)^2}{4Dt} - q^2Dt$. The remaining Gaussian integrates to 1.
     """)
     return
 
@@ -316,9 +360,15 @@ def _(answer):
 
     ⇒ Multiply the second by $D$: $D\,\partial^2 G/\partial x^2 = G\left(\dfrac{x^2}{4Dt^2} - \dfrac{1}{2t}\right)$, which is $\partial G/\partial t$. ✓
 
-    **(b)** $G$ is a normal distribution with $2\sigma^2 = 4Dt$, so $\langle x^2\rangle = \sigma^2 = 2Dt$ (per axis; $6Dt$ in 3D).
+    **(b)** $G$ is a normal distribution with $2\sigma^2 = 4Dt$, so $\langle x^2\rangle_{x\mid 0} = \sigma^2 = 2Dt$ (per axis; $6Dt$ in 3D).
 
-    → This is the same $\sqrt{2Dt}$ spread you get from a random walk. The equation for the *concentration* and the random walk of *one molecule* describe the same thing. [Einstein (1905)](https://doi.org/10.1002/andp.19053220806) made exactly this link, deriving $\langle x^2\rangle = 2Dt$ from the random motion of suspended particles. Part 1b builds on exactly that.
+    **(c)** ⇒ Complete the square: $\langle e^{iqx}\rangle_{x\mid 0} = e^{-q^2Dt}\int\frac{1}{\sqrt{4\pi Dt}}e^{-(x - 2iqDt)^2/4Dt}\,dx = e^{-q^2Dt}$.
+
+    ⇒ Its logarithm, $-q^2Dt = -\frac{q^2}{2}\,(2Dt)$, stops at $q^2$. Only the second cumulant, the variance $2Dt$, is nonzero; every higher cumulant is zero.
+
+    → Free diffusion has zero kurtosis at all times. Any nonzero kurtosis must come from the walls and the structure around the molecules.
+
+    → This is the same $\sqrt{2Dt}$ spread you get from a random walk. The equation for the *concentration* and the random walk of *one molecule* describe the same thing. [Einstein (1905)](https://doi.org/10.1002/andp.19053220806) made exactly this link, deriving $\langle x^2\rangle_{x\mid 0} = 2Dt$ from the random motion of suspended particles. Part 1b builds on exactly that.
     """)
     return
 
@@ -414,13 +464,13 @@ def _(mo):
 
     **Initial condition.** At the start the molecules are in equilibrium and spread evenly: $C(\mathbf r,0)=\rho$, a constant (or one constant per compartment).
 
-    **Interface conditions** on cell walls and membranes $\Gamma_{nm}$ ($\partial/\partial n$: derivative along the outward normal):
+    **Interface conditions** on cell walls and membranes $\Gamma_{nm}$ ($\partial/\partial n$: derivative along the outward normal). Each one is a statement about the flux into the wall, which by Fick's law is $\mathbf J\cdot\mathbf n = -D\,\partial C/\partial n$: zero, set by the jump across a membrane, or proportional to $C$ at the wall.
 
     | Interface | Condition | What it means | In a random walk |
     | --- | --- | --- | --- |
     | Impermeable, inert | $\dfrac{\partial C}{\partial n}=0$ (Neumann type) | no flux through the wall | the walker is reflected |
     | Permeable membrane | $D_n\dfrac{\partial C_n}{\partial n_n} = -D_m\dfrac{\partial C_m}{\partial n_m} = \kappa\,(C_m - C_n)$ (transmission) | the flux is continuous; the jump in $C$ across the membrane is set by the permeability $\kappa$ | the walker crosses with a small probability, else it is reflected |
-    | Partially absorbing wall | $D\dfrac{\partial C}{\partial n} + \varrho\, C = 0$ (Robin type) | the wall removes molecules at a rate set by the surface absorption rate $\varrho$ | the walker is removed with a small probability |
+    | Partially absorbing wall | $D\dfrac{\partial C}{\partial n} + \varrho\, C = 0$ (Robin type) | molecules that touch the wall bind or react there with a small probability, so the flux into the wall is proportional to $C$ at the wall, with rate $\varrho$ | the walker is removed with a small probability |
     | Perfect sink | $C = 0$ (Dirichlet type) | every molecule that touches the wall is lost: the limit $\varrho\to\infty$ | the walker is removed at its first touch |
 
     Two limits of the permeable membrane are worth remembering: $\kappa = 0$ gives an impermeable wall on both sides, and $\kappa\to\infty$ forces $C_n = C_m$, as if the membrane were not there.
@@ -536,8 +586,11 @@ def _(exercise):
     Take a slab $0 \le x \le L$ (diffusion between two parallel reflecting planes).
 
     **(a)** Solve $-u'' = \lambda u$ with $u'(0)=u'(L)=0$. Consider $\lambda<0$, $\lambda=0$ and $\lambda>0$ separately.
+
     **(b)** Normalise the modes so that $\int_0^L u_n^2\,dx = 1$.
+
     **(c)** Show that two different modes are orthogonal.
+
     **(d)** Write down the propagator $P(x\,|\,x_0,t)$ for the slab.
     """, "2 · Eigenmodes of a slab")
     return
@@ -549,6 +602,7 @@ def _(hint):
     - For $\lambda = -k^2 < 0$ the general solution is $A\cosh kx + B\sinh kx$; for $\lambda = k^2 > 0$ it is $A\cos kx + B\sin kx$.
     - Apply $u'(0)=0$ first: it removes one of the two functions. Then $u'(L)=0$ restricts $k$.
     - For (b) and (c): $\cos a\cos b = \tfrac12[\cos(a-b)+\cos(a+b)]$.
+    - For (d): expand the start, $\delta(x - x_0) = \sum_nc_nu_n(x)$, multiply by $u_m$ and integrate. Orthonormality leaves $c_m = u_m(x_0)$ (the separation-of-variables derivation above).
     """)
     return
 
@@ -708,7 +762,9 @@ def _(
 def _(exercise):
     exercise(r"""
     **(a)** Predict first: for $L = 10$ µm and $D = 2$ µm²/ms, about how many modes do you need for a smooth propagator at $t = 0.1$ ms? And at $t = 10$ ms? Check with the sliders.
+
     **(b)** At short times the walls have not been felt yet. Which curve should the propagator then match?
+
     **(c)** What does this tell you about when eigenmode methods are cheap, and when they are expensive?
     """, "3 · How many modes?")
     return
@@ -724,401 +780,6 @@ def _(answer):
     **(b)** The free Gaussian of Exercise 1, centred at $x_0$, as long as $\sqrt{2Dt}$ is small compared with the distance from $x_0$ to the nearest wall. Move $x_0$ close to a wall and you see the reflected part appear first there.
 
     **(c)** At long times only a handful of modes survive, so eigenmode methods are cheap exactly where diffusion has explored the whole pore. At short times you need many modes to build a narrow peak. There, a free Gaussian (or a random walk) is the natural description. You will see this trade-off again in Chapters 2 and 5.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(exercise):
-    exercise(r"""
-    Molecules start **uniformly** in the slab. Using the propagator, show that the mean-squared displacement is
-
-    $$\langle (x - x_0)^2\rangle(t) = \frac{L^2}{6} - \frac{16L^2}{\pi^4}\sum_{n\ \text{odd}}\frac{e^{-D(n\pi/L)^2 t}}{n^4},$$
-
-    and that it tends to $L^2/6$ at long times. (In the random-walk notebook the walkers between two walls levelled off at $L^2/6$. Here is where that number comes from.)
-    """, "4 · Mean-squared displacement in a slab")
-    return
-
-
-@app.cell(hide_code=True)
-def _(hint):
-    hint(r"""
-    - Expand the square: $\langle(x-x_0)^2\rangle = \langle x^2\rangle + \langle x_0^2\rangle - 2\langle x\,x_0\rangle$.
-    - Uniform start and reflecting walls mean the walkers stay uniform at all times, so $\langle x^2\rangle = \langle x_0^2\rangle = L^2/3$.
-    - $\langle x\,x_0\rangle = \frac1L\iint x\,x_0\,P(x|x_0,t)\,dx\,dx_0$. Insert the mode sum: each mode contributes $\frac1L\big(\int_0^L x\,u_n\,dx\big)^2 e^{-D\lambda_n t}$.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(answer):
-    answer(r"""
-    ⇒ $\langle x^2\rangle = \langle x_0^2\rangle = \frac1L\int_0^L x^2dx = \frac{L^2}{3}$.
-
-    ⇒ $\langle x\,x_0\rangle = \frac1L\sum_n e^{-D\lambda_n t}\left(\int_0^L x\,u_n(x)\,dx\right)^2$.
-
-    ⇒ $n=0$: $\int_0^L x/\sqrt L\,dx = L^{3/2}/2$, giving $\frac1L\cdot\frac{L^3}{4} = \frac{L^2}{4}$.
-
-    ⇒ $n\ge1$: integrate by parts, $\int_0^L x\cos\frac{n\pi x}{L}dx = \frac{L^2}{(n\pi)^2}\big[(-1)^n - 1\big]$. This is zero for even $n$ and $-2L^2/(n\pi)^2$ for odd $n$. With the factor $\sqrt{2/L}$ squared: $\frac1L\cdot\frac2L\cdot\frac{4L^4}{(n\pi)^4} = \frac{8L^2}{(n\pi)^4}$.
-
-    ⇒ Put together:
-
-    $$\langle(x-x_0)^2\rangle = \frac{2L^2}{3} - 2\left[\frac{L^2}{4} + \sum_{n\ \text{odd}}\frac{8L^2}{(n\pi)^4}e^{-D\lambda_n t}\right] = \frac{L^2}{6} - \frac{16L^2}{\pi^4}\sum_{n\ \text{odd}}\frac{e^{-D\lambda_n t}}{n^4}.$$
-
-    → Check $t=0$: $\sum_{n\ \text{odd}} n^{-4} = \pi^4/96$, so the MSD is $L^2/6 - L^2/6 = 0$. ✓
-    → $t\to\infty$: all exponentials vanish and the MSD is $L^2/6$: start and end positions have become independent, each uniform in the slab.
-    → The weights $8L^2/(n\pi)^4$ fall as $n^{-4}$: the first mode carries 98.6% of the total. Remember this. Exercise 5 shows where they come from, and Chapter 2 meets the same weights again.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(C_ALT, C_FREE, C_MAIN, D1, L1, mo, np, plt):
-    _L, _D = L1.value, D1.value
-    _t = np.logspace(-2, 2.3, 400)
-    _n = np.arange(1, 400, 2)[:, None]
-    _msd = _L**2 / 6 - 16 * _L**2 / np.pi**4 * np.sum(np.exp(-_D * (_n * np.pi / _L) ** 2 * _t) / _n**4, axis=0)
-
-    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(10, 3.6))
-    _a1.loglog(_t, 2 * _D * _t, color=C_FREE, ls="--", label="free: 2Dt")
-    _a1.loglog(_t, _msd, color=C_MAIN, lw=2, label="slab, from the modes")
-    _a1.axhline(_L**2 / 6, color=C_ALT, lw=1, ls=":", label="L²/6")
-    _a1.set(xlabel="t (ms)", ylabel="⟨(x − x₀)²⟩ (µm²)", title="Mean-squared displacement")
-    _a1.legend(frameon=False, fontsize=8)
-
-    _a2.semilogx(_t, _msd / (2 * _t), color=C_MAIN, lw=2, label="⟨(x − x₀)²⟩ / 2t")
-    _a2.axhline(_D, color=C_FREE, ls="--", label="free D")
-    _a2.axvline(_L**2 / (np.pi**2 * _D), color="k", lw=0.8, ls=":")
-    _a2.text(_L**2 / (np.pi**2 * _D), _D * 0.05, " τ₁", fontsize=9)
-    _a2.set(xlabel="t (ms)", ylabel="apparent D (µm²/ms)", ylim=(0, _D * 1.1), title="The apparent diffusivity falls once walls are felt")
-    _a2.legend(frameon=False, fontsize=8)
-    _fig.tight_layout()
-    mo.vstack([_fig, mo.md(f"Uses L and D from the sliders above. τ₁ = L²/(π²D) = **{_L**2 / (np.pi**2 * _D):.2f} ms**.")])
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ### The position in the mode basis
-
-    The MSD needed the integrals $\int x\,u_n\,dx$. They are the first row of a matrix that every later chapter uses: the **position written in the mode basis**,
-
-    $$B_{nm} = \int u_n(x)\;x\;u_m(x)\,dx ,$$
-
-    with $x$ measured from the centre of the pore. Like the eigenvalues $\lambda_n$, it depends only on the geometry. It answers: if a pattern sits in mode $m$ and is multiplied by $x$, how much ends up in mode $n$? Together with the eigenvalues it is everything the matrix methods of Chapter 2 need to know about a pore; 1b shows why.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(exercise):
-    exercise(r"""
-    Take the slab, with $x$ measured from its centre.
-
-    **(a)** Show that $\mathbf B$ is real and symmetric.
-
-    **(b)** Show that $B_{nm} = 0$ whenever $n + m$ is even. (Think of parity about the centre.)
-
-    **(c)** Compute the couplings to the uniform mode, $B_{0n}$, and show that $B_{0n}^2 = 8L^2/(n\pi)^4$ for odd $n$. Where did you see these numbers before?
-
-    **(d)** Show that for $n, m \ge 1$
-
-    $$B_{nm} = \frac{L}{\pi^2}\left[\frac{(-1)^{n-m}-1}{(n-m)^2} + \frac{(-1)^{n+m}-1}{(n+m)^2}\right].$$
-    """, "5 · The position in the mode basis")
-    return
-
-
-@app.cell(hide_code=True)
-def _(hint):
-    hint(r"""
-    - **(b)** About the centre, $x - L/2$ is odd and $\cos(n\pi x/L)$ has parity $(-1)^n$. The integral of an odd function over a symmetric interval is zero.
-    - **(c, d)** $\cos a\cos b = \frac12[\cos(a-b) + \cos(a+b)]$, and for $k \neq 0$, $\int_0^L (x - \tfrac L2)\cos\frac{k\pi x}{L}\,dx = \frac{L^2}{(k\pi)^2}\big[(-1)^k - 1\big]$ (integrate by parts).
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(answer):
-    answer(r"""
-    **(a)** ⇒ The modes are real and $B_{nm} = \int u_n\,x\,u_m\,dx$ is unchanged when $n$ and $m$ swap.
-
-    **(b)** ⇒ Put $y = x - L/2$. Then $u_n$ has parity $(-1)^n$ in $y$, and $y$ is odd, so $u_n\,y\,u_m$ has parity $(-1)^{n+m+1}$. For $n + m$ even it is odd, and its integral over $[-L/2, L/2]$ is zero.
-
-    → In particular the diagonal vanishes: a mode is never coupled to itself.
-
-    **(c)** ⇒ $B_{0n} = \frac{1}{\sqrt L}\sqrt{\frac 2L}\int_0^L(x - \tfrac L2)\cos\frac{n\pi x}{L}\,dx = \frac{\sqrt2}{L}\cdot\frac{L^2[(-1)^n-1]}{(n\pi)^2} = -\frac{2\sqrt2\,L}{(n\pi)^2}$ for odd $n$.
-
-    ⇒ $B_{0n}^2 = \dfrac{8L^2}{(n\pi)^4}$: exactly the weights in the mean-squared displacement of Exercise 4 (there you computed $\int x\,u_n$ from a wall; centring only changes $n = 0$). Chapter 2 uses them again.
-
-    **(d)** ⇒ $B_{nm} = \frac2L\int_0^L y\cos\frac{n\pi x}{L}\cos\frac{m\pi x}{L}dx = \frac1L\int_0^L y\Big[\cos\frac{(n-m)\pi x}{L} + \cos\frac{(n+m)\pi x}{L}\Big]dx$.
-
-    ⇒ Apply the integral from the hint with $k = n - m$ and $k = n + m$ and simplify: $\frac1L\cdot\frac{L^2}{\pi^2}[\dots] = \frac{L}{\pi^2}[\dots]$. ✓
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(C_ALT, C_MAIN, mo, np, plt):
-    def _slab_B(L, N):
-        n = np.arange(N)
-        m, k = n[:, None], n[None, :]
-        with np.errstate(divide="ignore", invalid="ignore"):
-            B = (L / np.pi**2) * ((((-1.0) ** (m - k)) - 1) / (m - k) ** 2 + (((-1.0) ** (m + k)) - 1) / (m + k) ** 2)
-            j = np.maximum(m, k)
-            B0 = np.sqrt(2) * L * (((-1.0) ** j) - 1) / (j * np.pi) ** 2
-        B = np.where((m == 0) | (k == 0), B0, B)
-        return np.where(m == k, 0.0, B)
-
-    _B = _slab_B(8.0, 16)
-    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(9.5, 3.6), gridspec_kw={"width_ratios": [1, 1.2]})
-    _im = _a1.imshow(np.log10(np.abs(_B) + 1e-12), cmap="Blues", vmin=-3, vmax=1)
-    _a1.set(xlabel="m", ylabel="n", title="log₁₀ |B_nm|, L = 8 µm", xticks=range(0, 16, 3), yticks=range(0, 16, 3))
-    _a1.grid(False)
-    _fig.colorbar(_im, ax=_a1, fraction=0.046)
-    _n = np.arange(1, 16, 2)
-    _a2.loglog(_n, np.abs(_B[0, 1::2]), "o-", color=C_MAIN, label="|B₀ₙ| (coupling to the uniform mode)")
-    _ne = np.arange(2, 16, 2)
-    _a2.loglog(_ne, np.abs(_B[3, _ne]), "s-", color=C_ALT, ms=4, label="|B₃ₙ| (even n; odd n give zero)")
-    _a2.loglog(_n, np.abs(_B[0, 1]) * _n**-2.0, ":", color="k", lw=1, label="∝ 1/n²")
-    _a2.set(xlabel="n", ylabel="|B| (µm)", title="Couplings fall off as 1/n²")
-    _a2.legend(frameon=False, fontsize=8)
-    _fig.tight_layout()
-    mo.vstack([_fig, mo.md("The checkerboard is the parity rule of Exercise 5(b): $x$ only connects modes of opposite parity, and each mode mostly to its neighbours.")])
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Beyond the mean-squared displacement: cumulants of the displacement
-
-    The MSD is one number per time. The propagator holds the whole **distribution of displacements** $X = x - x_0$, averaged over where the molecules start:
-
-    $$\bar P(X,t) = \frac{1}{V}\iint \delta\big(X - (x - x_0)\big)\,P(x\,|\,x_0,t)\,dx\,dx_0 .$$
-
-    A compact way to describe a distribution is by its **cumulants** $\kappa_n$: the mean ($\kappa_1$, zero here by symmetry), the variance ($\kappa_2 = \langle X^2\rangle$), and then the shape ($\kappa_4 = \langle X^4\rangle - 3\langle X^2\rangle^2$ for a symmetric distribution). In 1D define
-
-    $$D(t) = \frac{\langle X^2\rangle}{2t},\qquad K(t) = \frac{\kappa_4}{\kappa_2^2} = \frac{\langle X^4\rangle}{\langle X^2\rangle^2} - 3 .$$
-
-    $D(t)$ is the apparent diffusivity of the figure above. $K(t)$, the **excess kurtosis**, measures how far the shape is from a Gaussian. Free diffusion is Gaussian at every time, so $K = 0$: any nonzero $K$ comes from the geometry.
-
-    The cumulants are the Taylor coefficients of the logarithm of the **characteristic function**:
-
-    $$\ln\big\langle e^{iqX}\big\rangle = \sum_{n\ge1}\frac{(iq)^n}{n!}\,\kappa_n = -\frac{q^2}{2}\langle X^2\rangle + \frac{q^4}{24}\,\kappa_4 - \dots$$
-
-    Keep this line in mind: 1b shows that a measurement can give you exactly this characteristic function.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(maths):
-    maths(r"""
-    ⇒ Shift the coordinate to the slab centre, $y = x - L/2$, so that odd powers average to zero. The displacement is $X = y - y_0$.
-
-    ⇒ Expand: $\langle X^2\rangle = 2\langle y^2\rangle - 2\langle y\,y_0\rangle$ and $\langle X^4\rangle = 2\langle y^4\rangle - 8\langle y^3y_0\rangle + 6\langle y^2y_0^2\rangle$ (using $\langle y^3y_0\rangle = \langle y\,y_0^3\rangle$, because $P$ is symmetric in $x$ and $x_0$).
-
-    ⇒ Each mixed average is a mode sum, as in Exercise 4: $\langle f(y)\,g(y_0)\rangle = \frac1L\sum_n e^{-D\lambda_n t}\,f_n\,g_n$, with $f_n = \int f\,u_n\,dx$.
-
-    ⇒ The coefficients of $y$, $y^2$, $y^3$ follow from integrating by parts. With $k_n = n\pi/L$:
-
-    $$y_n = -\frac{2\sqrt2\,L^{3/2}}{(n\pi)^2}\ (n\ \text{odd}),\qquad (y^2)_n = \frac{2\sqrt2\,L^{5/2}}{(n\pi)^2}\ (n\ \text{even} \ge 2),\qquad (y^3)_n = \sqrt2\,L^{7/2}\Big[-\frac{3}{2(n\pi)^2} + \frac{12}{(n\pi)^4}\Big]\ (n\ \text{odd}),$$
-
-    and zero otherwise; for $n=0$ only $(y^2)_0 = L^{5/2}/12$ survives.
-
-    → $D(t)/D$ and $K(t)$ depend on $t$ only through $Dt/L^2$: one curve for all slabs.
-    """, title="Computing D(t) and K(t) from the modes")
-    return
-
-
-@app.cell(hide_code=True)
-def _(np):
-    def slab_cumulants(tau, N=1500):
-        """D(t)/D0 and excess kurtosis K(t) of the displacement in a slab, uniform start.
-
-        tau = D t / L^2 (array). Closed-form cosine coefficients of (x - L/2)^k, in units L = 1.
-        """
-        tau = np.asarray(tau, float)
-        n = np.arange(1, N + 1)[:, None]
-        k = np.pi * n
-        odd = n % 2 == 1
-        c1 = np.where(odd, -2 * np.sqrt(2) / k**2, 0.0)
-        c3 = np.where(odd, np.sqrt(2) * (-1.5 / k**2 + 12 / k**4), 0.0)
-        c2 = np.where(~odd, 2 * np.sqrt(2) / k**2, 0.0)
-        e = np.exp(-(k**2) * tau[None, :])
-        X2 = 1 / 6 - 2 * (e * c1 * c1).sum(0)
-        X4 = 2 / 80 + 6 / 144 - 8 * (e * c3 * c1).sum(0) + 6 * (e * c2 * c2).sum(0)
-        return X2 / (2 * tau), X4 / X2**2 - 3
-
-    return (slab_cumulants,)
-
-
-@app.cell(hide_code=True)
-def _(C_ALT, C_FREE, C_MAIN, D1, L1, mo, np, plt, slab_cumulants):
-    _L, _D = L1.value, D1.value
-    _t = np.logspace(-2, 2.7, 300)
-    _d, _K = slab_cumulants(_D * _t / _L**2)
-
-    _fig, _a1 = plt.subplots(figsize=(6.5, 4.6))
-    _a1.semilogx(_t, _d, color=C_MAIN, lw=2, label="D(t) / D")
-    _a1.semilogx(_t, _K, color=C_ALT, lw=2, label="K(t)")
-    _tau = _D * _t / _L**2
-    _sh = _tau < 0.1
-    _a1.semilogx(_t[_sh], 1 - 8 / (3 * np.sqrt(np.pi)) * np.sqrt(_tau[_sh]), color="k", lw=1.0, ls=(0, (4, 3)),
-                 zorder=4, label="short times: 1 − (8/3√π)√(Dt)/L (on top of D)")
-    _a1.semilogx(_t[_sh], 16 / (5 * np.sqrt(np.pi)) * np.sqrt(_tau[_sh]), color=C_ALT, lw=1.1, ls="--",
-                 label="short times: (16/5√π)√(Dt)/L")
-    _a1.axhline(0, color=C_FREE, lw=0.8)
-    _a1.axhline(-0.6, color=C_ALT, lw=0.8, ls=":", label="−3/5")
-    _a1.axvline(_L**2 / (np.pi**2 * _D), color="k", lw=0.8, ls=":")
-    _a1.text(_L**2 / (np.pi**2 * _D), 0.9, " τ₁", fontsize=9)
-    _a1.set(xlabel="t (ms)", ylim=(-0.7, 1.05), title="Diffusivity and kurtosis of the displacement in a slab")
-    _a1.legend(frameon=False, fontsize=7.5, loc="upper center", bbox_to_anchor=(0.5, -0.17), ncol=2)
-    _fig.tight_layout()
-    mo.vstack([_fig, mo.md("Uses L and D from the sliders above the propagator plot.")])
-    return
-
-
-@app.cell(hide_code=True)
-def _(exercise):
-    exercise(r"""
-    **(a)** At long times the start and end positions are independent, and each is uniform in the slab. Show that $X = x - x_0$ then has a **triangular** distribution on $[-L, L]$, and that its excess kurtosis is $K_\infty = -3/5$.
-
-    **(b)** Show that its characteristic function is $\langle e^{iqX}\rangle = \operatorname{sinc}^2(qL/2)$, with $\operatorname{sinc}z = \sin z/z$. Expand $\ln\operatorname{sinc}^2(qL/2)$ to order $q^4$ and read off $\kappa_2$ and $\kappa_4$. Do they agree with (a)?
-
-    **(c)** In the figure $K(t)$ is **positive** at short times before it turns negative. Explain both signs.
-    """, "6 · The kurtosis of a slab")
-    return
-
-
-@app.cell(hide_code=True)
-def _(hint):
-    hint(r"""
-    - **(a)** The density of a sum of two independent variables is the convolution of their densities: two boxes give a triangle. For the moments use symmetry, $\langle X^4\rangle = 2\int_0^L X^4\,\frac{L - X}{L^2}\,dX$.
-    - **(b)** The characteristic function of a sum of independent variables is the product of theirs. You need $\ln\operatorname{sinc}z = -z^2/6 - z^4/180 - \dots$
-    - **(c)** Split the molecules into two groups: those far from both walls, and those within about $\sqrt{Dt}$ of one.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(answer):
-    answer(r"""
-    **(a)** ⇒ $x$ and $x_0$ are independent and uniform on $[0, L]$, so $X$ has the convolution of two boxes of height $1/L$:
-
-    $$\bar P(X) = \frac{L - |X|}{L^2},\qquad |X|\le L .$$
-
-    ⇒ $\langle X^2\rangle = \frac{2}{L^2}\int_0^L X^2(L - X)\,dX = \frac{2}{L^2}\Big(\frac{L^4}{3} - \frac{L^4}{4}\Big) = \frac{L^2}{6}$, the long-time MSD of Exercise 4. ✓
-
-    ⇒ $\langle X^4\rangle = \frac{2}{L^2}\Big(\frac{L^6}{5} - \frac{L^6}{6}\Big) = \frac{L^4}{15}$.
-
-    ⇒ $K_\infty = \dfrac{L^4/15}{L^4/36} - 3 = \dfrac{12}{5} - 3 = -\dfrac35$.
-
-    → Negative: compared with a Gaussian of the same variance, the triangle has a broad shoulder and no tails at all. Every bounded distribution leans this way.
-
-    **(b)** ⇒ $\langle e^{iqX}\rangle = \langle e^{iqx}\rangle\,\langle e^{-iqx_0}\rangle = \big|\langle e^{iqx}\rangle\big|^2$, and $\langle e^{iqx}\rangle = \frac1L\int_0^L e^{iqx}dx = e^{iqL/2}\operatorname{sinc}(qL/2)$. So $\langle e^{iqX}\rangle = \operatorname{sinc}^2(qL/2)$.
-
-    ⇒ With $z = qL/2$: $\ln\operatorname{sinc}^2z = -\frac{z^2}{3} - \frac{z^4}{90} - \dots = -\frac{q^2L^2}{12} - \frac{q^4L^4}{1440} - \dots$
-
-    ⇒ Compare with $-\frac{q^2}{2}\kappa_2 + \frac{q^4}{24}\kappa_4$: $\kappa_2 = L^2/6$ and $\kappa_4 = -L^4/60$, so $K = \kappa_4/\kappa_2^2 = -36/60 = -3/5$. ✓
-
-    **(c)** ⇒ **Short times.** Most molecules are far from the walls and diffuse freely, with variance $2Dt$. Molecules within about $\sqrt{Dt}$ of a wall are held back and spread less. A mixture of zero-mean Gaussians with different variances $\sigma^2$ has $K = 3\,\mathrm{Var}(\sigma^2)/\langle\sigma^2\rangle^2 > 0$: a sharper peak and heavier tails than one Gaussian. The hindered fraction is about $(S/V)\sqrt{Dt}$, so $K$ grows like $\sqrt t$ at first, just as $D(t)$ first drops like $\sqrt t$ ([Mitra et al. 1992](https://doi.org/10.1103/PhysRevLett.68.3555)).
-
-    ⇒ **Long times.** Every molecule feels both walls, and the bounded triangle of (a) takes over: $K\to-3/5$.
-
-    → In between, $K$ peaks at about $+0.2$ near $Dt \approx 0.03\,L^2$ and crosses zero near $Dt \approx 0.08\,L^2$. The same geometry gives both signs: a kurtosis measured at one diffusion time cannot tell heterogeneity from restriction on its own.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Short times: the walls are felt through $S/V$
-
-    At short times a molecule notices a wall only if it starts within a few $\sqrt{Dt}$ of it. Seen from that close, any smooth wall looks flat, and the share of molecules that close to a wall is proportional to the **surface-to-volume ratio** $S/V$ of the pore space. The result holds for every pore shape ([Mitra, Sen, Schwartz & Le Doussal 1992](https://doi.org/10.1103/PhysRevLett.68.3555)):
-
-    $$\frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t)\qquad\text{in } d \text{ dimensions}.$$
-
-    | Pore | $S/V$ | $d$ | $D(t)/D$ at short times |
-    | --- | --- | --- | --- |
-    | slab, width $L$ | $2/L$ | 1 | $1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}L$ |
-    | cylinder, radius $R$ (cross-section) | $2/R$ | 2 | $1 - \frac{4}{3\sqrt\pi}\frac{\sqrt{Dt}}R$ |
-    | sphere, radius $R$ | $3/R$ | 3 | $1 - \frac{4}{3\sqrt\pi}\frac{\sqrt{Dt}}R$ |
-
-    → The first correction knows only $S/V$, nothing else about the shape. Curvature and absorbing walls appear one order later, in the $O(t)$ term ([Mitra, Sen & Schwartz 1993](https://doi.org/10.1103/PhysRevB.47.8565)). Measuring $D(t)$ at short times therefore gives $S/V$ directly; this was first done in porous rocks ([Latour et al. 1993](https://doi.org/10.1006/jmra.1993.1056)).
-
-    → The kurtosis grows at the same order: for a slab $K(t)\approx\frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}L$, the positive short-time kurtosis of Exercise 6(c). Both slab laws are the dashed lines in the figure above. Exercise 7 derives them with the method of images.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(exercise):
-    exercise(r"""
-    Take one flat reflecting wall at $x = 0$, a molecule starting at height $x_0 > 0$, and a free Brownian increment $W\sim\mathcal N(0, 2Dt)$. By the method of images the reflected walker ends at $\lvert x_0 + W\rvert$, so its displacement is $X = \lvert x_0 + W\rvert - x_0$.
-
-    **(a)** Show that $X^2 - W^2 = 4x_0^2 + 4x_0W$ when $x_0 + W < 0$, and $0$ otherwise. Average over $W$ and over $x_0$ (uniform, per unit wall area) to find the deficit $\int_0^\infty\langle X^2 - W^2\rangle\,dx_0$. Then put two such walls on a slab of width $L$, with the molecules spread uniformly, and recover $D(t)/D = 1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
-
-    **(b)** *Any shape, any dimension.* Take a pore in $d$ dimensions with a smooth wall, and define $D(t) = \langle\lvert\mathbf X\rvert^2\rangle/(2dt)$. Argue that at short times (i) only molecules within a few $\sqrt{Dt}$ of the wall are affected, (ii) each of them sees a flat wall, and (iii) only the displacement component normal to that wall changes. Use the deficit of (a) to derive Mitra's law.
-
-    **(c)** Do the same as in (a) for $X^4 - W^4$, and show that the slab kurtosis grows as $K(t) \approx \frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
-
-    **(d)** In the figure above, up to which $Dt/L^2$ does each dashed line stay within 5% of the exact curve? (Read $Dt/L^2$ off with the sliders: for $L = 10$ µm and $D = 2$ µm²/ms, $Dt/L^2 = 0.01$ is $t = 0.5$ ms.) Why does the kurtosis line fail first?
-    """, "7 · The surface-to-volume law")
-    return
-
-
-@app.cell(hide_code=True)
-def _(hint):
-    hint(r"""
-    - Scale lengths by $\sigma = \sqrt{2Dt}$: $x_0 = \sigma u$, $W = \sigma w$. The deficits become $\sigma^3 I_2$ and $\sigma^5 I_4$, with pure numbers $I_2$ and $I_4$.
-    - Swap the order of integration: for each $w < 0$, integrate over $u$ from 0 to $-w$ first. You need $\int_{-\infty}^0 \lvert w\rvert^k\,\phi(w)\,dw$ with $\phi$ the standard normal density: $\frac12, \frac1{\sqrt{2\pi}}, \frac12, \frac{2}{\sqrt{2\pi}}, \frac32, \frac{8}{\sqrt{2\pi}}$ for $k = 0..5$.
-    - (b) With uniform density $1/V$, the number of molecules per unit wall area, within reach of the wall, is the same as in (a). How much wall is there per unit volume?
-    - (c) Expand $\langle X^4\rangle/\langle X^2\rangle^2 - 3$ to first order in the small deficits.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(answer):
-    answer(r"""
-    **(a)** ⇒ If $x_0 + W\ge0$ nothing is reflected and $X = W$. If $x_0 + W < 0$, $X = -2x_0 - W$, so $X^2 - W^2 = 4x_0^2 + 4x_0W$.
-
-    ⇒ Scale with $\sigma$: deficit $= \sigma^3 I_2$, $\ I_2 = \int_{-\infty}^0\phi(w)\int_0^{-w}(4u^2 + 4uw)\,du\,dw$. The inner integral is $\frac43\lvert w\rvert^3 - 2\lvert w\rvert^3 = -\frac23\lvert w\rvert^3$, so $I_2 = -\frac23\cdot\frac{2}{\sqrt{2\pi}} = -\frac{4}{3\sqrt{2\pi}}$.
-
-    ⇒ Two walls, molecules spread over $L$ with density $1/L$: $\langle X^2\rangle = \sigma^2 + 2\sigma^3I_2/L$, so
-
-    $$\frac{D(t)}{D} = \frac{\langle X^2\rangle}{\sigma^2} = 1 + \frac{2\sigma I_2}{L} = 1 - \frac{8}{3\sqrt{2\pi}}\frac{\sqrt{2Dt}}{L} = 1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}{L}. \checkmark$$
-
-    → The deficit per unit wall area, $\sigma^3I_2 = -\frac{8}{3\sqrt\pi}(Dt)^{3/2}$, is all that (b) needs.
-
-    **(b)** ⇒ (i) A molecule further than a few $\sigma$ from the wall does not reach it: the Gaussian tail beyond is exponentially small. (ii) On the scale $\sigma$ a smooth wall with radius of curvature $\gg\sigma$ is flat. (iii) Split the step into a normal part and $d - 1$ tangential parts. They are independent, and a flat wall reflects only the normal part, so each tangential part keeps its free $2Dt$ and the normal part gives $2Dt$ plus the deficit of (a).
-
-    ⇒ With density $1/V$, the molecules near a piece of wall of area $dS$ give the deficit $\sigma^3I_2\,dS/V$. Summed over the wall:
-
-    $$\langle\lvert\mathbf X\rvert^2\rangle = 2dDt + \frac SV\,\sigma^3I_2 = 2dDt - \frac{8}{3\sqrt\pi}\,\frac SV\,(Dt)^{3/2}.$$
-
-    ⇒ Divide by $2dDt$:
-
-    $$\frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt}. \checkmark$$
-
-    ⇒ Slab: $S/V = 2/L$ and $d = 1$ give (a) back. ✓
-
-    → The steps (i)–(iii) are exactly what fails one order later: curvature on the scale $\sigma$, and corners, give the $O(t)$ term. For a flat wall that term vanishes, and the slab line is exact until molecules from one wall reach the other.
-
-    **(c)** ⇒ For $x_0 + W < 0$: $X^4 - W^4 = (2x_0 + W)^4 - W^4$. The inner integral over $u\in[0,\lvert w\rvert]$ of $(2u + w)^4 - w^4$ is $\frac{(2u+w)^5}{10}\Big|_0^{\lvert w\rvert} - \lvert w\rvert^5 = \frac{\lvert w\rvert^5}{10} + \frac{\lvert w\rvert^5}{10} - \lvert w\rvert^5 = -\frac45\lvert w\rvert^5$, so $I_4 = -\frac45\cdot\frac{8}{\sqrt{2\pi}} = -\frac{32}{5\sqrt{2\pi}}$.
-
-    ⇒ $\langle X^4\rangle = 3\sigma^4 + 2\sigma^5I_4/L$ and $\langle X^2\rangle^2 = \sigma^4(1 + 4\sigma I_2/L + \dots)$, so
-
-    $$K = \frac{3 + 2\sigma I_4/L}{1 + 4\sigma I_2/L} - 3 \approx \frac{2\sigma}{L}\big(I_4 - 6I_2\big) = \frac{2\sigma}{L}\cdot\frac{8/5}{\sqrt{2\pi}} = \frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}{L} = 1.805\,\frac{\sqrt{Dt}}{L}.$$
-
-    The mode sums give 1.79 at $Dt = 10^{-4}L^2$ and 1.75 at $10^{-3}L^2$, approaching 1.805.
-
-    **(d)** ⇒ $D(t)$: the line is exact (to $10^{-6}$) up to $Dt\approx0.03\,L^2$ and still within 0.2% at $0.08\,L^2$. The two walls act independently until the molecules from one wall reach the other. $K(t)$: within 5% only up to $Dt\approx 2\times10^{-3}L^2$; it peaks at $+0.20$ near $0.03\,L^2$ and changes sign near $0.08\,L^2$, on its way to $-3/5$.
-
-    → The kurtosis is a small excess divided by $\langle X^2\rangle^2$. Its next correction is already of relative order $\sqrt{Dt}/L$, while for $D(t)$ next to a flat wall the next correction is exponentially small.
     """)
     return
 
@@ -1145,6 +806,56 @@ def _(mo):
 
     The roots below are computed in this notebook; the table quotes them.
     """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(maths):
+    maths(r"""
+    **Cylinder.** Write $u = R(r)\,\Theta(\theta)\,Z(z)$ in $-\nabla^2u = \lambda u$, with the Laplacian in cylindrical coordinates (notation section). For the modes of the cross-section $Z$ is constant. $\Theta$ must come back to itself after one turn, so $\Theta = \cos m\theta$ or $\sin m\theta$ with $m = 0, 1, 2, \dots$ What is left for $R$:
+
+    $$r^2R'' + r\,R' + \big(\lambda r^2 - m^2\big)R = 0 .$$
+
+    ⇒ With $s = \sqrt\lambda\,r$ this is **Bessel's equation**. Its solution that stays finite at the centre is $J_m(\sqrt\lambda\,r)$. (The second solution, $Y_m$, blows up at $r = 0$; it returns in an annulus, where the centre is not part of the domain.)
+
+    ⇒ **The wall picks the scale.** The reflecting wall needs $R'(R) = 0$, so $\sqrt\lambda\,R$ must be a root $\alpha_{mk}$ of $J_m'$. The function $J_m$ is the same for every pore; the wall condition stretches it so that one of its flat points lands exactly on the wall: $\lambda = (\alpha_{mk}/R)^2$.
+
+    **Sphere.** With $u = R(r)\,Y_{lm}(\theta,\phi)$ the radial equation becomes $r^2R'' + 2r\,R' + \big(\lambda r^2 - l(l+1)\big)R = 0$, solved by the spherical Bessel function $j_l(\sqrt\lambda\,r)$, with the wall at a root of $j_l'$.
+
+    **Orthogonality.** Modes with different $m$ are orthogonal through the angle: $\int_0^{2\pi}\cos m\theta\cos m'\theta\,d\theta = 0$. Modes with the same $m$ and different roots are orthogonal through the radius, **with weight $r$**:
+
+    $$\int_0^R J_m\Big(\frac{\alpha_{mk}r}{R}\Big)\,J_m\Big(\frac{\alpha_{mk'}r}{R}\Big)\,r\,dr = 0\qquad (k\ne k').$$
+
+    → The weight is the $r\,dr$ of the area element, so this is ordinary orthogonality, $\int u\,u'\,dA = 0$. It follows from the same integration by parts as for the slab (Exercise 2c), because the radial equation can be written $(rR')' - \frac{m^2}rR = -\lambda\,r\,R$. For the sphere the weight is $r^2$.
+    """, title="Where the Bessel functions come from")
+    return
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_FREE, C_MAIN, jv, np, plt, spherical_jn):
+    _a = np.linspace(0.2, 12, 1200)          # spherical recursion is unstable very close to 0
+    _cols = [C_MAIN, C_ALT, "#2e9e6a", "#8a5cd1"]
+    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(10, 4.0))
+    for _m, _c in zip(range(4), _cols):
+        _d = 0.5 * (jv(_m - 1, _a) - jv(_m + 1, _a))
+        _a1.plot(_a, _d, color=_c, lw=1.6, label=f"m = {_m}")
+        _z = _a[:-1][np.sign(_d[:-1]) != np.sign(_d[1:])]
+        _a1.plot(_z, np.zeros_like(_z), "o", color=_c, ms=5, mec="k", mew=0.4)
+        _dl = spherical_jn(_m, _a, derivative=True)
+        _a2.plot(_a, _dl, color=_c, lw=1.6, label=f"l = {_m}")
+        _z = _a[:-1][np.sign(_dl[:-1]) != np.sign(_dl[1:])]
+        _a2.plot(_z, np.zeros_like(_z), "o", color=_c, ms=5, mec="k", mew=0.4)
+    for _ax in (_a1, _a2):
+        _ax.plot([0], [0], "o", color=_cols[0], ms=5, mec="k", mew=0.4)   # α = 0: the uniform mode
+    for _ax, _t in ((_a1, r"Cylinder: $J_m'(\alpha)$"), (_a2, r"Sphere: $j_l'(\alpha)$")):
+        _ax.axhline(0, color=C_FREE, lw=0.8)
+        _ax.set(xlabel=r"$\alpha = \sqrt{\lambda}\,R$", xlim=(0, 12), title=_t)
+        _ax.legend(frameon=False, fontsize=8, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.2))
+    _a1.set_ylim(-0.65, 0.6)
+    _a2.set_ylim(-0.48, 0.4)
+    _fig.suptitle("The dots are the allowed α: the wall sits where the derivative is zero", fontsize=10)
+    _fig.tight_layout()
+    _fig
     return
 
 
@@ -1199,7 +910,7 @@ def _(exercise):
     (i) a slab with $L = 8$ µm, (ii) a cylinder with **radius** $R = 5$ µm, (iii) a sphere with radius $R = 5$ µm.
 
     In which pores have the molecules explored the whole pore after 20 ms? What does that mean for what any observation at 20 ms can tell you about pore *size*?
-    """, "8 · Time scales of three pores")
+    """, "4 · Time scales of three pores")
     return
 
 
@@ -1210,7 +921,7 @@ def _(answer):
     ⇒ Cylinder: $\tau_1 = R^2/(\alpha_{11}^2 D) = 25/(3.390\times 2) = $ **3.7 ms**.
     ⇒ Sphere: $\tau_1 = R^2/(\alpha_{11}^2 D) = 25/(4.333\times 2) = $ **2.9 ms**.
 
-    → All three are much shorter than 20 ms: after a few $\tau_1$ every non-uniform mode has faded and the molecules have explored the whole pore: the long-time (**fully restricted**) regime. Their positions are then uniform and independent of where they started, so an observation depends on size only through a few numbers such as $\langle x^2\rangle$ in the pore, not through details of the shape.
+    → All three are much shorter than 20 ms: after a few $\tau_1$ every non-uniform mode has faded and the molecules have explored the whole pore: the long-time (**fully restricted**) regime. Their positions are then uniform and independent of where they started, so an observation depends on size only through a few numbers such as $\langle x^2\rangle_x$ in the pore, not through details of the shape.
 
     → Watch out for radius versus diameter: a "10 µm cell" has $R = 5$ µm. Using the diameter in $R^2$ overestimates $\tau_1$ fourfold.
     """)
@@ -1322,9 +1033,11 @@ def _(C_ALT, C_MAIN, gratio5, mo, nlay5, np, plt, rout5):
 def _(exercise):
     exercise(r"""
         **(a)** Derive the modes of a circle of radius $r$: solve $-u''(s) = \lambda u(s)$ on $0 \le s < 2\pi r$ with $u$ periodic, and normalise.
+
         **(b)** Molecules are spread uniformly over a stack of concentric cylindrical surfaces of equal length. Show that layer $i$ holds a share $w_i = r_i/\sum_j r_j$ of them.
+
         **(c)** For $r = 1$ µm and $D = 0.8$ µm²/ms, compare $\tau_1$ on the surface with $\tau_1$ inside a solid cylinder of the same radius.
-        """, "9 · Modes on a cylindrical surface")
+        """, "5 · Modes on a cylindrical surface")
     return
 
 
@@ -1342,6 +1055,414 @@ def _(answer):
         **(c)** ⇒ Surface: $\tau_1 = r^2/D = 1/0.8 = 1.25$ ms. Solid cylinder: $\tau_1 = R^2/(1.8412^2 D) = 1/(3.39\times0.8) = 0.37$ ms.
         → The surface is 3.4 times slower to "forget" where a molecule started. In the long-time limit the variance of $x$ is $r^2/2$ on the surface and $R^2/4$ inside the cylinder, so the surface also looks larger. Water on the sheath and water inside the axon diffuse differently, even at the same radius.
         """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(exercise):
+    exercise(r"""
+    Molecules start **uniformly** in the slab. The mean-squared displacement averages over where each molecule starts *and* where it ends,
+
+    $$\langle (x - x_0)^2\rangle_{x,x_0} = \frac1L\int_0^L\!\!\int_0^L (x - x_0)^2\,P(x\mid x_0,t)\,dx\,dx_0 .$$
+
+    Using the propagator, show that
+
+    $$\langle (x - x_0)^2\rangle_{x,x_0}(t) = \frac{L^2}{6} - \frac{16L^2}{\pi^4}\sum_{n\ \text{odd}}\frac{e^{-D(n\pi/L)^2 t}}{n^4},$$
+
+    and that it tends to $L^2/6$ at long times. (In the random-walk notebook the walkers between two walls levelled off at $L^2/6$. Here is where that number comes from.)
+    """, "6 · Mean-squared displacement in a slab")
+    return
+
+
+@app.cell(hide_code=True)
+def _(hint):
+    hint(r"""
+    - Expand the square: $\langle(x-x_0)^2\rangle_{x,x_0} = \langle x^2\rangle_{x,x_0} + \langle x_0^2\rangle_{x,x_0} - 2\langle x\,x_0\rangle_{x,x_0}$.
+    - Uniform start and reflecting walls mean the walkers stay uniform at all times, so $\langle x^2\rangle_{x,x_0} = \langle x_0^2\rangle_{x,x_0} = L^2/3$.
+    - $\langle x\,x_0\rangle_{x,x_0} = \frac1L\iint x\,x_0\,P(x|x_0,t)\,dx\,dx_0$. Insert the mode sum: each mode contributes $\frac1L\big(\int_0^L x\,u_n\,dx\big)^2 e^{-D\lambda_n t}$.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(answer):
+    answer(r"""
+    ⇒ $\langle x^2\rangle_{x,x_0} = \langle x_0^2\rangle_{x,x_0} = \frac1L\int_0^L x^2dx = \frac{L^2}{3}$.
+
+    ⇒ $\langle x\,x_0\rangle_{x,x_0} = \frac1L\sum_n e^{-D\lambda_n t}\left(\int_0^L x\,u_n(x)\,dx\right)^2$.
+
+    ⇒ $n=0$: $\int_0^L x/\sqrt L\,dx = L^{3/2}/2$, giving $\frac1L\cdot\frac{L^3}{4} = \frac{L^2}{4}$.
+
+    ⇒ $n\ge1$: integrate by parts, $\int_0^L x\cos\frac{n\pi x}{L}dx = \frac{L^2}{(n\pi)^2}\big[(-1)^n - 1\big]$. This is zero for even $n$ and $-2L^2/(n\pi)^2$ for odd $n$. With the factor $\sqrt{2/L}$ squared: $\frac1L\cdot\frac2L\cdot\frac{4L^4}{(n\pi)^4} = \frac{8L^2}{(n\pi)^4}$.
+
+    ⇒ Put together:
+
+    $$\langle(x-x_0)^2\rangle_{x,x_0} = \frac{2L^2}{3} - 2\left[\frac{L^2}{4} + \sum_{n\ \text{odd}}\frac{8L^2}{(n\pi)^4}e^{-D\lambda_n t}\right] = \frac{L^2}{6} - \frac{16L^2}{\pi^4}\sum_{n\ \text{odd}}\frac{e^{-D\lambda_n t}}{n^4}.$$
+
+    → Check $t=0$: $\sum_{n\ \text{odd}} n^{-4} = \pi^4/96$, so the MSD is $L^2/6 - L^2/6 = 0$. ✓
+    → $t\to\infty$: all exponentials vanish and the MSD is $L^2/6$: start and end positions have become independent, each uniform in the slab.
+    → The weights $8L^2/(n\pi)^4$ fall as $n^{-4}$: the first mode carries 98.6% of the total. Remember this. Exercise 7 shows where they come from, and Chapter 2 meets the same weights again.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_FREE, C_MAIN, D1, L1, mo, np, plt):
+    _L, _D = L1.value, D1.value
+    _t = np.logspace(-2, 2.3, 400)
+    _n = np.arange(1, 400, 2)[:, None]
+    _msd = _L**2 / 6 - 16 * _L**2 / np.pi**4 * np.sum(np.exp(-_D * (_n * np.pi / _L) ** 2 * _t) / _n**4, axis=0)
+
+    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(10, 3.6))
+    _a1.loglog(_t, 2 * _D * _t, color=C_FREE, ls="--", label="free: 2Dt")
+    _a1.loglog(_t, _msd, color=C_MAIN, lw=2, label="slab, from the modes")
+    _a1.axhline(_L**2 / 6, color=C_ALT, lw=1, ls=":", label="L²/6")
+    _a1.set(xlabel="t (ms)", ylabel="⟨(x − x₀)²⟩ (µm²)", title="Mean-squared displacement")
+    _a1.legend(frameon=False, fontsize=8)
+
+    _a2.semilogx(_t, _msd / (2 * _t), color=C_MAIN, lw=2, label="⟨(x − x₀)²⟩ / 2t")
+    _a2.axhline(_D, color=C_FREE, ls="--", label="free D")
+    _a2.axvline(_L**2 / (np.pi**2 * _D), color="k", lw=0.8, ls=":")
+    _a2.text(_L**2 / (np.pi**2 * _D), _D * 0.05, " τ₁", fontsize=9)
+    _a2.set(xlabel="t (ms)", ylabel="apparent D (µm²/ms)", ylim=(0, _D * 1.1), title="The apparent diffusivity falls once walls are felt")
+    _a2.legend(frameon=False, fontsize=8)
+    _fig.tight_layout()
+    mo.vstack([_fig, mo.md(f"Uses L and D from the sliders above. τ₁ = L²/(π²D) = **{_L**2 / (np.pi**2 * _D):.2f} ms**.")])
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### The position in the mode basis
+
+    The MSD needed the integrals $\int x\,u_n\,dx$. They are the first row of a matrix that every later chapter uses: the **position written in the mode basis**,
+
+    $$B_{nm} = \int u_n(x)\;x\;u_m(x)\,dx ,$$
+
+    with $x$ measured from the centre of the pore. Like the eigenvalues $\lambda_n$, it depends only on the geometry. Some of its properties hold for any pore, others only for special shapes:
+
+    | Property | Holds for |
+    | --- | --- |
+    | real and symmetric, $B_{nm} = B_{mn}$ | every pore, any direction of $x$ |
+    | $B_{00} = \langle x\rangle_x$ = the centre of the pore | every pore |
+    | $B_{nm} = 0$ between modes of the same parity | pores symmetric about their centre (slab, disk, sphere) |
+    | $B_{0n}\propto1/n^2$ | the slab; Chapter 2 explains the decay rate from the shape |
+
+    It answers: if a pattern sits in mode $m$ and is multiplied by $x$, how much ends up in mode $n$? Together with the eigenvalues it is everything the matrix methods of Chapter 2 need to know about a pore; 1b shows why.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(exercise):
+    exercise(r"""
+    Take the slab, with $x$ measured from its centre.
+
+    **(a)** Show that $\mathbf B$ is real and symmetric.
+
+    **(b)** Show that $B_{nm} = 0$ whenever $n + m$ is even. (Think of parity about the centre.)
+
+    **(c)** Compute the couplings to the uniform mode, $B_{0n}$, and show that $B_{0n}^2 = 8L^2/(n\pi)^4$ for odd $n$. Where did you see these numbers before?
+
+    **(d)** Show that for $n, m \ge 1$
+
+    $$B_{nm} = \frac{L}{\pi^2}\left[\frac{(-1)^{n-m}-1}{(n-m)^2} + \frac{(-1)^{n+m}-1}{(n+m)^2}\right].$$
+    """, "7 · The position in the mode basis")
+    return
+
+
+@app.cell(hide_code=True)
+def _(hint):
+    hint(r"""
+    - **(b)** About the centre, $x - L/2$ is odd and $\cos(n\pi x/L)$ has parity $(-1)^n$. The integral of an odd function over a symmetric interval is zero.
+    - **(c, d)** $\cos a\cos b = \frac12[\cos(a-b) + \cos(a+b)]$, and for $k \neq 0$, $\int_0^L (x - \tfrac L2)\cos\frac{k\pi x}{L}\,dx = \frac{L^2}{(k\pi)^2}\big[(-1)^k - 1\big]$ (integrate by parts).
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(answer):
+    answer(r"""
+    **(a)** ⇒ The modes are real and $B_{nm} = \int u_n\,x\,u_m\,dx$ is unchanged when $n$ and $m$ swap.
+
+    **(b)** ⇒ Put $y = x - L/2$. Then $u_n$ has parity $(-1)^n$ in $y$, and $y$ is odd, so $u_n\,y\,u_m$ has parity $(-1)^{n+m+1}$. For $n + m$ even it is odd, and its integral over $[-L/2, L/2]$ is zero.
+
+    → In particular the diagonal vanishes: a mode is never coupled to itself.
+
+    **(c)** ⇒ $B_{0n} = \frac{1}{\sqrt L}\sqrt{\frac 2L}\int_0^L(x - \tfrac L2)\cos\frac{n\pi x}{L}\,dx = \frac{\sqrt2}{L}\cdot\frac{L^2[(-1)^n-1]}{(n\pi)^2} = -\frac{2\sqrt2\,L}{(n\pi)^2}$ for odd $n$.
+
+    ⇒ $B_{0n}^2 = \dfrac{8L^2}{(n\pi)^4}$: exactly the weights in the mean-squared displacement of Exercise 6 (there you computed $\int x\,u_n$ from a wall; centring only changes $n = 0$). Chapter 2 uses them again.
+
+    **(d)** ⇒ $B_{nm} = \frac2L\int_0^L y\cos\frac{n\pi x}{L}\cos\frac{m\pi x}{L}dx = \frac1L\int_0^L y\Big[\cos\frac{(n-m)\pi x}{L} + \cos\frac{(n+m)\pi x}{L}\Big]dx$.
+
+    ⇒ Apply the integral from the hint with $k = n - m$ and $k = n + m$ and simplify: $\frac1L\cdot\frac{L^2}{\pi^2}[\dots] = \frac{L}{\pi^2}[\dots]$. ✓
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_MAIN, mo, np, plt):
+    def _slab_B(L, N):
+        n = np.arange(N)
+        m, k = n[:, None], n[None, :]
+        with np.errstate(divide="ignore", invalid="ignore"):
+            B = (L / np.pi**2) * ((((-1.0) ** (m - k)) - 1) / (m - k) ** 2 + (((-1.0) ** (m + k)) - 1) / (m + k) ** 2)
+            j = np.maximum(m, k)
+            B0 = np.sqrt(2) * L * (((-1.0) ** j) - 1) / (j * np.pi) ** 2
+        B = np.where((m == 0) | (k == 0), B0, B)
+        return np.where(m == k, 0.0, B)
+
+    _B = _slab_B(8.0, 16)
+    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(9.5, 3.6), gridspec_kw={"width_ratios": [1, 1.2]})
+    _im = _a1.imshow(np.log10(np.abs(_B) + 1e-12), cmap="Blues", vmin=-3, vmax=1)
+    _a1.set(xlabel="m", ylabel="n", title="log₁₀ |B_nm|, L = 8 µm", xticks=range(0, 16, 3), yticks=range(0, 16, 3))
+    _a1.grid(False)
+    _fig.colorbar(_im, ax=_a1, fraction=0.046)
+    _n = np.arange(1, 16, 2)
+    _a2.loglog(_n, np.abs(_B[0, 1::2]), "o-", color=C_MAIN, label="|B₀ₙ| (coupling to the uniform mode)")
+    _ne = np.arange(2, 16, 2)
+    _a2.loglog(_ne, np.abs(_B[3, _ne]), "s-", color=C_ALT, ms=4, label="|B₃ₙ| (even n; odd n give zero)")
+    _a2.loglog(_n, np.abs(_B[0, 1]) * _n**-2.0, ":", color="k", lw=1, label="∝ 1/n²")
+    _a2.set(xlabel="n", ylabel="|B| (µm)", title="Couplings fall off as 1/n²")
+    _a2.legend(frameon=False, fontsize=8)
+    _fig.tight_layout()
+    mo.vstack([_fig, mo.md("The checkerboard is the parity rule of Exercise 7(b): $x$ only connects modes of opposite parity, and each mode mostly to its neighbours.")])
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Beyond the mean-squared displacement: cumulants of the displacement
+
+    The MSD is one number per time. The propagator holds the whole **distribution of displacements** $X = x - x_0$, averaged over where the molecules start:
+
+    $$\bar P(X,t) = \frac{1}{V}\iint \delta\big(X - (x - x_0)\big)\,P(x\,|\,x_0,t)\,dx\,dx_0 .$$
+
+    A compact way to describe a distribution is by its **cumulants** $\kappa_n$: the mean ($\kappa_1$, zero here by symmetry), the variance ($\kappa_2 = \langle X^2\rangle_{x,x_0}$), and then the shape ($\kappa_4 = \langle X^4\rangle_{x,x_0} - 3\langle X^2\rangle_{x,x_0}^2$ for a symmetric distribution). In 1D define
+
+    $$D(t) = \frac{\langle X^2\rangle_{x,x_0}}{2t},\qquad K(t) = \frac{\kappa_4}{\kappa_2^2} = \frac{\langle X^4\rangle_{x,x_0}}{\langle X^2\rangle_{x,x_0}^2} - 3 .$$
+
+    $D(t)$ is the apparent diffusivity of the figure above. $K(t)$, the **excess kurtosis**, measures how far the shape is from a Gaussian. Free diffusion is Gaussian at every time, so $K = 0$ (Exercise 1c): **any nonzero $K$ comes from the geometry.**
+
+    The cumulants are the Taylor coefficients of the logarithm of the **characteristic function**:
+
+    $$\ln\big\langle e^{iqX}\big\rangle_{x,x_0} = \sum_{n\ge1}\frac{(iq)^n}{n!}\,\kappa_n = -\frac{q^2}{2}\langle X^2\rangle_{x,x_0} + \frac{q^4}{24}\,\kappa_4 - \dots$$
+
+    Keep this line in mind: 1b shows that a measurement can give you exactly this characteristic function.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(maths):
+    maths(r"""
+    ⇒ Shift the coordinate to the slab centre, $y = x - L/2$, so that odd powers average to zero. The displacement is $X = y - y_0$.
+
+    ⇒ Expand: $\langle X^2\rangle_{x,x_0} = 2\langle y^2\rangle_{x,x_0} - 2\langle y\,y_0\rangle_{x,x_0}$ and $\langle X^4\rangle_{x,x_0} = 2\langle y^4\rangle_{x,x_0} - 8\langle y^3y_0\rangle_{x,x_0} + 6\langle y^2y_0^2\rangle_{x,x_0}$ (using $\langle y^3y_0\rangle_{x,x_0} = \langle y\,y_0^3\rangle_{x,x_0}$, because $P$ is symmetric in $x$ and $x_0$).
+
+    ⇒ Each mixed average is a mode sum, as in Exercise 6: $\langle f(y)\,g(y_0)\rangle_{x,x_0} = \frac1L\sum_n e^{-D\lambda_n t}\,f_n\,g_n$, with $f_n = \int f\,u_n\,dx$.
+
+    ⇒ The coefficients of $y$, $y^2$, $y^3$ follow from integrating by parts. With $k_n = n\pi/L$:
+
+    $$y_n = -\frac{2\sqrt2\,L^{3/2}}{(n\pi)^2}\ (n\ \text{odd}),\qquad (y^2)_n = \frac{2\sqrt2\,L^{5/2}}{(n\pi)^2}\ (n\ \text{even} \ge 2),\qquad (y^3)_n = \sqrt2\,L^{7/2}\Big[-\frac{3}{2(n\pi)^2} + \frac{12}{(n\pi)^4}\Big]\ (n\ \text{odd}),$$
+
+    and zero otherwise; for $n=0$ only $(y^2)_0 = L^{5/2}/12$ survives.
+
+    → $D(t)/D$ and $K(t)$ depend on $t$ only through $Dt/L^2$: one curve for all slabs.
+    """, title="Computing D(t) and K(t) from the modes")
+    return
+
+
+@app.cell(hide_code=True)
+def _(np):
+    def slab_cumulants(tau, N=1500):
+        """D(t)/D0 and excess kurtosis K(t) of the displacement in a slab, uniform start.
+
+        tau = D t / L^2 (array). Closed-form cosine coefficients of (x - L/2)^k, in units L = 1.
+        """
+        tau = np.asarray(tau, float)
+        n = np.arange(1, N + 1)[:, None]
+        k = np.pi * n
+        odd = n % 2 == 1
+        c1 = np.where(odd, -2 * np.sqrt(2) / k**2, 0.0)
+        c3 = np.where(odd, np.sqrt(2) * (-1.5 / k**2 + 12 / k**4), 0.0)
+        c2 = np.where(~odd, 2 * np.sqrt(2) / k**2, 0.0)
+        e = np.exp(-(k**2) * tau[None, :])
+        X2 = 1 / 6 - 2 * (e * c1 * c1).sum(0)
+        X4 = 2 / 80 + 6 / 144 - 8 * (e * c3 * c1).sum(0) + 6 * (e * c2 * c2).sum(0)
+        return X2 / (2 * tau), X4 / X2**2 - 3
+
+    return (slab_cumulants,)
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_FREE, C_MAIN, D1, L1, mo, np, plt, slab_cumulants):
+    _L, _D = L1.value, D1.value
+    _t = np.logspace(-2, 2.7, 300)
+    _d, _K = slab_cumulants(_D * _t / _L**2)
+
+    _fig, _a1 = plt.subplots(figsize=(6.5, 4.6))
+    _a1.semilogx(_t, _d, color=C_MAIN, lw=2, label="D(t) / D")
+    _a1.semilogx(_t, _K, color=C_ALT, lw=2, label="K(t)")
+    _tau = _D * _t / _L**2
+    _sh = _tau < 0.1
+    _a1.semilogx(_t[_sh], 1 - 8 / (3 * np.sqrt(np.pi)) * np.sqrt(_tau[_sh]), color="k", lw=1.0, ls=(0, (4, 3)),
+                 zorder=4, label="short times: 1 − (8/3√π)√(Dt)/L (on top of D)")
+    _a1.semilogx(_t[_sh], 16 / (5 * np.sqrt(np.pi)) * np.sqrt(_tau[_sh]), color=C_ALT, lw=1.1, ls="--",
+                 label="short times: (16/5√π)√(Dt)/L")
+    _a1.axhline(0, color=C_FREE, lw=0.8)
+    _a1.axhline(-0.6, color=C_ALT, lw=0.8, ls=":", label="−3/5")
+    _a1.axvline(_L**2 / (np.pi**2 * _D), color="k", lw=0.8, ls=":")
+    _a1.text(_L**2 / (np.pi**2 * _D), 0.9, " τ₁", fontsize=9)
+    _a1.set(xlabel="t (ms)", ylim=(-0.7, 1.05), title="Diffusivity and kurtosis of the displacement in a slab")
+    _a1.legend(frameon=False, fontsize=7.5, loc="upper center", bbox_to_anchor=(0.5, -0.17), ncol=2)
+    _fig.tight_layout()
+    mo.vstack([_fig, mo.md("Uses L and D from the sliders above the propagator plot.")])
+    return
+
+
+@app.cell(hide_code=True)
+def _(exercise):
+    exercise(r"""
+    **(a)** At long times the start and end positions are independent, and each is uniform in the slab. Show that $X = x - x_0$ then has a **triangular** distribution on $[-L, L]$, and that its excess kurtosis is $K_\infty = -3/5$.
+
+    **(b)** Show that its characteristic function is $\langle e^{iqX}\rangle_{x,x_0} = \operatorname{sinc}^2(qL/2)$, with $\operatorname{sinc}z = \sin z/z$. Expand $\ln\operatorname{sinc}^2(qL/2)$ to order $q^4$ and read off $\kappa_2$ and $\kappa_4$. Do they agree with (a)?
+
+    **(c)** In the figure $K(t)$ is **positive** at short times before it turns negative. Explain both signs.
+    """, "8 · The kurtosis of a slab")
+    return
+
+
+@app.cell(hide_code=True)
+def _(hint):
+    hint(r"""
+    - **(a)** The density of a sum of two independent variables is the convolution of their densities: two boxes give a triangle. For the moments use symmetry, $\langle X^4\rangle_{x,x_0} = 2\int_0^L X^4\,\frac{L - X}{L^2}\,dX$.
+    - **(b)** The characteristic function of a sum of independent variables is the product of theirs. You need $\ln\operatorname{sinc}z = -z^2/6 - z^4/180 - \dots$
+    - **(c)** Split the molecules into two groups: those far from both walls, and those within about $\sqrt{Dt}$ of one.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(answer):
+    answer(r"""
+    **(a)** ⇒ $x$ and $x_0$ are independent and uniform on $[0, L]$, so $X$ has the convolution of two boxes of height $1/L$:
+
+    $$\bar P(X) = \frac{L - |X|}{L^2},\qquad |X|\le L .$$
+
+    ⇒ $\langle X^2\rangle_{x,x_0} = \frac{2}{L^2}\int_0^L X^2(L - X)\,dX = \frac{2}{L^2}\Big(\frac{L^4}{3} - \frac{L^4}{4}\Big) = \frac{L^2}{6}$, the long-time MSD of Exercise 6. ✓
+
+    ⇒ $\langle X^4\rangle_{x,x_0} = \frac{2}{L^2}\Big(\frac{L^6}{5} - \frac{L^6}{6}\Big) = \frac{L^4}{15}$.
+
+    ⇒ $K_\infty = \dfrac{L^4/15}{L^4/36} - 3 = \dfrac{12}{5} - 3 = -\dfrac35$.
+
+    → Negative: compared with a Gaussian of the same variance, the triangle has a broad shoulder and no tails at all. Every bounded distribution leans this way.
+
+    **(b)** ⇒ $\langle e^{iqX}\rangle_{x,x_0} = \langle e^{iqx}\rangle_x\,\langle e^{-iqx_0}\rangle_{x_0} = \big|\langle e^{iqx}\rangle_x\big|^2$, and $\langle e^{iqx}\rangle_x = \frac1L\int_0^L e^{iqx}dx = e^{iqL/2}\operatorname{sinc}(qL/2)$. So $\langle e^{iqX}\rangle_{x,x_0} = \operatorname{sinc}^2(qL/2)$.
+
+    ⇒ With $z = qL/2$: $\ln\operatorname{sinc}^2z = -\frac{z^2}{3} - \frac{z^4}{90} - \dots = -\frac{q^2L^2}{12} - \frac{q^4L^4}{1440} - \dots$
+
+    ⇒ Compare with $-\frac{q^2}{2}\kappa_2 + \frac{q^4}{24}\kappa_4$: $\kappa_2 = L^2/6$ and $\kappa_4 = -L^4/60$, so $K = \kappa_4/\kappa_2^2 = -36/60 = -3/5$. ✓
+
+    **(c)** ⇒ **Short times.** Most molecules are far from the walls and diffuse freely, with variance $2Dt$. Molecules within about $\sqrt{Dt}$ of a wall are held back and spread less. A mixture of zero-mean Gaussians with different variances $\sigma^2$ has $K = 3\,\mathrm{Var}(\sigma^2)/\langle\sigma^2\rangle^2 > 0$: a sharper peak and heavier tails than one Gaussian. The hindered fraction is about $(S/V)\sqrt{Dt}$, so $K$ grows like $\sqrt t$ at first, just as $D(t)$ first drops like $\sqrt t$ ([Mitra et al. 1992](https://doi.org/10.1103/PhysRevLett.68.3555)).
+
+    ⇒ **Long times.** Every molecule feels both walls, and the bounded triangle of (a) takes over: $K\to-3/5$.
+
+    → In between, $K$ peaks at about $+0.2$ near $Dt \approx 0.03\,L^2$ and crosses zero near $Dt \approx 0.08\,L^2$. The same geometry gives both signs: a kurtosis measured at one diffusion time cannot tell heterogeneity from restriction on its own.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Short times: the walls are felt through $S/V$
+
+    At short times a molecule notices a wall only if it starts within a few $\sqrt{Dt}$ of it. Seen from that close, any smooth wall looks flat, and the share of molecules that close to a wall is proportional to the **surface-to-volume ratio** $S/V$ of the pore space. The result holds for every pore shape ([Mitra, Sen, Schwartz & Le Doussal 1992](https://doi.org/10.1103/PhysRevLett.68.3555)):
+
+    $$\frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t)\qquad\text{in } d \text{ dimensions}.$$
+
+    | Pore | $S/V$ | $d$ | $D(t)/D$ at short times |
+    | --- | --- | --- | --- |
+    | slab, width $L$ | $2/L$ | 1 | $1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}L$ |
+    | cylinder, radius $R$ (cross-section) | $2/R$ | 2 | $1 - \frac{4}{3\sqrt\pi}\frac{\sqrt{Dt}}R$ |
+    | sphere, radius $R$ | $3/R$ | 3 | $1 - \frac{4}{3\sqrt\pi}\frac{\sqrt{Dt}}R$ |
+
+    → The first correction knows only $S/V$, nothing else about the shape. Curvature and absorbing walls appear one order later, in the $O(t)$ term ([Mitra, Sen & Schwartz 1993](https://doi.org/10.1103/PhysRevB.47.8565)). Measuring $D(t)$ at short times therefore gives $S/V$ directly; this was first done in porous rocks ([Latour et al. 1993](https://doi.org/10.1006/jmra.1993.1056)).
+
+    → The kurtosis grows at the same order: for a slab $K(t)\approx\frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}L$, the positive short-time kurtosis of Exercise 8(c). Both slab laws are the dashed lines in the figure above. Exercise 9 derives them with the method of images.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(exercise):
+    exercise(r"""
+    Take one flat reflecting wall at $x = 0$, a molecule starting at height $x_0 > 0$, and a free Brownian increment $W\sim\mathcal N(0, 2Dt)$. By the method of images the reflected walker ends at $\lvert x_0 + W\rvert$, so its displacement is $X = \lvert x_0 + W\rvert - x_0$.
+
+    **(a)** Show that $X^2 - W^2 = 4x_0^2 + 4x_0W$ when $x_0 + W < 0$, and $0$ otherwise. Average over $W$ and over $x_0$ (uniform, per unit wall area) to find the deficit $\int_0^\infty\langle X^2 - W^2\rangle_W\,dx_0$. Then put two such walls on a slab of width $L$, with the molecules spread uniformly, and recover $D(t)/D = 1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
+
+    **(b)** *Any shape, any dimension.* Take a pore in $d$ dimensions with a smooth wall, and define $D(t) = \langle\lvert\mathbf X\rvert^2\rangle_{\mathbf r,\mathbf r_0}/(2dt)$. Argue that at short times (i) only molecules within a few $\sqrt{Dt}$ of the wall are affected, (ii) each of them sees a flat wall, and (iii) only the displacement component normal to that wall changes. Use the deficit of (a) to derive Mitra's law.
+
+    **(c)** Do the same as in (a) for $X^4 - W^4$, and show that the slab kurtosis grows as $K(t) \approx \frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
+
+    **(d)** In the figure above, up to which $Dt/L^2$ does each dashed line stay within 5% of the exact curve? (Read $Dt/L^2$ off with the sliders: for $L = 10$ µm and $D = 2$ µm²/ms, $Dt/L^2 = 0.01$ is $t = 0.5$ ms.) Why does the kurtosis line fail first?
+    """, "9 · The surface-to-volume law")
+    return
+
+
+@app.cell(hide_code=True)
+def _(hint):
+    hint(r"""
+    - Scale lengths by $\sigma = \sqrt{2Dt}$: $x_0 = \sigma u$, $W = \sigma w$. The deficits become $\sigma^3 I_2$ and $\sigma^5 I_4$, with pure numbers $I_2$ and $I_4$.
+    - Swap the order of integration: for each $w < 0$, integrate over $u$ from 0 to $-w$ first. You need $\int_{-\infty}^0 \lvert w\rvert^k\,\phi(w)\,dw$ with $\phi$ the standard normal density: $\frac12, \frac1{\sqrt{2\pi}}, \frac12, \frac{2}{\sqrt{2\pi}}, \frac32, \frac{8}{\sqrt{2\pi}}$ for $k = 0..5$.
+    - (b) With uniform density $1/V$, the number of molecules per unit wall area, within reach of the wall, is the same as in (a). How much wall is there per unit volume?
+    - (c) Expand $\langle X^4\rangle_{x,x_0}/\langle X^2\rangle_{x,x_0}^2 - 3$ to first order in the small deficits.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(answer):
+    answer(r"""
+    **(a)** ⇒ If $x_0 + W\ge0$ nothing is reflected and $X = W$. If $x_0 + W < 0$, $X = -2x_0 - W$, so $X^2 - W^2 = 4x_0^2 + 4x_0W$.
+
+    ⇒ Scale with $\sigma$: deficit $= \sigma^3 I_2$, $\ I_2 = \int_{-\infty}^0\phi(w)\int_0^{-w}(4u^2 + 4uw)\,du\,dw$. The inner integral is $\frac43\lvert w\rvert^3 - 2\lvert w\rvert^3 = -\frac23\lvert w\rvert^3$, so $I_2 = -\frac23\cdot\frac{2}{\sqrt{2\pi}} = -\frac{4}{3\sqrt{2\pi}}$.
+
+    ⇒ Two walls, molecules spread over $L$ with density $1/L$: $\langle X^2\rangle_{x,x_0} = \sigma^2 + 2\sigma^3I_2/L$, so
+
+    $$\frac{D(t)}{D} = \frac{\langle X^2\rangle_{x,x_0}}{\sigma^2} = 1 + \frac{2\sigma I_2}{L} = 1 - \frac{8}{3\sqrt{2\pi}}\frac{\sqrt{2Dt}}{L} = 1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}{L}. \checkmark$$
+
+    → The deficit per unit wall area, $\sigma^3I_2 = -\frac{8}{3\sqrt\pi}(Dt)^{3/2}$, is all that (b) needs.
+
+    **(b)** ⇒ (i) A molecule further than a few $\sigma$ from the wall does not reach it: the Gaussian tail beyond is exponentially small. (ii) On the scale $\sigma$ a smooth wall with radius of curvature $\gg\sigma$ is flat. (iii) Split the step into a normal part and $d - 1$ tangential parts. They are independent, and a flat wall reflects only the normal part, so each tangential part keeps its free $2Dt$ and the normal part gives $2Dt$ plus the deficit of (a).
+
+    ⇒ With density $1/V$, the molecules near a piece of wall of area $dS$ give the deficit $\sigma^3I_2\,dS/V$. Summed over the wall:
+
+    $$\langle\lvert\mathbf X\rvert^2\rangle_{\mathbf r,\mathbf r_0} = 2dDt + \frac SV\,\sigma^3I_2 = 2dDt - \frac{8}{3\sqrt\pi}\,\frac SV\,(Dt)^{3/2}.$$
+
+    ⇒ Divide by $2dDt$:
+
+    $$\frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt}. \checkmark$$
+
+    ⇒ Slab: $S/V = 2/L$ and $d = 1$ give (a) back. ✓
+
+    → The steps (i)–(iii) are exactly what fails one order later: curvature on the scale $\sigma$, and corners, give the $O(t)$ term. For a flat wall that term vanishes, and the slab line is exact until molecules from one wall reach the other.
+
+    **(c)** ⇒ For $x_0 + W < 0$: $X^4 - W^4 = (2x_0 + W)^4 - W^4$. The inner integral over $u\in[0,\lvert w\rvert]$ of $(2u + w)^4 - w^4$ is $\frac{(2u+w)^5}{10}\Big|_0^{\lvert w\rvert} - \lvert w\rvert^5 = \frac{\lvert w\rvert^5}{10} + \frac{\lvert w\rvert^5}{10} - \lvert w\rvert^5 = -\frac45\lvert w\rvert^5$, so $I_4 = -\frac45\cdot\frac{8}{\sqrt{2\pi}} = -\frac{32}{5\sqrt{2\pi}}$.
+
+    ⇒ $\langle X^4\rangle_{x,x_0} = 3\sigma^4 + 2\sigma^5I_4/L$ and $\langle X^2\rangle_{x,x_0}^2 = \sigma^4(1 + 4\sigma I_2/L + \dots)$, so
+
+    $$K = \frac{3 + 2\sigma I_4/L}{1 + 4\sigma I_2/L} - 3 \approx \frac{2\sigma}{L}\big(I_4 - 6I_2\big) = \frac{2\sigma}{L}\cdot\frac{8/5}{\sqrt{2\pi}} = \frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}{L} = 1.805\,\frac{\sqrt{Dt}}{L}.$$
+
+    The mode sums give 1.79 at $Dt = 10^{-4}L^2$ and 1.75 at $10^{-3}L^2$, approaching 1.805.
+
+    **(d)** ⇒ $D(t)$: the line is exact (to $10^{-6}$) up to $Dt\approx0.03\,L^2$ and still within 0.2% at $0.08\,L^2$. The two walls act independently until the molecules from one wall reach the other. $K(t)$: within 5% only up to $Dt\approx 2\times10^{-3}L^2$; it peaks at $+0.20$ near $0.03\,L^2$ and changes sign near $0.08\,L^2$, on its way to $-3/5$.
+
+    → The kurtosis is a small excess divided by $\langle X^2\rangle_{x,x_0}^2$. Its next correction is already of relative order $\sqrt{Dt}/L$, while for $D(t)$ next to a flat wall the next correction is exponentially small.
+    """)
     return
 
 
@@ -1464,11 +1585,13 @@ def _(exercise):
         A slab $-a \le x \le a$ (so $L = 2a$) with reflecting outer walls and a permeable membrane at $x = 0$, the same $D$ on both sides.
 
         **(a)** Explain why every mode is either even or odd in $x$, and show that the even modes do not notice the membrane.
+
         **(b)** For the odd modes, try $u = \cos k(a - x)$ for $x>0$ and $u = -\cos k(a + x)$ for $x<0$. Use the membrane condition to show that
 
         $$k\tan(ka) = \frac{2\kappa}{D}.$$
 
         **(c)** Check the limits $\kappa\to 0$ and $\kappa\to\infty$ against what you expect.
+
         **(d)** For small $\kappa$, show that the slowest odd mode decays at the rate $D\lambda \approx 4\kappa/L$, and interpret it.
         """, "10 · Eigenmodes with a permeable membrane")
     return
@@ -1602,7 +1725,7 @@ def _(mo):
     | | **Field picture** | **Path picture** |
     | --- | --- | --- |
     | Follows | the magnetization $m(\mathbf r,t)$ everywhere in the voxel | single spins, each on its own random path $\mathbf r(t)$ |
-    | Computes | a PDE, the Bloch–Torrey equation; then $S = \int m\,d\mathbf r$ at the echo | each spin's phase $\varphi = \gamma\int\mathbf g\cdot\mathbf r\,dt$; then the average $E = \langle e^{-i\varphi}\rangle$ |
+    | Computes | a PDE, the Bloch–Torrey equation; then $S = \int m\,d\mathbf r$ at the echo | each spin's phase $\varphi = \gamma\int\mathbf g\cdot\mathbf r\,dt$; then the average $E = \langle e^{-i\varphi}\rangle_{\text{paths}}$ |
     | The geometry enters as | interface conditions, through the eigenmodes of 1a | walls that reflect the walkers, or let them through |
     | Methods in this course | eigenmodes and matrices (Ch 2a), formulas (Ch 3), grids and meshes (Ch 4) | the cumulant expansion (Ch 2b), Monte Carlo (Ch 5) |
 
@@ -1649,7 +1772,7 @@ def _(mo):
 
     Two conditions of 1a change meaning for magnetization:
 
-    - The partially absorbing wall becomes a **relaxing wall**: $\varrho$ is the surface relaxivity, the rate at which a wall destroys magnetization ([Brownstein & Tarr 1979](https://doi.org/10.1103/PhysRevA.19.2446)). It matters in rocks and porous media, and is rarely needed in soft tissue.
+    - The partially absorbing wall becomes a **relaxing wall**: $\varrho$ is the surface relaxivity, the rate at which a wall destroys magnetization, for example through paramagnetic sites on the wall ([Brownstein & Tarr 1979](https://doi.org/10.1103/PhysRevA.19.2446)). It matters in rocks and porous media, and is rarely needed in soft tissue.
     - A **periodic** outer boundary must remember the gradient. A spin that leaves through one face and re-enters through the opposite face has crossed one period $\mathbf L$ of the tissue, and the gradient has wound a phase across that distance. So $m$ matches on opposite faces only up to that phase: $m(\mathbf r + \mathbf L, t) = e^{-i\mathbf q(t)\cdot\mathbf L}\,m(\mathbf r, t)$, with $\mathbf q(t) = \gamma\int_0^t\mathbf g\,dt'$ (Chapter 4 shows how simulators use it).
 
     The simulators of Chapters 4 and 5 solve this problem as it stands. The exact methods of Chapter 2 and the formulas of Chapter 3 simplify it in three steps:
@@ -1732,7 +1855,7 @@ def _(exercise):
     exercise(r"""
     **(a)** Derive the weak form in 1D on $[a, b]$, and show that the boundary term $[w\,D\,\partial_xm]_a^b$ vanishes for reflecting walls whatever $w$ is.
 
-    **(b)** *The matrix method as a weak form.* In a slab with reflecting walls, expand $m = \sum_nc_n(t)\,u_n(x)$ in the orthonormal eigenmodes and take $w = u_k$. Show that the weak form gives $\dot c_k = -D\lambda_kc_k - i\gamma g(t)\sum_nB_{kn}c_n$, with $B_{kn}$ the position matrix of Exercise 5.
+    **(b)** *The matrix method as a weak form.* In a slab with reflecting walls, expand $m = \sum_nc_n(t)\,u_n(x)$ in the orthonormal eigenmodes and take $w = u_k$. Show that the weak form gives $\dot c_k = -D\lambda_kc_k - i\gamma g(t)\sum_nB_{kn}c_n$, with $B_{kn}$ the position matrix of Exercise 7.
 
     **(c)** For a membrane at $x = 0$ between $[a, 0]$ and $[0, b]$, equal densities, with $m$ and $w$ allowed to jump there: collect the two boundary terms at $x = 0$ and show that they combine into $-\kappa(m_1 - m_2)(w_1 - w_2)$, where 1 and 2 label the two sides.
 
@@ -1805,7 +1928,7 @@ def _(mo):
 
     **Short pulses: the distribution of displacements.** Make both lobes so short that the spins hardly move during them. The first lobe gives each spin the phase $\mathbf q\cdot\mathbf r(0)$ and the second takes away $\mathbf q\cdot\mathbf r(\Delta)$, so $\varphi = -\mathbf q\cdot\mathbf X$ with $\mathbf X$ the displacement of 1a over the time $\Delta$. Then
 
-    $$E = \big\langle e^{i\mathbf q\cdot\mathbf X}\big\rangle ,$$
+    $$E = \big\langle e^{i\mathbf q\cdot\mathbf X}\big\rangle_{\mathbf r,\mathbf r_0} ,$$
 
     the characteristic function of the displacements. Its logarithm has the cumulants of 1a as coefficients, so in this limit $D(t)$ and $K(t)$ are what diffusion and kurtosis imaging estimate. Chapter 3 maps where the limit holds; Chapter 2 shows what changes when the pulses are not short.
 
@@ -1819,14 +1942,17 @@ def _(exercise):
     exercise(r"""
     Work in 1D, in a slab with a constant-in-space gradient $g(t)$ along $x$. Define the **phase-weighted density of walkers**
 
-    $$w(x,t) = \Big\langle e^{-i\varphi_t}\;\delta\big(x - X_t\big)\Big\rangle ,\qquad \varphi_t = \gamma\int_0^t g(t')X_{t'}\,dt' ,$$
+    $$w(x,t) = \Big\langle e^{-i\varphi_t}\;\delta\big(x - X_t\big)\Big\rangle_{\text{paths}} ,\qquad \varphi_t = \gamma\int_0^t g(t')X_{t'}\,dt' ,$$
 
     where $X_t$ is the position of a walker at time $t$. In words: count the walkers that are at $x$ at time $t$, each one weighted by its current phase factor.
 
-    **(a)** Show that $\int w(x,t)\,dx = \langle e^{-i\varphi_t}\rangle$: integrating $w$ gives the path-picture signal.
+    **(a)** Show that $\int w(x,t)\,dx = \langle e^{-i\varphi_t}\rangle_{\text{paths}}$: integrating $w$ gives the path-picture signal.
+
     **(b)** Write $w(x,t+\delta t)$ in terms of $w(\cdot,t)$ for one short step $\delta t$. In that step a walker moves from $y$ to $x$ with the Gaussian step density $p(x-y)$ of variance $2D\,\delta t$, and gains the phase $\gamma g(t)\,y\,\delta t$.
+
     **(c)** Expand for small $\delta t$ and show that $w$ obeys the Bloch–Torrey equation.
-    **(d)** What are the initial and interface conditions for $w$? Conclude that $\int m\,dx = \langle e^{-i\varphi}\rangle$.
+
+    **(d)** What are the initial and interface conditions for $w$? Conclude that $\int m\,dx = \langle e^{-i\varphi}\rangle_{\text{paths}}$.
     """, "13 · Derive the Feynman–Kac relation")
     return
 
@@ -1836,7 +1962,7 @@ def _(hint):
     hint(r"""
     - (a) $\int\delta(x - X_t)\,dx = 1$ for every walker.
     - (b) Sum over where the walker was at time $t$: $w(x,t+\delta t) = \int p(x-y)\,e^{-i\gamma g(t) y\,\delta t}\,w(y,t)\,dy$. The walk has no memory, so only the position at $t$ matters.
-    - (c) Two small things: the phase factor, $e^{-i\gamma g y\delta t}\approx 1 - i\gamma g y\,\delta t$, and the step. For any smooth $f$, write $y = x - s$, Taylor-expand $f(x-s)$ in $s$, and use $\langle s\rangle = 0$ and $\langle s^2\rangle = 2D\,\delta t$.
+    - (c) Two small things: the phase factor, $e^{-i\gamma g y\delta t}\approx 1 - i\gamma g y\,\delta t$, and the step. For any smooth $f$, write $y = x - s$, Taylor-expand $f(x-s)$ in $s$, and use $\langle s\rangle_s = 0$ and $\langle s^2\rangle_s = 2D\,\delta t$.
     """)
     return
 
@@ -1844,7 +1970,7 @@ def _(hint):
 @app.cell(hide_code=True)
 def _(answer):
     answer(r"""
-    **(a)** ⇒ $\int w\,dx = \big\langle e^{-i\varphi_t}\int\delta(x - X_t)\,dx\big\rangle = \langle e^{-i\varphi_t}\rangle$. ✓
+    **(a)** ⇒ $\int w\,dx = \big\langle e^{-i\varphi_t}\int\delta(x - X_t)\,dx\big\rangle_{\text{paths}} = \langle e^{-i\varphi_t}\rangle_{\text{paths}}$. ✓
 
     **(b)** ⇒ A walker at $x$ at $t+\delta t$ was at some $y$ at time $t$, carried the weight $e^{-i\varphi_t}$ there, and multiplied it by $e^{-i\gamma g(t)y\,\delta t}$ during the step:
 
@@ -1872,7 +1998,7 @@ def _(answer):
     ⇒ **Walls:** reflected walkers are never lost, so no weighted walkers flow through a wall: $\partial w/\partial x = 0$, the Neumann condition on $m$.
     ⇒ Same equation, same initial and interface conditions, so the same solution: $w = m$. Then (a) gives
 
-    $$\int m(x,T)\,dx = \big\langle e^{-i\varphi}\big\rangle .\qquad\blacksquare$$
+    $$\int m(x,T)\,dx = \big\langle e^{-i\varphi}\big\rangle_{\text{paths}} .\qquad\blacksquare$$
 
     → **What it means.** The magnetization at $x$ *is* the phase-weighted density of spins at $x$. The PDE tracks the density; the random walk tracks the spins.
     → **What it means for simulation.** Step (b), repeated many times, is a recipe: move each walker with a Gaussian step, then add its phase. That is a Monte Carlo simulation (Chapter 5). Written in the eigenbasis of 1a, the same alternation of "diffuse, then add phase" is the multiple propagator method (Chapter 2). Both converge to the Bloch–Torrey solution as $\delta t\to0$, for exactly the reason shown in (c).
@@ -1898,11 +2024,11 @@ def _(mo):
 
     [Grebenkov (2007)](https://doi.org/10.1103/RevModPhys.79.1077) lists the first four as $L$, $L_p = \sqrt{DT}$, $L_q$ and the relaxation length $L_h = D/\varrho$. The gradient length $\ell_g$ is the one that sets the strong-gradient regime ([Stoller, Happer & Dyson 1991](https://doi.org/10.1103/PhysRevA.44.7459); [de Swiet & Sen 1994](https://doi.org/10.1063/1.467127)). The three are not independent: $\ell_g^3 = \ell_D^2\,\ell_q$.
 
-    | Shortest length | Regime | What the signal does |
-    | --- | --- | --- |
-    | $\ell_D$ | free diffusion, or short times | $E \approx e^{-bD}$; walls only add a correction $\propto (S/V)\sqrt{DT}$ |
-    | $L$ | motional narrowing (fully restricted) | spins average over the pore; slab: $\ln E \approx -\gamma^2g^2L^4T/(120D)$ ([Robertson 1966](https://doi.org/10.1103/PhysRev.151.273)) |
-    | $\ell_g$ | localisation | magnetization survives only in layers of thickness $\sim\ell_g$ at the walls; $\ln E \propto -DT/\ell_g^2 \propto -g^{2/3}T$, not $-g^2$ |
+    | Shortest length | Regime | What the signal does | In this course |
+    | --- | --- | --- | --- |
+    | $\ell_D$ | free diffusion, or short times | $E \approx e^{-bD}$; walls only add a correction $\propto (S/V)\sqrt{DT}$ | Ch 3: short times and the $(q,t)$ map; the $S/V$ law of 1a |
+    | $L$ | motional narrowing (fully restricted) | spins average over the pore; slab: $\ln E \approx -\gamma^2g^2L^4T/(120D)$ ([Robertson 1966](https://doi.org/10.1103/PhysRev.151.273)) | Ch 2: Gaussian phase approximation; Ch 3: motional narrowing |
+    | $\ell_g$ | localisation | magnetization survives only in layers of thickness $\sim\ell_g$ at the walls; $\ln E \propto -DT/\ell_g^2 \propto -g^{2/3}T$, not $-g^2$ | Ch 2: the matrix method (the cumulant series fails); Ch 3: localisation |
 
     For relaxing walls compare $\ell_\varrho$ with $L$. If $\ell_\varrho \gg L$ (the usual case in tissue), spins visit the walls many times before relaxing: the loss is uniform, at rate $\varrho\,S/V$ (the **fast-diffusion** regime, [Brownstein & Tarr 1979](https://doi.org/10.1103/PhysRevA.19.2446)). If $\ell_\varrho \ll L$, relaxation is limited by how fast spins reach the wall.
     """)
@@ -1921,6 +2047,8 @@ def _(maths):
     ⇒ From the second, $t = 1/(\gamma g\ell)$. Put it in the first: $\ell^2 = D/(\gamma g\ell)$, so
 
     $$\ell_g = \left(\frac{D}{\gamma g}\right)^{1/3},\qquad \tau_g = \frac{\ell_g^2}{D}.$$
+
+    → The same length from the table: $\ell_D = \sqrt{DT}$ grows with $T$ and $\ell_q = 1/(\gamma gT)$ shrinks. They are equal at $T = \tau_g$, and there both equal $\ell_g$ (Exercise 14a).
 
     → Closer to a wall than $\ell_g$, a spin is held back by the wall before it can dephase much: that is why magnetization survives there in the localisation regime.
     """, title="Where ℓ_g comes from")
@@ -2010,8 +2138,11 @@ def _(
 def _(exercise):
     exercise(r"""
         **(a)** Show that $\ell_g^3 = \ell_D^2\,\ell_q$.
+
         **(b)** Take $D = 2$ µm²/ms and $T = 60$ ms. Compute $\ell_D$, and $\ell_g$ for $g = 80$ mT/m (clinical) and $g = 300$ mT/m (a strong research scanner). Which regime applies to a 10 µm cell, and to a 1 µm axon?
+
         **(c)** For the 1 µm case, estimate the attenuation from the motional-narrowing formula for a slab at 300 mT/m. What does it tell you about measuring axon diameters?
+
         **(d)** With an illustrative relaxivity $\varrho = 10^{-3}$ µm/ms, are 10 µm cells in the fast-diffusion regime?
         """, "14 · Length scales on real scanners")
     return
@@ -2048,7 +2179,7 @@ def _(mo):
     | Eigenmodes of a pore | $-\nabla^2 u_n = \lambda_n u_n$, $\ \partial u_n/\partial n = 0$; time scales $\tau_n = 1/(D\lambda_n)$ |
     | Propagator | $P(\mathbf r\mid\mathbf r_0,t) = \sum_n u_n(\mathbf r)u_n(\mathbf r_0)e^{-D\lambda_n t}$ |
     | Slab | $u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$, MSD $\to L^2/6$ |
-    | Displacement cumulants | $D(t) = \langle X^2\rangle/2t$, $\ K(t) = \langle X^4\rangle/\langle X^2\rangle^2 - 3$, with $\langle X^k\rangle = \int X^k\,\bar P(X,t)\,dX$ and $\bar P(X,t) = \frac1V\int_V P(\mathbf r_0 + X\mid\mathbf r_0,t)\,d\mathbf r_0$ (uniform start); slab: $K>0$ at short times, $K\to-3/5$ at long times |
+    | Displacement cumulants | $D(t) = \langle X^2\rangle_{x,x_0}/2t$, $\ K(t) = \langle X^4\rangle_{x,x_0}/\langle X^2\rangle_{x,x_0}^2 - 3$, with $\langle X^k\rangle_{x,x_0} = \int X^k\,\bar P(X,t)\,dX$ and $\bar P(X,t) = \frac1V\int_V P(\mathbf r_0 + X\mid\mathbf r_0,t)\,d\mathbf r_0$ (uniform start); slab: $K>0$ at short times, $K\to-3/5$ at long times |
     | Permeable membrane, absorbing walls | modes of the whole domain; exchange rate $\approx 4\kappa/L$; wall loss $\approx\varrho\,S/V$ |
     | Other geometries | disk and sphere: roots of $J_m'$, $j_l'$; cylindrical surface: $\lambda_n = n^2/r^2$ (periodic, no wall); concentric layers weighted by $r_i/\sum r_j$ |
     | Length scales | $\ell_D = \sqrt{DT}$, $\ell_g = (D/\gamma g)^{1/3}$, $\ell_\varrho = D/\varrho$; the shortest of $L$, $\ell_D$, $\ell_g$ sets the regime |
@@ -2056,7 +2187,7 @@ def _(mo):
     | Bloch–Torrey | $\partial m/\partial t = D\nabla^2 m - i\gamma\,\mathbf g(t)\cdot\mathbf r\,m$, $\ E = \frac{1}{S_0}\int m\,d\mathbf r$ |
     | Full problem | per compartment $\partial_tm_n = \nabla\cdot(D_n\nabla m_n) - m_n/T_{2,n} - i\gamma f(t)(\mathbf g\cdot\mathbf r)m_n$, $\ m_n(0) = \rho_n$; simplified by uniform $T_2$, equal densities, one compartment |
     | Weak form | $\int w\,\partial_tm + \int D\nabla w\cdot\nabla m + i\gamma f\int w(\mathbf g\cdot\mathbf r)m = \oint wD\,\partial m/\partial n$ for all $w$; walls natural; modes as test functions give Chapter 2, hats give finite elements |
-    | Path picture (Feynman–Kac) | short pulses: $E = \langle e^{i\mathbf q\cdot\mathbf X}\rangle$; in general $E = \langle e^{-i\varphi}\rangle = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int \mathbf g\cdot\mathbf r_j\,dt$ over the random paths $\mathbf r_j(t)$ of $N$ spins |
+    | Path picture (Feynman–Kac) | short pulses: $E = \langle e^{i\mathbf q\cdot\mathbf X}\rangle_{\mathbf r,\mathbf r_0}$; in general $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int \mathbf g\cdot\mathbf r_j\,dt$ over the random paths $\mathbf r_j(t)$ of $N$ spins |
 
     ---
     ## Coming next
@@ -2066,7 +2197,7 @@ def _(mo):
     Two different series, often confused. **(a)** expands the magnetization in the eigenmodes of 1a: exact once enough modes are kept, at any gradient strength, so it is a numerical method. **(b)** expands $\ln E$ in powers of the gradient: an approximation for weak gradients, which gives closed formulas.
 
     - **2a · Matrix methods.** The gradient as a matrix $\mathbf B$ in the eigenbasis: the eigenmodes stay the same, the gradient only couples them, $d\mathbf c/dt = -(D\Lambda + i\gamma g(t)\mathbf B)\,\mathbf c$. Grebenkov's MCF: one matrix exponential per piece of constant gradient, exact for piecewise-constant waveforms (Barzykin 1999; Grebenkov 2007). The multiple propagator: diffusion and phase kicks in turn, with Strang splitting and its $\tau^2$ error (Caprihan et al. 1996; Callaghan 1997). The time-ordered exponential (Axelrod & Sen 2001); trapezoids and other waveforms. **How many modes:** smoothness of the mirrored magnetization, Jackson's theorem, and why the couplings fall as $1/n^2$. Beyond simple shapes: modes computed on a mesh (SpinDoctor's matrix formalism), a differentiable version for fitting (ReMiDi), and cylindrical surfaces (Canales-Rodríguez, Tax et al. 2026).
-    - **2b · The cumulant expansion.** $\ln E = -\frac12\langle\varphi^2\rangle + \frac1{24}\big(\langle\varphi^4\rangle - 3\langle\varphi^2\rangle^2\big) - \dots$ The second-order term is the **Gaussian phase approximation**: closed formulas from the mode weights and time scales of 1a (Murday & Cotts 1968; Neuman 1974; van Gelderen et al. 1994), the same in frequency as the diffusion spectrum $D(\omega)$ and OGSE (Stepišnik 1993), exact in a harmonic well. Walkers, modes and the GPA side by side: when is the phase Gaussian? The fourth-order term is the **kurtosis** (Jensen et al. 2005). With narrow pulses these are the displacement cumulants $D(t)$ and $K(t)$ of 1a. With finite pulses they become time integrals of multi-time correlation functions, and the measured kurtosis is no longer the displacement kurtosis.
+    - **2b · The cumulant expansion.** $\ln E = -\frac12\langle\varphi^2\rangle_{\text{paths}} + \frac1{24}\big(\langle\varphi^4\rangle_{\text{paths}} - 3\langle\varphi^2\rangle_{\text{paths}}^2\big) - \dots$ The second-order term is the **Gaussian phase approximation**: closed formulas from the mode weights and time scales of 1a (Murday & Cotts 1968; Neuman 1974; van Gelderen et al. 1994), the same in frequency as the diffusion spectrum $D(\omega)$ and OGSE (Stepišnik 1993), exact in a harmonic well. Walkers, modes and the GPA side by side: when is the phase Gaussian? The fourth-order term is the **kurtosis** (Jensen et al. 2005). With narrow pulses these are the displacement cumulants $D(t)$ and $K(t)$ of 1a. With finite pulses they become time integrals of multi-time correlation functions, and the measured kurtosis is no longer the displacement kurtosis.
     - **2c · The link.** Grebenkov's MCF moment series computes each cumulant from the modes; the second is $\propto\iint g(t_1)g(t_2)\,[\mathbf B\,e^{-D\Lambda|t_1-t_2|}\mathbf B]_{00}\,dt_1dt_2$. Where the cumulant series stops converging, and why the matrix methods of 2a do not have that limit.
     - *Implementations:* MCFAL, MISST, SpinDoctor, the cylindrical-surface code; GPA formulas in Camino and dmipy.
 
@@ -2074,7 +2205,7 @@ def _(mo):
 
     A PGSE experiment in a pore is fixed by three dimensionless numbers, $D\Delta/L^2$, $D\delta/L^2$ and $\gamma gL^3/D$. Every closed-form result holds in one corner of this box. The chapter computes each corner by comparing the formula with the exact solutions of Chapter 2.
 
-    - **Narrow pulses, the $(q,t)$ map:** the signal as the characteristic function of the displacement, $E(q,\Delta) = \langle e^{iqX}\rangle$. Short times: free diffusion, the $b$-matrix (Stejskal & Tanner 1965; Basser et al. 1994), the surface-to-volume ratio from $D(t)$ (Mitra et al. 1992) and the short-time kurtosis. Long times: closed pores, tortuosity and structural disorder (Novikov et al. 2014). Large $q$: diffusion–diffraction and the form factors of slab, cylinder and sphere (Tanner & Stejskal 1968; Callaghan et al. 1991). Where the cumulant series stops.
+    - **Narrow pulses, the $(q,t)$ map:** the signal as the characteristic function of the displacement, $E(q,\Delta) = \langle e^{iqX}\rangle_{x,x_0}$. Short times: free diffusion, the $b$-matrix (Stejskal & Tanner 1965; Basser et al. 1994), the surface-to-volume ratio from $D(t)$ (Mitra et al. 1992) and the short-time kurtosis. Long times: closed pores, tortuosity and structural disorder (Novikov et al. 2014). Large $q$: diffusion–diffraction and the form factors of slab, cylinder and sphere (Tanner & Stejskal 1968; Callaghan et al. 1991). Where the cumulant series stops.
     - **Long pulses, the $(g,T)$ map** built from the length scales of 1b: free diffusion, motional narrowing (Robertson 1966) and localisation (Stoller, Happer & Dyson 1991; Hürlimann et al. 1995), meeting at a triple point.
     - **Inside the box:** how the edge of the cumulant region moves with $\delta/\Delta$, and a tested rule for it.
     - **Extra axes:** exchange between compartments (Kärger 1985) and relaxing walls (Brownstein & Tarr 1979).
@@ -2087,7 +2218,7 @@ def _(mo):
 
     **Chapter 5 · Monte Carlo: simulating the random walk**
 
-    - The algorithm from Exercise 13: Gaussian steps, reflection at walls, phase accumulation, and the average $\langle e^{-i\varphi}\rangle$.
+    - The algorithm from Exercise 13: Gaussian steps, reflection at walls, phase accumulation, and the average $\langle e^{-i\varphi}\rangle_{\text{paths}}$.
     - Permeable membranes as a crossing probability; choosing the time step; the $1/\sqrt N$ noise floor, compared with an exact eigenmode solution.
     - Walker histories as reusable data: replay packs that answer any later sequence as an inner product ([Fick 2026](https://arxiv.org/abs/2611.01758)).
     - *Implementations:* Camino, MC-DC Simulator, Disimpy, RMS.

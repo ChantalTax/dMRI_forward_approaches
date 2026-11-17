@@ -395,6 +395,7 @@ def _(mo):
     | Wall and interface conditions | impermeable: $D\,\partial M/\partial n = 0$; membrane: continuous flux $= \kappa\times$ jump in $M$; relaxing wall: $D\,\partial M/\partial n + \rho M = 0$ |
     | The full problem (Ch 1) | compartments $\Omega_n$ with $D_n$, $T_{2,n}$ and spin density $\rho_n$; reflecting outer boundary; on a membrane $\Gamma_{nm}$ continuous flux $= \kappa_{nm}(c_{nm}M_m - c_{mn}M_n)$, $\ c_{nm} = 2\rho_n/(\rho_n + \rho_m)$; the gradient $f(t)\,\mathbf g$ |
     | Weak form (Ch 1) | $\int w\,\partial_tM + \int D\nabla w\cdot\nabla M + i\gamma g\int w\,x\,M = \oint wD\,\partial_nM$ for every $w$; walls natural; modes as test functions give Chapter 2 |
+    | Averages (Ch 1) | the subscript says over what: $\langle f\rangle_{x,x_0}$ over start (uniform) and end, $\langle f\rangle_{\text{paths}}$ over whole random paths |
     | Matrix method (Ch 2) | $d\mathbf c/dt = -(D\Lambda + i\gamma g(t)\mathbf B)\,\mathbf c$ in the eigenmodes: $\Lambda$ diagonal, $\mathbf B$ dense |
     | Length scales | $\ell_D = \sqrt{Dt}$, $\ \ell_g = (D/\gamma g)^{1/3}$, phase wavelength $2\pi/q$ |
     | Tortuosity (Ch 3) | membranes with spacing $L$: $1/D_\infty = 1/D + 1/(\kappa L)$ |
@@ -954,7 +955,7 @@ def _(exercise):
 
     **(b)** Without membranes, what must the single-cell simulation give? Explain why a single cell then reproduces free diffusion exactly, whatever its width.
 
-    **(c)** In the right panel, $D_{\text{app}}$ approaches $D_\infty$ as $1/\Delta$. Chapter 3 said that ordered (periodic) structures approach as $1/t$. Explain the $1/\Delta$ from $\langle X^2\rangle = 2D_\infty t + c$.
+    **(c)** In the right panel, $D_{\text{app}}$ approaches $D_\infty$ as $1/\Delta$. Chapter 3 said that ordered (periodic) structures approach as $1/t$. Explain the $1/\Delta$ from $\langle X^2\rangle_{x,x_0} = 2D_\infty t + c$.
 
     **(d)** Make the membranes very permeable ($\kappa = 10$ µm/ms) and then nearly closed ($\kappa = 0.01$). How long must $\Delta$ be in each case before $D_{\text{app}}$ is within 5% of $D_\infty$? Relate it to the exchange time between cells.
     """, "5 · A periodic cell")
@@ -970,7 +971,7 @@ def _(answer):
 
     **(b)** ⇒ Without membranes the periodic medium is free space, so $E = e^{-bD}$. The single cell has no walls; with $m$ uniform at the start, the stencil keeps it uniform in space, and $m$ just decays through the phase factors: $m(t) = \exp(-D\int_0^tq^2dt')$, exactly $e^{-bD}$ at the echo. The cell width does not matter. The simulation gives 0.995582 against $e^{-bD} = 0.995582$ for $\delta = 2$, $\Delta = 20$ ms, $G = 20$ mT/m.
 
-    **(c)** ⇒ At long times $\langle X^2\rangle = 2D_\infty t + c$, where $c$ is a constant set by the structure of one cell. Then $D(t) = \langle X^2\rangle/2t = D_\infty + c/(2t)$: a $1/t$ approach. In the figure $(D_{\text{app}} - D_\infty)\Delta\approx2.0$ µm² for $\kappa = 0.1$ µm/ms, from 100 to 1000 ms.
+    **(c)** ⇒ At long times $\langle X^2\rangle_{x,x_0} = 2D_\infty t + c$, where $c$ is a constant set by the structure of one cell. Then $D(t) = \langle X^2\rangle_{x,x_0}/2t = D_\infty + c/(2t)$: a $1/t$ approach. In the figure $(D_{\text{app}} - D_\infty)\Delta\approx2.0$ µm² for $\kappa = 0.1$ µm/ms, from 100 to 1000 ms.
 
     **(d)** ⇒ $\kappa = 10$: $\kappa L/D = 40$, the membranes hardly matter, $D_\infty = 1.95$, and $D_{\text{app}}$ is within 5% almost at once (it starts close to $D$ anyway). $\kappa = 0.01$: $D_\infty = 0.077$; $D_{\text{app}}$ is still above $D_\infty$ by about 5% only around $\Delta\approx 1000$ ms.
 
@@ -1475,7 +1476,7 @@ def _(mo):
 
     **Chapter 5 · Monte Carlo: simulating the random walk**
 
-    - No grid and no mesh: walkers take Gaussian steps, reflect at walls, cross membranes with a probability set by $\kappa$, and collect phase; the signal is $\langle e^{-i\varphi}\rangle$ (the Feynman–Kac picture of Chapter 1).
+    - No grid and no mesh: walkers take Gaussian steps, reflect at walls, cross membranes with a probability set by $\kappa$, and collect phase; the signal is $\langle e^{-i\varphi}\rangle_{\text{paths}}$ (the Feynman–Kac picture of Chapter 1).
     - The two errors: a bias from the finite step near walls, and noise that falls only as $1/\sqrt N$, checked against the exact signals of Chapters 2 and 3.
     - Walker histories as reusable data: replay packs ([Fick 2026](https://arxiv.org/abs/2611.01758)).
     - *Implementations:* Camino, MC-DC Simulator, Disimpy, RMS.
