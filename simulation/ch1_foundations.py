@@ -297,7 +297,15 @@ def _(mo):
 
     Together they give
 
-    $$\frac{\partial C}{\partial t} = D\,\nabla^2 C .$$
+    $$\boxed{\ \frac{\partial C}{\partial t} = D\,\nabla^2 C\ }.$$
+
+    **The propagator is one particular solution.** Put a single molecule at $\mathbf r_0$ at $t = 0$: the initial condition $C(\mathbf r, 0) = \delta(\mathbf r - \mathbf r_0)$. Solve the diffusion equation with that start and with the wall conditions of the domain. The solution is the probability density of finding that molecule at $\mathbf r$ at time $t$, which is the propagator:
+
+    $$\boxed{\ P(\mathbf r\mid\mathbf r_0,t) = C(\mathbf r,t)\quad\text{for}\quad C(\mathbf r,0) = \delta(\mathbf r - \mathbf r_0)\ }$$
+
+    → Every other start is a sum of point sources, so one propagator solves the equation for every initial condition: $C(\mathbf r,t) = \int P(\mathbf r\mid\mathbf r_0,t)\,C(\mathbf r_0,0)\,d\mathbf r_0$.
+
+    → Without walls, $P$ is the Gaussian of Exercise 1. With walls, it is built from the eigenmodes of the pore (next sections, Exercise 2).
 
     [Fick (1855)](https://doi.org/10.1002/andp.18551700105) proposed the flux law by analogy with Fourier's law of heat conduction (Fourier 1822): the same equation describes heat, with temperature for $C$ and conductivity for $D$.
     """)
@@ -327,11 +335,11 @@ def _(exercise):
     exercise(r"""
     Without walls (1D) a molecule released at $x=0$ spreads as
 
-    $$G(x,t)=\frac{1}{\sqrt{4\pi Dt}}\exp\!\left(-\frac{x^2}{4Dt}\right).$$
+    $$\boxed{\ G(x,t)=\frac{1}{\sqrt{4\pi Dt}}\exp\!\left(-\frac{x^2}{4Dt}\right)\ }.$$
 
     $G$ is the propagator of free diffusion: a molecule released at any $x_0$ spreads as $P(x\mid x_0,t) = G(x - x_0, t)$.
 
-    **(a)** Check that $G$ solves $\partial G/\partial t = D\,\partial^2 G/\partial x^2$.
+    **(a)** Check that $G$ solves $\partial G/\partial t = D\,\partial^2 G/\partial x^2$, and that it starts as a point: $G(x,t)\to\delta(x)$ as $t\to0$ (it keeps unit area while its width shrinks to zero).
 
     **(b)** Show that its variance is $\langle x^2\rangle_{x\mid 0} = 2Dt$.
 
@@ -490,38 +498,12 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _(mo):
-    bc_check = mo.ui.radio(
-        options=[
-            "a reflecting wall",
-            "no membrane at all",
-            "a perfect sink",
-        ],
-        label="**Quick check:** a membrane with permeability κ → ∞ behaves like…",
-    )
-    bc_check
-    return (bc_check,)
-
-
-@app.cell(hide_code=True)
-def _(bc_check, mo):
-    if bc_check.value is None:
-        _out = mo.md("")
-    elif bc_check.value == "no membrane at all":
-        _out = mo.callout(mo.md("**Yes.** A finite flux with κ → ∞ is only possible if the jump $C_- - C_+$ goes to zero, so $C$ is continuous across the membrane, as in a single compartment."), kind="success")
-    else:
-        _out = mo.callout(mo.md("**Not quite.** Look at the second equality: flux = κ (C₋ − C₊). For the flux to stay finite as κ grows, the jump C₋ − C₊ must shrink to zero."), kind="warn")
-    _out
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
     mo.md(r"""
     ## The full problem, and the step to one compartment
 
     Put the pieces together. In every compartment the molecules diffuse with their own diffusivity, starting from their own equilibrium density:
 
-    $$\frac{\partial C_n}{\partial t} = \nabla\cdot(D_n\nabla C_n)\ \text{ in }\Omega_n,\qquad C_n(\mathbf r,0) = \rho_n,$$
+    $$\boxed{\ \frac{\partial C_n}{\partial t} = \nabla\cdot(D_n\nabla C_n)\ \text{ in }\Omega_n,\qquad C_n(\mathbf r,0) = \rho_n\ },$$
 
     with a reflecting outer edge, $D_n\,\partial C_n/\partial n = 0$ on $\Gamma_n$, and on every membrane $\Gamma_{nm}$
 
@@ -541,7 +523,7 @@ def _(mo):
 
     Put the diffusion equation in a bounded domain $\Omega$: one pore, or several compartments joined by membranes, with any of the interface and boundary conditions of the tables above. Some concentration patterns keep their **shape** and only fade in amplitude. These are the **eigenmodes** $u_n(\mathbf r)$ of the domain. Any initial concentration can be written as a sum of eigenmodes, and each one fades at its own rate:
 
-    $$C(\mathbf r,t) = \sum_n c_n\, u_n(\mathbf r)\, e^{-D\lambda_n t}, \qquad -\nabla^2 u_n = \lambda_n u_n \ \text{in } \Omega, \qquad \text{with the same wall and interface conditions as } C.$$
+    $$\boxed{\ C(\mathbf r,t) = \sum_n c_n\, u_n(\mathbf r)\, e^{-D\lambda_n t}, \qquad -\nabla^2 u_n = \lambda_n u_n \ \text{in } \Omega, \qquad \text{with the same wall and interface conditions as } C\ }.$$
 
     The derivation below shows why the conditions on $C$ carry over to every $u_n$ unchanged. For the reflecting walls of most of this chapter, that is $\partial u_n/\partial n = 0$.
 
@@ -598,7 +580,7 @@ def _(maths):
 
     ⇒ **Point source.** Start with one molecule at $\mathbf r_0$: $C(\mathbf r,0) = \delta(\mathbf r - \mathbf r_0)$. Then $c_n = u_n(\mathbf r_0)$, and the solution is the **propagator**, the probability density of being at $\mathbf r$ at time $t$ after starting at $\mathbf r_0$:
 
-    $$P(\mathbf r\mid\mathbf r_0,t) = \sum_n u_n(\mathbf r)\,u_n(\mathbf r_0)\,e^{-D\lambda_n t}.$$
+    $$\boxed{\ P(\mathbf r\mid\mathbf r_0,t) = \sum_n u_n(\mathbf r)\,u_n(\mathbf r_0)\,e^{-D\lambda_n t}\ }.$$
 
     → Why a point source if molecules start everywhere? Because every other start is a sum of point sources: $C(\mathbf r,t) = \int P(\mathbf r|\mathbf r_0,t)\,C(\mathbf r_0,0)\,d\mathbf r_0$. One propagator serves all initial conditions.
     """, title="Derivation: separation of variables")
@@ -616,7 +598,7 @@ def _(exercise):
 
     **(c)** Show that two different modes are orthogonal.
 
-    **(d)** Write down the propagator $P(x\,|\,x_0,t)$ for the slab.
+    **(d)** A molecule starts at $x_0$: the initial condition is $C(x,0) = \delta(x - x_0)$. Expand it in the modes and write down the propagator $P(x\,|\,x_0,t)$ for the slab.
     """, "2 · Eigenmodes of a slab")
     return
 
@@ -651,7 +633,7 @@ def _(answer):
 
     **(d)** ⇒ Insert into the general propagator:
 
-    $$P(x\,|\,x_0,t) = \frac1L + \frac2L\sum_{n=1}^{\infty}\cos\frac{n\pi x}{L}\cos\frac{n\pi x_0}{L}\,e^{-D(n\pi/L)^2 t}.$$
+    $$\boxed{\ P(x\,|\,x_0,t) = \frac1L + \frac2L\sum_{n=1}^{\infty}\cos\frac{n\pi x}{L}\cos\frac{n\pi x_0}{L}\,e^{-D(n\pi/L)^2 t}\ }.$$
 
     → The first term is the uniform long-time state, $1/L$. The slowest mode that still carries information fades with $\tau_1 = L^2/(\pi^2 D)$: 3.2 ms for $L = 8$ µm and $D = 2$ µm²/ms.
     """)
@@ -1163,7 +1145,7 @@ def _(mo):
 
     The MSD needed the integrals $\int x\,u_n\,dx$. They are the first row of a matrix that every later chapter uses: the **position written in the mode basis**,
 
-    $$B_{nm} = \int u_n(x)\;x\;u_m(x)\,dx ,$$
+    $$\boxed{\ B_{nm} = \int u_n(x)\;x\;u_m(x)\,dx\ },$$
 
     with $x$ measured from the centre of the pore. Like the eigenvalues $\lambda_n$, it depends only on the geometry. Some of its properties hold for any pore, others only for special shapes:
 
@@ -1267,13 +1249,13 @@ def _(mo):
 
     A compact way to describe a distribution is by its **cumulants** $\kappa_n$: the mean ($\kappa_1$, zero here by symmetry), the variance ($\kappa_2 = \langle X^2\rangle_{x,x_0}$), and then the shape ($\kappa_4 = \langle X^4\rangle_{x,x_0} - 3\langle X^2\rangle_{x,x_0}^2$ for a symmetric distribution). In 1D define
 
-    $$D(t) = \frac{\langle X^2\rangle_{x,x_0}}{2t},\qquad K(t) = \frac{\kappa_4}{\kappa_2^2} = \frac{\langle X^4\rangle_{x,x_0}}{\langle X^2\rangle_{x,x_0}^2} - 3 .$$
+    $$\boxed{\ D(t) = \frac{\langle X^2\rangle_{x,x_0}}{2t},\qquad K(t) = \frac{\kappa_4}{\kappa_2^2} = \frac{\langle X^4\rangle_{x,x_0}}{\langle X^2\rangle_{x,x_0}^2} - 3\ }.$$
 
     $D(t)$ is the apparent diffusivity of the figure above. $K(t)$, the **excess kurtosis**, measures how far the shape is from a Gaussian. Free diffusion is Gaussian at every time, so $K = 0$ (Exercise 1c): **any nonzero $K$ comes from the geometry.**
 
     The cumulants are the Taylor coefficients of the logarithm of the **characteristic function**:
 
-    $$\ln\big\langle e^{i\xi X}\big\rangle_{x,x_0} = \sum_{n\ge1}\frac{(i\xi)^n}{n!}\,\kappa_n = -\frac{\xi^2}{2}\langle X^2\rangle_{x,x_0} + \frac{\xi^4}{24}\,\kappa_4 - \dots$$
+    $$\boxed{\ \ln\big\langle e^{i\xi X}\big\rangle_{x,x_0} = \sum_{n\ge1}\frac{(i\xi)^n}{n!}\,\kappa_n = -\frac{\xi^2}{2}\langle X^2\rangle_{x,x_0} + \frac{\xi^4}{24}\,\kappa_4 - \dots\ }$$
 
     Keep this line in mind: 1b shows that a measurement can give you exactly this characteristic function.
     """)
@@ -1407,7 +1389,7 @@ def _(mo):
 
     At short times a molecule notices a wall only if it starts within a few $\sqrt{Dt}$ of it. Seen from that close, any smooth wall looks flat, and the share of molecules that close to a wall is proportional to the **surface-to-volume ratio** $S/V$ of the pore space. The result holds for every pore shape ([Mitra, Sen, Schwartz & Le Doussal 1992](https://doi.org/10.1103/PhysRevLett.68.3555)):
 
-    $$\frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t)\qquad\text{in } d \text{ dimensions}.$$
+    $$\boxed{\ \frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t)\qquad\text{in } d \text{ dimensions}\ }.$$
 
     | Pore | $S/V$ | $d$ | $D(t)/D$ at short times |
     | --- | --- | --- | --- |
@@ -1724,7 +1706,7 @@ def _(mo):
 
     ⇒ Keep track of the characteristic function separately for the molecules that are in compartment $i$ at time $t$, $f_i(\xi,t)$. Diffusion inside and hopping between give a linear system (Exercise 11b):
 
-    $$\frac{d\mathbf f}{dt} = -\big(\xi^2\mathbf D + \mathbf K\big)\,\mathbf f,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},\quad \mathbf f(0) = \mathbf p,$$
+    $$\boxed{\ \frac{d\mathbf f}{dt} = -\big(\xi^2\mathbf D + \mathbf K\big)\,\mathbf f,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},\quad \mathbf f(0) = \mathbf p\ },$$
 
     so that $\langle e^{i\xi X}\rangle_{x,x_0} = (1,1)\,e^{-(\xi^2\mathbf D + \mathbf K)t}\,\mathbf p$. (Bold $\mathbf K$ is the matrix of rates; italic $K$ stays the kurtosis.)
 
@@ -2022,7 +2004,7 @@ def _(mo):
 
     The magnetization lives in the same compartments, with the same conditions, as the concentration in 1a; the block of tissue $\Omega$ is now the imaging voxel, or a piece of it. Two things are added: the gradient, and relaxation, which can differ between compartments. With the gradient written as $\mathbf g(t) = f(t)\,\mathbf g$ (for PGSE, $f = +1$ during the first lobe and $-1$ during the second, once the 180° pulse is folded in), each compartment obeys
 
-    $$\frac{\partial m_n}{\partial t} = \nabla\cdot(D_n\nabla m_n) - \frac{m_n}{T_{2,n}} - i\gamma f(t)\,(\mathbf g\cdot\mathbf r)\,m_n\ \text{ in }\Omega_n,\qquad m_n(\mathbf r,0) = \rho_n,$$
+    $$\boxed{\ \frac{\partial m_n}{\partial t} = \nabla\cdot(D_n\nabla m_n) - \frac{m_n}{T_{2,n}} - i\gamma f(t)\,(\mathbf g\cdot\mathbf r)\,m_n\ \text{ in }\Omega_n,\qquad m_n(\mathbf r,0) = \rho_n\ },$$
 
     | Where | Condition | Meaning |
     | --- | --- | --- |
@@ -2084,7 +2066,7 @@ def _(mo):
 
     ⇒ Integrate the diffusion term by parts (Green's identity). Half of the derivatives move onto $w$, and a boundary term appears:
 
-    $$\int_\Omega w\,\partial_tm\,d\mathbf r + \int_\Omega D\,\nabla w\cdot\nabla m\,d\mathbf r + i\gamma f(t)\int_\Omega w\,(\mathbf g\cdot\mathbf r)\,m\,d\mathbf r = \oint_{\partial\Omega}w\,D\,\frac{\partial m}{\partial n}\,dS\qquad\text{for every } w .$$
+    $$\boxed{\ \int_\Omega w\,\partial_tm\,d\mathbf r + \int_\Omega D\,\nabla w\cdot\nabla m\,d\mathbf r + i\gamma f(t)\int_\Omega w\,(\mathbf g\cdot\mathbf r)\,m\,d\mathbf r = \oint_{\partial\Omega}w\,D\,\frac{\partial m}{\partial n}\,dS\qquad\text{for every } w\ }.$$
 
     This is the **weak form**. It needs only first derivatives of $m$, so $m$ may have kinks, which the equation itself would not allow.
 
@@ -2178,11 +2160,11 @@ def _(mo):
 
     Follow single spins. Each spin random-walks along its own path $\mathbf r(t)$ (reflected at walls, as in 1a) and gathers its own phase
 
-    $$\varphi = \gamma\int_0^T \mathbf g(t)\cdot\mathbf r(t)\,dt .$$
+    $$\boxed{\ \varphi = \gamma\int_0^T \mathbf g(t)\cdot\mathbf r(t)\,dt\ }.$$
 
     The voxel contains so many spins that the signal is the **average phase factor** over all possible paths, starting from uniformly spread positions:
 
-    $$E = \big\langle e^{-i\varphi}\big\rangle_{\text{paths}} .$$
+    $$\boxed{\ E = \big\langle e^{-i\varphi}\big\rangle_{\text{paths}}\ }.$$
 
     In the language of probability: the signal is the **characteristic function** of the random phase. Chapter 5 (Monte Carlo) works this way.
 
@@ -2190,7 +2172,7 @@ def _(mo):
 
     **Short pulses: the distribution of displacements.** Make both lobes so short that the spins hardly move during them. The first lobe gives each spin the phase $\mathbf q\cdot\mathbf r(0)$ and the second takes away $\mathbf q\cdot\mathbf r(\Delta)$, so $\varphi = -\mathbf q\cdot\mathbf X$ with $\mathbf X$ the displacement of 1a over the time $\Delta$. Then
 
-    $$E = \big\langle e^{i\mathbf q\cdot\mathbf X}\big\rangle_{\mathbf r,\mathbf r_0} ,$$
+    $$\boxed{\ E = \big\langle e^{i\mathbf q\cdot\mathbf X}\big\rangle_{\mathbf r,\mathbf r_0}\ },$$
 
     the characteristic function of the displacements of 1a, with the Fourier variable $\xi$ set by the gradient: $\xi = q$. Its logarithm has the cumulants of 1a as coefficients, so in this limit $D(t)$ and $K(t)$ are what diffusion and kurtosis imaging estimate. Chapter 3 maps where the limit holds; Chapter 2 shows what changes when the pulses are not short.
 
@@ -2308,7 +2290,7 @@ def _(maths):
 
     ⇒ From the second, $t = 1/(\gamma g\ell)$. Put it in the first: $\ell^2 = D/(\gamma g\ell)$, so
 
-    $$\ell_g = \left(\frac{D}{\gamma g}\right)^{1/3},\qquad \tau_g = \frac{\ell_g^2}{D}.$$
+    $$\boxed{\ \ell_g = \left(\frac{D}{\gamma g}\right)^{1/3},\qquad \tau_g = \frac{\ell_g^2}{D}\ }.$$
 
     → The same length from the table: $\ell_D = \sqrt{DT}$ grows with $T$ and $\ell_q = 1/(\gamma gT)$ shrinks. They are equal at $T = \tau_g$, and there both equal $\ell_g$ (Exercise 15a).
 
