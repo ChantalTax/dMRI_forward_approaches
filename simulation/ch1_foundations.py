@@ -331,6 +331,75 @@ def _(maths):
 
 
 @app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    **See it: from coin flips to a Gaussian.** Each of 4000 walkers takes $n$ equal steps of $\pm a$ in a time $t$, with $a = \sqrt{2D\,t/n}$, so every walk has the same variance $2Dt$. With one step the walkers sit at two points; with more steps their histogram approaches $G(x,t)$ (left), their variance grows as $2Dt$ (middle), and their characteristic function approaches $e^{-\xi^2Dt}$ (right). Exercise 1 derives the three curves.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    rw_t = mo.ui.slider(0.5, 20.0, step=0.5, value=5.0, label="t (ms)", show_value=True)
+    rw_D = mo.ui.slider(0.5, 3.0, step=0.1, value=2.0, label="D (µm²/ms)", show_value=True)
+    rw_n = mo.ui.dropdown(options=["1", "2", "5", "20", "200"], value="20", label="steps per walk n")
+    mo.hstack([rw_t, rw_D, rw_n], justify="start", gap=2, wrap=True)
+    return rw_D, rw_n, rw_t
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_FREE, C_MAIN, mo, np, plt, rw_D, rw_n, rw_t):
+    _t, _D, _n = rw_t.value, rw_D.value, int(rw_n.value)
+    _N = 4000
+    _a = np.sqrt(2 * _D * _t / _n)                  # step length: n steps give variance 2Dt
+    _rng = np.random.default_rng(1)
+    _steps = _a * (2 * _rng.integers(0, 2, size=(_N, _n)) - 1)
+    _paths = np.cumsum(_steps, axis=1)
+    _x = _paths[:, -1]
+    _sig = np.sqrt(2 * _D * _t)
+
+    _fig, (_a1, _a2, _a3) = plt.subplots(1, 3, figsize=(12, 3.7))
+    # left: histogram against the Gaussian
+    _xx = np.linspace(-4.5 * _sig, 4.5 * _sig, 400)
+    _G = np.exp(-_xx**2 / (4 * _D * _t)) / np.sqrt(4 * np.pi * _D * _t)
+    if _n <= 5:
+        _vals, _cnt = np.unique(np.round(_x / _a).astype(int), return_counts=True)
+        _a1.vlines(_vals * _a, 0, _cnt / _N / (2 * _a), color=C_MAIN, lw=4, label="walkers (mass per site / 2a)")
+    else:
+        _edges = np.arange(-(_n + 1) * _a, (_n + 1.01) * _a, 2 * _a)   # one bin per lattice site (sites are 2a apart)
+        _a1.hist(_x, bins=_edges, density=True, color=C_MAIN, alpha=0.55, label="walkers")
+    _a1.plot(_xx, _G, color=C_ALT, lw=2, label="G(x, t)")
+    _a1.set(xlabel="x (µm)", ylabel="density (1/µm)", xlim=(-4.5 * _sig, 4.5 * _sig), title=f"Positions at t = {_t:g} ms, n = {_n}")
+    _a1.legend(frameon=False, fontsize=8, loc="upper right")
+
+    # middle: variance against time
+    _tk = _t * np.arange(1, _n + 1) / _n
+    _var = (_paths**2).mean(axis=0)
+    _tl = np.linspace(0, 20, 50)
+    _a2.plot(_tl, 2 * _D * _tl, color=C_ALT, lw=2, label="2Dt")
+    _a2.plot(_tk, _var, "o", color=C_MAIN, ms=4 if _n > 20 else 6, label="walkers ⟨x²⟩")
+    _a2.set(xlabel="t (ms)", ylabel="⟨x²⟩ (µm²)", xlim=(0, 20), ylim=(0, 2 * _D * 20 * 1.05),
+            title="Variance grows linearly")
+    _a2.legend(frameon=False, fontsize=8, loc="upper left")
+
+    # right: characteristic function
+    _xi = np.linspace(0, 3.5 / _sig, 200)
+    _cf_walk = np.cos(np.outer(_xi, _x)).mean(axis=1)
+    _a3.plot(_xi, np.exp(-_xi**2 * _D * _t), color=C_ALT, lw=2, label=r"$e^{-\xi^2 Dt}$")
+    _a3.plot(_xi, np.cos(_xi * _a) ** _n, color=C_FREE, lw=1.2, ls="--", label=r"$\cos^n(\xi a)$, exact for the walk")
+    _a3.plot(_xi[::8], _cf_walk[::8], "o", color=C_MAIN, ms=4, label="walkers")
+    _a3.axhline(0, color="0.8", lw=0.8)
+    _a3.set(xlabel="ξ (1/µm)", ylabel=r"$\langle e^{i\xi x}\rangle$", ylim=(-1.05, 1.05), title="Characteristic function")
+    _a3.legend(frameon=False, fontsize=7.5, loc="lower left")
+    _fig.tight_layout()
+    mo.vstack([_fig, mo.md(
+        f"Step length a = {_a:.2f} µm. Walkers: ⟨x²⟩ = **{(_x**2).mean():.2f}** µm², against 2Dt = **{2 * _D * _t:.2f}** µm². "
+        f"Excess kurtosis of the walkers: **{(_x**4).mean() / (_x**2).mean()**2 - 3:+.2f}** (exactly −2/n = {-2 / _n:+.2f} for ±a steps; 0 for the Gaussian)."
+    )])
+    return
+
+
+@app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
     Without walls (1D) a molecule released at $x=0$ spreads as
