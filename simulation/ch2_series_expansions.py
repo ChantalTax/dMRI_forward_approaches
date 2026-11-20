@@ -188,10 +188,10 @@ def _(mo):
     | Eigenmodes of a pore | $-\nabla^2u_n = \lambda_nu_n$, $\ \partial u_n/\partial n = 0$ on the walls, $\ \int u_nu_m = \delta_{nm}$ |
     | Slab | $u_0 = 1/\sqrt L$, $\ u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$ |
     | Propagator | $P(x\mid x_0,t) = \sum_n u_n(x)u_n(x_0)e^{-D\lambda_nt}$ |
-    | Averages $\langle\cdot\rangle$ | the mean over many spins, each starting at a uniformly random $x_0$ and following its own random path: $\langle f\rangle = \lim_{N\to\infty}\frac1N\sum_{j=1}^N f_j$. For start and end points only: $\langle f(x_0, x)\rangle = \frac1L\iint f(x_0, x)\,P(x\mid x_0,t)\,dx\,dx_0$ |
-    | MSD weights in a slab | $\langle(x-x_0)^2\rangle = \frac1L\iint(x-x_0)^2P(x\mid x_0,t)\,dx\,dx_0 = \frac{L^2}{6} - 2\sum_{n\ \text{odd}} \frac{8L^2}{(n\pi)^4}e^{-D\lambda_nt}$ |
+    | Averages (Ch 1) | the subscript says over what: $\langle f\rangle_{x,x_0} = \frac1L\iint f(x, x_0)\,P(x\mid x_0,t)\,dx\,dx_0$ over start (uniform) and end; $\langle f\rangle_{\text{paths}}$ over whole random paths with a uniform start, the mean over $N\to\infty$ walkers; $\langle f\rangle_x = \frac1L\int f\,dx$ over the pore |
+    | MSD weights in a slab | $\langle(x-x_0)^2\rangle_{x,x_0} = \frac1L\iint(x-x_0)^2P(x\mid x_0,t)\,dx\,dx_0 = \frac{L^2}{6} - 2\sum_{n\ \text{odd}} \frac{8L^2}{(n\pi)^4}e^{-D\lambda_nt}$ |
     | Bloch–Torrey | $\partial m/\partial t = D\nabla^2m - i\gamma\,g(t)\,x\,m$, $\ E = \int m\,dx\big/\int m(x,0)\,dx$ |
-    | Path picture | $E = \langle e^{-i\varphi}\rangle = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ |
+    | Path picture | $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ |
     | Gradient length | $\ell_g = (D/\gamma g)^{1/3}$ |
 
     ## Two kinds of series
@@ -201,7 +201,7 @@ def _(mo):
     | | **2a · Eigenmode expansion (matrix methods)** | **2b · Cumulant expansion** |
     | --- | --- | --- |
     | What is expanded | the magnetization $m(x,t)$, in the eigenmodes $u_n$ | $\ln E$, in powers of the gradient |
-    | Small parameter | none: keep enough modes | the phase spread, $\langle\varphi^2\rangle = \lim\frac1N\sum_j\varphi_j^2\lesssim 1$ |
+    | Small parameter | none: keep enough modes | the phase spread, $\langle\varphi^2\rangle_{\text{paths}} = \lim\frac1N\sum_j\varphi_j^2\lesssim 1$ |
     | Result | exact (to any precision) at any gradient | an approximation for weak gradients |
     | Output | numbers | closed formulas you can fit and interpret |
     | First term | — | the Gaussian phase approximation |
@@ -232,7 +232,7 @@ def _(mo):
     - **The gradient couples the modes.** The field $x$ is not a mode, so multiplying a mode by $x$ spreads it over the others; $\mathbf B$ says how much goes where. All the geometry is in $\Lambda$ and $\mathbf B$.
     - **Start and finish.** Spins start uniform, $m(x,0) = u_0$, so $\mathbf c(0) = \mathbf e_0 = (1,0,0,\dots)$. Only the uniform mode has a nonzero integral, so the signal is just the first component at the echo: $E = c_0(T)$.
 
-    $\mathbf B$ is the **position matrix** of Chapter 1 (Exercise 5): real, symmetric, nonzero only between modes of opposite parity, with couplings that fall off as $1/n^2$, and $B_{0n}^2$ equal to the MSD weights. Together, $\Lambda$ and $\mathbf B$ are everything the geometry contributes.
+    $\mathbf B$ is the **position matrix** of Chapter 1 (Exercise 7): real, symmetric, nonzero only between modes of opposite parity, with couplings that fall off as $1/n^2$, and $B_{0n}^2$ equal to the MSD weights. Together, $\Lambda$ and $\mathbf B$ are everything the geometry contributes.
 
     The whole simulation problem is now: propagate $\mathbf c$ from $\mathbf e_0$ to the echo, and read off $c_0$. The methods below differ only in **how they step through time**.
     """)
@@ -254,7 +254,7 @@ def _(maths):
 
     → For a slab the uniform mode is $u_0 = 1/\sqrt L$. With $m(x,0) = u_0$, $\ \int m(x,0)\,dx = \sqrt L$, and at the echo $\int m\,dx = \sum_n c_n\int u_n = c_0\sqrt L$ (all other modes integrate to zero). So $E = c_0(T)$.
 
-    → Measure $x$ from the centre of the pore. Then $B_{00} = \langle x\rangle = 0$, and the diagonal of $\mathbf B$ vanishes for a symmetric pore. A shift of origin would only add a constant to the diagonal, a common phase that a refocused echo removes.
+    → Measure $x$ from the centre of the pore. Then $B_{00} = \langle x\rangle_x = 0$, and the diagonal of $\mathbf B$ vanishes for a symmetric pore. A shift of origin would only add a constant to the diagonal, a common phase that a refocused echo removes.
     """, title="From Bloch–Torrey to dc/dt")
     return
 
@@ -489,7 +489,7 @@ def _(mo):
     Mirroring is what makes the wall behaviour matter. A function with a nonzero slope at a wall gets a kink when mirrored, even if it is perfectly smooth inside. The left panel shows the cosine coefficients of four functions:
 
     - a **step** (a jump): coefficients fall as $1/n$;
-    - the gradient field **$x$** itself: slope 1 at the walls, so the mirror has kinks, and the coefficients fall as $1/n^2$. These are the couplings $B_{0n}$ of Chapter 1, Exercise 5;
+    - the gradient field **$x$** itself: slope 1 at the walls, so the mirror has kinks, and the coefficients fall as $1/n^2$. These are the couplings $B_{0n}$ of Chapter 1, Exercise 7;
     - a **smooth step with zero slope at the walls**: the first jump is in the third derivative of the mirror, so $1/n^4$;
     - the **propagator** at $t > 0$: diffusion has smoothed it completely, and the coefficients $e^{-D\lambda_n t}u_n(x_0)$ fall faster than any power.
 
@@ -552,7 +552,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
-    **(a)** In Chapter 1, Exercise 5 you found that $B_{0n} \propto 1/n^2$. Explain the $1/n^2$ with the mirrored function. Would measuring $x$ from a wall instead of the centre change anything?
+    **(a)** In Chapter 1, Exercise 7 you found that $B_{0n} \propto 1/n^2$. Explain the $1/n^2$ with the mirrored function. Would measuring $x$ from a wall instead of the centre change anything?
 
     **(b)** Use rule 2 for $L = 8$ µm, $D = 2$ µm²/ms and $G = 300$ mT/m: from which $N$ on is the last mode damped more strongly than it is dephased? Compare with the right-hand panel.
 
@@ -603,23 +603,23 @@ def _(mo):
 
     ## Expanding the logarithm of the signal
 
-    The path picture gives $E = \langle e^{-i\varphi}\rangle$: the **characteristic function** of the phase. As for the displacement in Chapter 1, its logarithm is a series of cumulants:
+    The path picture gives $E = \langle e^{-i\varphi}\rangle_{\text{paths}}$: the **characteristic function** of the phase. As for the displacement in Chapter 1, its logarithm is a series of cumulants:
 
-    $$\ln E = \sum_{n\ge1}\frac{(-i)^n}{n!}\,\kappa_n(\varphi) = -\frac12\langle\varphi^2\rangle + \frac1{24}\Big(\langle\varphi^4\rangle - 3\langle\varphi^2\rangle^2\Big) - \dots$$
+    $$\ln E = \sum_{n\ge1}\frac{(-i)^n}{n!}\,\kappa_n(\varphi) = -\frac12\langle\varphi^2\rangle_{\text{paths}} + \frac1{24}\Big(\langle\varphi^4\rangle_{\text{paths}} - 3\langle\varphi^2\rangle_{\text{paths}}^2\Big) - \dots$$
 
     The odd cumulants vanish for a refocused echo in a symmetric pore (the phase is as likely to be $+\varphi$ as $-\varphi$). Since $\varphi \propto g$, this is a series in **powers of the gradient**: $\kappa_2 \propto g^2$, $\kappa_4 \propto g^4$, and so on.
 
-    **The Gaussian phase approximation (GPA)** keeps only the first term: $E \approx e^{-\langle\varphi^2\rangle/2}$. It is exact when the phase is Gaussian (free diffusion, Exercise 4), and good whenever the higher cumulants are small compared with $\langle\varphi^2\rangle$.
+    **The Gaussian phase approximation (GPA)** keeps only the first term: $E \approx e^{-\langle\varphi^2\rangle_{\text{paths}}/2}$. It is exact when the phase is Gaussian (free diffusion, Exercise 4), and good whenever the higher cumulants are small compared with $\langle\varphi^2\rangle_{\text{paths}}$.
 
     ## The second cumulant from the modes
 
     $\varphi = \gamma\int g(t)\,x(t)\,dt$ is linear in the path, so its variance only needs the **position autocorrelation**:
 
-    $$\langle\varphi^2\rangle = \gamma^2\iint g(t_1)\,g(t_2)\,\langle x(t_1)\,x(t_2)\rangle\,dt_1\,dt_2 .$$
+    $$\langle\varphi^2\rangle_{\text{paths}} = \gamma^2\iint g(t_1)\,g(t_2)\,\langle x(t_1)\,x(t_2)\rangle_{\text{paths}}\,dt_1\,dt_2 .$$
 
     In a pore, with spins starting uniformly and $x$ measured from the centre, the propagator of Chapter 1 gives
 
-    $$\langle x(t_1)\,x(t_2)\rangle = \sum_{n\ge1} B_{0n}^2\; e^{-D\lambda_n|t_1-t_2|}.$$
+    $$\langle x(t_1)\,x(t_2)\rangle_{\text{paths}} = \sum_{n\ge1} B_{0n}^2\; e^{-D\lambda_n|t_1-t_2|}.$$
 
     So the GPA needs only two lists per geometry: the weights $w_n = B_{0n}^2$ and the rates $D\lambda_n$. For the slab they are the MSD weights $8L^2/(n\pi)^4$ and $D(n\pi/L)^2$. Each mode contributes a double integral of the waveform against one exponential, which you can do once and for all for a PGSE (Murday & Cotts 1968; Neuman 1974; for any waveform, Stepišnik 1993 and van Gelderen et al. 1994).
     """)
@@ -629,13 +629,13 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(maths):
     maths(r"""
-    ⇒ For a uniform start in a pore of length $L$, $\langle f(x(t_1))\,h(x(t_2))\rangle = \frac1L\iint f(x_0)\,h(x)\,P(x\,|\,x_0,|t_2 - t_1|)\,dx\,dx_0$.
+    ⇒ For a uniform start in a pore of length $L$, $\langle f(x(t_1))\,h(x(t_2))\rangle_{\text{paths}} = \frac1L\iint f(x_0)\,h(x)\,P(x\,|\,x_0,|t_2 - t_1|)\,dx\,dx_0$.
 
-    ⇒ Insert the mode sum of the propagator: $\langle x(t_1)x(t_2)\rangle = \frac1L\sum_n e^{-D\lambda_n|t_1-t_2|}\Big(\int x\,u_n\,dx\Big)^2$.
+    ⇒ Insert the mode sum of the propagator: $\langle x(t_1)x(t_2)\rangle_{\text{paths}} = \frac1L\sum_n e^{-D\lambda_n|t_1-t_2|}\Big(\int x\,u_n\,dx\Big)^2$.
 
-    ⇒ With $u_0 = 1/\sqrt L$: $\frac1{\sqrt L}\int x\,u_n\,dx = \int u_0\,x\,u_n\,dx = B_{0n}$, so each term is $B_{0n}^2e^{-D\lambda_n|t_1-t_2|}$. The $n = 0$ term is $B_{00}^2 = \langle x\rangle^2 = 0$ for a centred $x$.
+    ⇒ With $u_0 = 1/\sqrt L$: $\frac1{\sqrt L}\int x\,u_n\,dx = \int u_0\,x\,u_n\,dx = B_{0n}$, so each term is $B_{0n}^2e^{-D\lambda_n|t_1-t_2|}$. The $n = 0$ term is $B_{00}^2 = \langle x\rangle_x^2 = 0$ for a centred $x$.
 
-    → At $t_1 = t_2$: $\sum_n B_{0n}^2 = \langle x^2\rangle = L^2/12$ for the slab. Check: $\sum_{n\ \text{odd}} 8L^2/(n\pi)^4 = 8L^2/96 = L^2/12$. ✓
+    → At $t_1 = t_2$: $\sum_n B_{0n}^2 = \langle x^2\rangle_x = L^2/12$ for the slab. Check: $\sum_{n\ \text{odd}} 8L^2/(n\pi)^4 = 8L^2/96 = L^2/12$. ✓
     """, title="The position autocorrelation from the modes")
     return
 
@@ -643,7 +643,7 @@ def _(maths):
 @app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
-    **(a)** For **free** diffusion, show that the phase is Gaussian, and that $\langle\varphi^2\rangle = 2bD$ with $b = \int_0^T q(t)^2\,dt$ and $q(t) = \gamma\int_0^t g(t')\,dt'$. Conclude that $E = e^{-bD}$.
+    **(a)** For **free** diffusion, show that the phase is Gaussian, and that $\langle\varphi^2\rangle_{\text{paths}} = 2bD$ with $b = \int_0^T q(t)^2\,dt$ and $q(t) = \gamma\int_0^t g(t')\,dt'$. Conclude that $E = e^{-bD}$.
 
     **(b)** For a PGSE (effective gradient $+G$ on $[0,\delta]$, $-G$ on $[\Delta,\Delta+\delta]$) and one exponential $e^{-a|t_1-t_2|}$, show that
 
@@ -651,7 +651,7 @@ def _(exercise):
 
     **(c)** Check two limits for the slab, using $w_n = 8L^2/(n\pi)^4$, $\sum_n w_n\lambda_n = 1$ and $\sum_{n\ \text{odd}} n^{-6} = \pi^6/960$.
 
-    - Large pore (all $a\delta, a\Delta \ll 1$): you should recover free diffusion, $\langle\varphi^2\rangle = 2bD$ with $b = \gamma^2G^2\delta^2(\Delta - \delta/3)$.
+    - Large pore (all $a\delta, a\Delta \ll 1$): you should recover free diffusion, $\langle\varphi^2\rangle_{\text{paths}} = 2bD$ with $b = \gamma^2G^2\delta^2(\Delta - \delta/3)$.
     - Small pore (all $a\delta \gg 1$): you should recover motional narrowing, $\ln E = -\gamma^2G^2L^4(2\delta)/(120D)$, the formula in the Chapter 1 length-scale table with $T = 2\delta$ the time the gradient is on.
     """, "4 · The Gaussian phase approximation for a slab")
     return
@@ -674,7 +674,7 @@ def _(answer):
 
     ⇒ The increments $dx$ are independent and Gaussian, so $\varphi$ is a weighted sum of independent Gaussians: Gaussian itself, with mean zero.
 
-    ⇒ Variances of independent terms add: $\langle\varphi^2\rangle = \int_0^T q(t)^2\cdot 2D\,dt = 2bD$, and $E = e^{-\langle\varphi^2\rangle/2} = e^{-bD}$. ✓ For a PGSE, $b = \gamma^2G^2\delta^2(\Delta - \delta/3)$ ([Stejskal & Tanner 1965](https://doi.org/10.1063/1.1695690)).
+    ⇒ Variances of independent terms add: $\langle\varphi^2\rangle_{\text{paths}} = \int_0^T q(t)^2\cdot 2D\,dt = 2bD$, and $E = e^{-\langle\varphi^2\rangle_{\text{paths}}/2} = e^{-bD}$. ✓ For a PGSE, $b = \gamma^2G^2\delta^2(\Delta - \delta/3)$ ([Stejskal & Tanner 1965](https://doi.org/10.1063/1.1695690)).
 
     **(b)** ⇒ Same lobe, twice: $2G^2\cdot\frac{2(a\delta - 1 + e^{-a\delta})}{a^2}$.
 
@@ -684,11 +684,11 @@ def _(answer):
 
     **(c)** ⇒ **Large pore.** To first order in $a$: $4(a\delta - 1 + e^{-a\delta}) \approx 2a^2\delta^2 - \frac23a^3\delta^3$ and $4e^{-a\Delta}(\cosh a\delta - 1) \approx 2a^2\delta^2 - 2a^3\Delta\delta^2$. The bracket is $2a^3\delta^2(\Delta - \delta/3)$, so each mode gives $2aG^2\delta^2(\Delta - \delta/3)$.
 
-    ⇒ Summed: $\langle\varphi^2\rangle = 2\gamma^2G^2\delta^2(\Delta - \delta/3)\,D\sum_n w_n\lambda_n = 2bD$, because $\sum_{n\ \text{odd}}\frac{8L^2}{(n\pi)^4}\frac{(n\pi)^2}{L^2} = \frac{8}{\pi^2}\cdot\frac{\pi^2}{8} = 1$. ✓ Before the walls are felt, the pore looks infinite.
+    ⇒ Summed: $\langle\varphi^2\rangle_{\text{paths}} = 2\gamma^2G^2\delta^2(\Delta - \delta/3)\,D\sum_n w_n\lambda_n = 2bD$, because $\sum_{n\ \text{odd}}\frac{8L^2}{(n\pi)^4}\frac{(n\pi)^2}{L^2} = \frac{8}{\pi^2}\cdot\frac{\pi^2}{8} = 1$. ✓ Before the walls are felt, the pore looks infinite.
 
-    ⇒ **Small pore.** For $a\delta \gg 1$ the bracket is $\approx 4a\delta$, so each mode gives $4G^2\delta/a$ and $\langle\varphi^2\rangle = \frac{4\gamma^2G^2\delta}{D}\sum_n\frac{w_n}{\lambda_n} = \frac{4\gamma^2G^2\delta}{D}\cdot 8L^4\sum_{n\ \text{odd}}\frac{1}{(n\pi)^6} = \frac{4\gamma^2G^2\delta L^4}{D}\cdot\frac{8}{960} = \frac{\gamma^2G^2\delta L^4}{30D}$.
+    ⇒ **Small pore.** For $a\delta \gg 1$ the bracket is $\approx 4a\delta$, so each mode gives $4G^2\delta/a$ and $\langle\varphi^2\rangle_{\text{paths}} = \frac{4\gamma^2G^2\delta}{D}\sum_n\frac{w_n}{\lambda_n} = \frac{4\gamma^2G^2\delta}{D}\cdot 8L^4\sum_{n\ \text{odd}}\frac{1}{(n\pi)^6} = \frac{4\gamma^2G^2\delta L^4}{D}\cdot\frac{8}{960} = \frac{\gamma^2G^2\delta L^4}{30D}$.
 
-    ⇒ $\ln E = -\langle\varphi^2\rangle/2 = -\gamma^2G^2L^4(2\delta)/(120D)$. ✓ Motional narrowing ([Robertson 1966](https://doi.org/10.1103/PhysRev.151.273)): the signal no longer depends on $\Delta$, only on how long the gradient is on.
+    ⇒ $\ln E = -\langle\varphi^2\rangle_{\text{paths}}/2 = -\gamma^2G^2L^4(2\delta)/(120D)$. ✓ Motional narrowing ([Robertson 1966](https://doi.org/10.1103/PhysRev.151.273)): the signal no longer depends on $\Delta$, only on how long the gradient is on.
     """)
     return
 
@@ -754,9 +754,9 @@ def _(answer):
     answer(r"""
     **(a)** ⇒ About 205–210 mT/m (1.3% at 150 mT/m, about 30% at 300 mT/m).
 
-    → At low $G$ the signal is close to 1, so $\ln E \approx -\langle\varphi^2\rangle/2$ plus a fourth-cumulant term of order $G^4$ that is still small. The non-Gaussian shape of the phase only matters once its spread approaches about one radian.
+    → At low $G$ the signal is close to 1, so $\ln E \approx -\langle\varphi^2\rangle_{\text{paths}}/2$ plus a fourth-cumulant term of order $G^4$ that is still small. The non-Gaussian shape of the phase only matters once its spread approaches about one radian.
 
-    **(b)** ⇒ A Gaussian phase gives $e^{-\langle\varphi^2\rangle/2}$: positive and monotonic in $G$. A dip and a recovery mean that the phases of different spins interfere and nearly cancel at one $G$, then cancel less at a higher $G$. That needs a phase distribution with structure, here set by the walls: the restricted spins cannot spread their phase indefinitely.
+    **(b)** ⇒ A Gaussian phase gives $e^{-\langle\varphi^2\rangle_{\text{paths}}/2}$: positive and monotonic in $G$. A dip and a recovery mean that the phases of different spins interfere and nearly cancel at one $G$, then cancel less at a higher $G$. That needs a phase distribution with structure, here set by the walls: the restricted spins cannot spread their phase indefinitely.
 
     **(c)** ⇒ $\ln E$ is singular where $E = 0$. A Taylor series converges inside the largest disc around $G = 0$ that contains no singularity, so the cumulant series converges only for $|G| < |G^*| \approx 464$ mT/m (assuming no zero lies closer).
 
@@ -780,7 +780,7 @@ def _(mo):
 
     **With narrow pulses** ($\delta \to 0$), the phase is $-q$ times the displacement $X$ (Chapter 3 derives this), and $b = q^2\Delta$. Then $D_{\text{app}}$ and $K_{\text{app}}$ are exactly the displacement cumulants of Chapter 1: $D(\Delta)$ and $K(\Delta)$.
 
-    **With finite pulses** they are not. During a pulse the spin keeps moving, so the phase records a **time-averaged position** during each lobe, not the end points. The signal becomes the Fourier transform of a "centre-of-mass" propagator, and isolated pores look smaller than they are ([Mitra & Halperin 1995](https://doi.org/10.1006/jmra.1995.1060)). The measured cumulants are then time integrals of the multi-time correlation functions $\langle x(t_1)x(t_2)\rangle$, $\langle x(t_1)x(t_2)x(t_3)x(t_4)\rangle$, … weighted by the waveform.
+    **With finite pulses** they are not. During a pulse the spin keeps moving, so the phase records a **time-averaged position** during each lobe, not the end points. The signal becomes the Fourier transform of a "centre-of-mass" propagator, and isolated pores look smaller than they are ([Mitra & Halperin 1995](https://doi.org/10.1006/jmra.1995.1060)). The measured cumulants are then time integrals of the multi-time correlation functions $\langle x(t_1)x(t_2)\rangle_{\text{paths}}$, $\langle x(t_1)x(t_2)x(t_3)x(t_4)\rangle_{\text{paths}}$, … weighted by the waveform.
 
     The figure extracts $D_{\text{app}}$ and $K_{\text{app}}$ from the exact signal (MCF, a polynomial fit of $\ln E$ in $b$ at small $b$) and compares them with the displacement values of Chapter 1.
     """)
@@ -852,7 +852,7 @@ def _(mo):
 
     Write the variance of the phase in the frequency domain. With $Q(\omega) = \int q(t)\,e^{i\omega t}dt$,
 
-    $$\langle\varphi^2\rangle = \frac2\pi\int_0^\infty |Q(\omega)|^2\,\mathcal D(\omega)\,d\omega ,$$
+    $$\langle\varphi^2\rangle_{\text{paths}} = \frac2\pi\int_0^\infty |Q(\omega)|^2\,\mathcal D(\omega)\,d\omega ,$$
 
     where $\mathcal D(\omega)$ is the **diffusion spectrum**, the Fourier transform of the velocity autocorrelation (Stepišnik 1993). The gradient waveform acts as a filter $|Q(\omega)|^2$ that picks which frequencies of the motion are seen. For free diffusion $\mathcal D(\omega) = D$ at every frequency and Parseval gives back $2bD$. For a pore, the modes give
 
@@ -893,11 +893,11 @@ def _(mo):
 
     The $n$-th term holds $n$ factors of $\mathbf B$ separated by diffusion propagators. Each such sandwich is a **multi-time correlation function** of the position,
 
-    $$\big[\mathbf B\,e^{-D\Lambda(t_2-t_1)}\mathbf B\big]_{00} = \langle x(t_1)\,x(t_2)\rangle,\qquad \big[\mathbf B e^{-D\Lambda\tau_3}\mathbf B e^{-D\Lambda\tau_2}\mathbf B e^{-D\Lambda\tau_1}\mathbf B\big]_{00} = \langle x(t_1)\,x(t_2)\,x(t_3)\,x(t_4)\rangle,\ \dots$$
+    $$\big[\mathbf B\,e^{-D\Lambda(t_2-t_1)}\mathbf B\big]_{00} = \langle x(t_1)\,x(t_2)\rangle_{\text{paths}},\qquad \big[\mathbf B e^{-D\Lambda\tau_3}\mathbf B e^{-D\Lambda\tau_2}\mathbf B e^{-D\Lambda\tau_1}\mathbf B\big]_{00} = \langle x(t_1)\,x(t_2)\,x(t_3)\,x(t_4)\rangle_{\text{paths}},\ \dots$$
 
     which is where the name of the method comes from: **MCF = multiple correlation function** (Grebenkov 2007). The time-ordered exponential of Axelrod & Sen (2001) is the same expansion written compactly.
 
-    - The **moments** of the phase are these terms. Taking the logarithm turns them into **cumulants**: the second-order term is $-\langle\varphi^2\rangle/2$, the GPA.
+    - The **moments** of the phase are these terms. Taking the logarithm turns them into **cumulants**: the second-order term is $-\langle\varphi^2\rangle_{\text{paths}}/2$, the GPA.
     - The matrix methods of 2a sum the whole series at once, by computing the exponentials directly. That is why they work at any $G$.
     - The cumulant series of 2b truncates the logarithm. That is why it has a radius of convergence (Exercise 5c), while the series for $E$ itself does not (for a finite number of modes).
     """)
@@ -909,7 +909,7 @@ def _(exercise):
     exercise(r"""
     **(a)** Why does the first-order term vanish?
 
-    **(b)** Show that the second-order term equals $-\langle\varphi^2\rangle/2$ with $\langle\varphi^2\rangle$ from 2b. Use $\mathbf e_0^{\mathsf T}e^{-D\Lambda s} = \mathbf e_0^{\mathsf T}$ and $e^{-D\Lambda s}\mathbf e_0 = \mathbf e_0$.
+    **(b)** Show that the second-order term equals $-\langle\varphi^2\rangle_{\text{paths}}/2$ with $\langle\varphi^2\rangle_{\text{paths}}$ from 2b. Use $\mathbf e_0^{\mathsf T}e^{-D\Lambda s} = \mathbf e_0^{\mathsf T}$ and $e^{-D\Lambda s}\mathbf e_0 = \mathbf e_0$.
 
     **(c)** For a finite number of modes, the series for $E = c_0(T)$ converges for every $G$, but the cumulant series for $\ln E$ does not. Explain the difference in one sentence. Which would you use to compute the signal at $G = 600$ mT/m in an 8 µm slab, and which to write down a model you can fit?
     """, "7 · The second-order term is the GPA")
@@ -927,13 +927,13 @@ def _(hint):
 @app.cell(hide_code=True)
 def _(answer):
     answer(r"""
-    **(a)** ⇒ It is $-i\gamma B_{00}\int g\,dt$. With $x$ measured from the centre, $B_{00} = \langle x\rangle = 0$. (Even with another origin, $\int g\,dt = 0$ at the echo, so it vanishes anyway.)
+    **(a)** ⇒ It is $-i\gamma B_{00}\int g\,dt$. With $x$ measured from the centre, $B_{00} = \langle x\rangle_x = 0$. (Even with another origin, $\int g\,dt = 0$ at the echo, so it vanishes anyway.)
 
-    **(b)** ⇒ $[\mathbf Be^{-D\Lambda\tau}\mathbf B]_{00} = \sum_n B_{0n}^2e^{-D\lambda_n\tau} = \langle x(t_1)x(t_2)\rangle$ with $\tau = t_2 - t_1$ (2b, and $\mathbf B$ symmetric).
+    **(b)** ⇒ $[\mathbf Be^{-D\Lambda\tau}\mathbf B]_{00} = \sum_n B_{0n}^2e^{-D\lambda_n\tau} = \langle x(t_1)x(t_2)\rangle_{\text{paths}}$ with $\tau = t_2 - t_1$ (2b, and $\mathbf B$ symmetric).
 
-    ⇒ The second-order term is $-\gamma^2\int_{t_1<t_2}g(t_1)g(t_2)\langle x(t_1)x(t_2)\rangle = -\frac{\gamma^2}{2}\iint g(t_1)g(t_2)\langle x(t_1)x(t_2)\rangle = -\frac12\langle\varphi^2\rangle$. ✓
+    ⇒ The second-order term is $-\gamma^2\int_{t_1<t_2}g(t_1)g(t_2)\langle x(t_1)x(t_2)\rangle_{\text{paths}} = -\frac{\gamma^2}{2}\iint g(t_1)g(t_2)\langle x(t_1)x(t_2)\rangle_{\text{paths}} = -\frac12\langle\varphi^2\rangle_{\text{paths}}$. ✓
 
-    ⇒ So to second order $E \approx 1 - \frac12\langle\varphi^2\rangle$, and $\ln E \approx -\frac12\langle\varphi^2\rangle$: the GPA is the first nontrivial term of the matrix expansion.
+    ⇒ So to second order $E \approx 1 - \frac12\langle\varphi^2\rangle_{\text{paths}}$, and $\ln E \approx -\frac12\langle\varphi^2\rangle_{\text{paths}}$: the GPA is the first nontrivial term of the matrix expansion.
 
     **(c)** ⇒ $E$ is a finite sum of exponentials, finite everywhere, so its power series converges for all $G$; $\ln E$ blows up where $E = 0$, which caps the radius of its series.
 
@@ -1244,13 +1244,13 @@ def _(mo):
     | Grebenkov's MCF (PGSE) | $E = [e^{-(D\Lambda - i\gamma G\mathbf B)\delta}e^{-D\Lambda(\Delta-\delta)}e^{-(D\Lambda + i\gamma G\mathbf B)\delta}]_{00}$ |
     | Multiple propagator | $e^{-D\Lambda\tau/2}e^{-i\gamma g\tau\mathbf B}e^{-D\Lambda\tau/2}$ per step; error $\propto\tau^2$ |
     | Number of modes | mirrored $m$ has a jump in $\partial_x^3$: error $\sim N^{-5}$; $D\lambda_N \gg \gamma gL$; double $N$ to check |
-    | Cumulant expansion | $\ln E = -\frac12\langle\varphi^2\rangle + \frac1{24}\kappa_4 - \dots$, $\ \kappa_4 = \langle\varphi^4\rangle - 3\langle\varphi^2\rangle^2$, averages over spins (their random paths); GPA keeps the first term |
-    | GPA from the modes | $\langle\varphi^2\rangle = \gamma^2\iint g(t_1)g(t_2)\langle x(t_1)x(t_2)\rangle dt_1dt_2$, $\ \langle x(t_1)x(t_2)\rangle = \frac1L\iint x_0\,x\,P(x\mid x_0,\lvert t_2-t_1\rvert)\,dx\,dx_0 = \sum_n B_{0n}^2e^{-D\lambda_n\lvert t_1-t_2\rvert}$ |
+    | Cumulant expansion | $\ln E = -\frac12\langle\varphi^2\rangle_{\text{paths}} + \frac1{24}\kappa_4 - \dots$, $\ \kappa_4 = \langle\varphi^4\rangle_{\text{paths}} - 3\langle\varphi^2\rangle_{\text{paths}}^2$, averages over spins (their random paths); GPA keeps the first term |
+    | GPA from the modes | $\langle\varphi^2\rangle_{\text{paths}} = \gamma^2\iint g(t_1)g(t_2)\langle x(t_1)x(t_2)\rangle_{\text{paths}} dt_1dt_2$, $\ \langle x(t_1)x(t_2)\rangle_{\text{paths}} = \frac1L\iint x_0\,x\,P(x\mid x_0,\lvert t_2-t_1\rvert)\,dx\,dx_0 = \sum_n B_{0n}^2e^{-D\lambda_n\lvert t_1-t_2\rvert}$ |
     | Limits of the GPA | large pore: $e^{-bD}$; small pore: $\ln E = -\gamma^2G^2L^4T/(120D)$ |
     | Radius of the cumulant series | $R = \lvert G^*\rvert$, the nearest complex zero of $E(G)$; zeros in fours $\pm G^*, \pm\bar G^*$; $c_{2k}\approx-\frac2k R^{-2k}\cos2k\theta^*$ |
     | Cumulants in practice | $c_k = \mathrm{FFT}(\ln E)_k/(Mr^k)$ on a circle $r < R$; check $c_0\approx0$ and the winding number; polynomial fits in $b$ are biased by the omitted terms |
     | Finite pulses | $D_{\text{app}}$, $K_{\text{app}}$ depend on $\delta$: the centre-of-mass effect |
-    | Diffusion spectrum | $\langle\varphi^2\rangle = \frac2\pi\int_0^\infty\lvert Q\rvert^2\mathcal D(\omega)d\omega$, $\ \mathcal D = \sum w_nD\lambda_n\,\omega^2/((D\lambda_n)^2 + \omega^2)$ |
+    | Diffusion spectrum | $\langle\varphi^2\rangle_{\text{paths}} = \frac2\pi\int_0^\infty\lvert Q\rvert^2\mathcal D(\omega)d\omega$, $\ \mathcal D = \sum w_nD\lambda_n\,\omega^2/((D\lambda_n)^2 + \omega^2)$ |
     | The link | Dyson series of $c_0(T)$: products $[\mathbf B e^{-D\Lambda\tau}\mathbf B\cdots]_{00}$ = multi-time correlation functions |
 
     ---
@@ -1259,7 +1259,7 @@ def _(mo):
     **Chapter 3 · Analytical formulas: a map of the PGSE parameter space**
 
     - **The PGSE box:** three dimensionless numbers, $D\Delta/L^2$, $D\delta/L^2$ and $\gamma gL^3/D$, with a narrow-pulse face and a long-pulse face.
-    - **Narrow pulses, the $(q,t)$ map:** $E = \langle e^{iqX}\rangle$ (Tanner & Stejskal 1968); free diffusion and the $b$-matrix; the surface-to-volume ratio and the short-time kurtosis (Mitra et al. 1992); closed pores, tortuosity and disorder (Novikov et al. 2014); diffraction and the form factors of slab, cylinder and sphere (Callaghan et al. 1991); where the cumulant series stops, $qX_{\text{rms}}\approx1$.
+    - **Narrow pulses, the $(q,t)$ map:** $E = \langle e^{iqX}\rangle_{x,x_0}$ (Tanner & Stejskal 1968); free diffusion and the $b$-matrix; the surface-to-volume ratio and the short-time kurtosis (Mitra et al. 1992); closed pores, tortuosity and disorder (Novikov et al. 2014); diffraction and the form factors of slab, cylinder and sphere (Callaghan et al. 1991); where the cumulant series stops, $qX_{\text{rms}}\approx1$.
     - **Long pulses, the $(g,T)$ map:** free diffusion, motional narrowing (Robertson 1966; Neuman 1974) and localisation (Stoller, Happer & Dyson 1991; Hürlimann et al. 1995), with the triple point.
     - **Inside the box:** when the Gaussian phase approximation of 2b holds for a real PGSE, tested against the exact MCF of 2a.
     - **Extra axes:** relaxing walls (Brownstein & Tarr 1979) and exchange (Kärger 1985).
