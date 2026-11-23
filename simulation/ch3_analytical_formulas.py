@@ -247,7 +247,7 @@ def _(mo):
     | --- | --- |
     | Length scales | pore size $L$; diffusion length $\ell_D = \sqrt{Dt}$; gradient length $\ell_g = (D/\gamma g)^{1/3}$; phase wavelength $1/q$ |
     | Averages (Ch 1) | the subscript says over what: $\langle f\rangle_{x,x_0}$ over start (uniform in the pore, volume $V$) and end; $\langle f\rangle_{\text{paths}}$ over whole random paths, the mean over $N\to\infty$ walkers; $\langle f\rangle_x$ over the pore; $\langle f\rangle_W$ over a random step $W$ |
-    | … of the displacement | $r = x(t) - x_0$: $\ \langle f(r)\rangle_{x,x_0} = \int f(r)\,\bar P(r,t)\,dr$, with the ensemble-average propagator $\bar P(r,t) = \frac1V\int_V P(x_0 + r\mid x_0,t)\,dx_0$ |
+    | … of the displacement | $r = x(t) - x_0$: $\ \langle f(r)\rangle_{x,x_0} = \int f(r)\,\bar P(r,t)\,dr$, with $\bar P(r,t)$ the ensemble-average propagator of Chapter 1 |
     | Displacement cumulants | $\langle r^2\rangle_{x,x_0} = \int r^2\bar P(r,t)\,dr = 2D(t)\,t$, $\ K(t) = \langle r^4\rangle_{x,x_0}/\langle r^2\rangle_{x,x_0}^2 - 3$, with $\langle r^4\rangle_{x,x_0} = \int r^4\bar P(r,t)\,dr$ |
     | Slab, limits | $D(t)\to D$ and $K\to0$ for $t\to0$; $\ \langle r^2\rangle_{x,x_0}\to L^2/6$ and $K\to-3/5$ for $t\to\infty$ |
     | Slab modes | $u_0 = 1/\sqrt L$, $\ u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$, $\ \tau_1 = L^2/(\pi^2D)$ |

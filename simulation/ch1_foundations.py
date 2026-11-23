@@ -311,7 +311,9 @@ def _(mo):
 
     Often we follow all molecules at once, starting spread uniformly over the domain (volume $V$), and ask only how far each one moved: the **displacement** $\mathbf r = \mathbf x - \mathbf x_0$. Its probability density is the **ensemble-average propagator**, the propagator for a move by $\mathbf r$, averaged over all starting points:
 
-    $$\boxed{\ \bar P(\mathbf r,t) = \frac1V\int_V P(\mathbf x_0 + \mathbf r\mid\mathbf x_0,t)\,d\mathbf x_0\ }$$
+    $$\boxed{\ \bar P(\mathbf r,t) = \frac1V\int_V P(\mathbf x_0 + \mathbf r\mid\mathbf x_0,t)\,d\mathbf x_0 = \frac1V\iint\delta\big(\mathbf r - (\mathbf x - \mathbf x_0)\big)\,P(\mathbf x\mid\mathbf x_0,t)\,d\mathbf x\,d\mathbf x_0\ }$$
+
+    The two forms are the same: the second counts every pair of start and end points whose difference is $\mathbf r$, and integrating out $\mathbf x$ against the delta function sets $\mathbf x = \mathbf x_0 + \mathbf r$, which gives the first.
 
     | | $P(\mathbf x\mid\mathbf x_0,t)$ | $\bar P(\mathbf r,t)$ |
     | --- | --- | --- |
@@ -1319,9 +1321,7 @@ def _(mo):
     mo.md(r"""
     ## Beyond the mean-squared displacement: cumulants of the displacement
 
-    The MSD is one number per time. The ensemble-average propagator $\bar P(r,t)$ of the diffusion-equation section holds the whole **distribution of displacements** $r = x - x_0$, averaged over where the molecules start:
-
-    $$\bar P(r,t) = \frac{1}{V}\iint \delta\big(r - (x - x_0)\big)\,P(x\,|\,x_0,t)\,dx\,dx_0 .$$
+    The MSD is one number per time. The ensemble-average propagator $\bar P(r,t)$, defined in the diffusion-equation section, holds the whole **distribution of displacements** $r = x - x_0$ over all molecules.
 
     A compact way to describe a distribution is by its **cumulants** $\kappa_n$: the mean ($\kappa_1$, zero here by symmetry), the variance ($\kappa_2 = \langle r^2\rangle_{x,x_0}$), and then the shape ($\kappa_4 = \langle r^4\rangle_{x,x_0} - 3\langle r^2\rangle_{x,x_0}^2$ for a symmetric distribution). In 1D define
 
