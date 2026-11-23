@@ -1490,7 +1490,16 @@ def _(mo):
     mo.md(r"""
     ## Short times: the walls are felt through $S/V$
 
-    At short times a molecule notices a wall only if it starts within a few $\sqrt{Dt}$ of it. Seen from that close, any smooth wall looks flat, and the share of molecules that close to a wall is proportional to the **surface-to-volume ratio** $S/V$ of the pore space. The result holds for every pore shape ([Mitra, Sen, Schwartz & Le Doussal 1992](https://doi.org/10.1103/PhysRevLett.68.3555)):
+    **Two pools of water.** At short times a molecule only feels a wall if it starts within about one diffusion length $\ell_D = \sqrt{Dt}$ of it. That splits the water into two pools (figure below):
+
+    - the **bulk pool**, further than $\ell_D$ from any wall: it does not know the walls are there and diffuses freely, with $D$;
+    - the **surface pool**, a thin layer of thickness $\ell_D$ along the walls: part of its motion towards the wall is turned back, so it spreads less.
+
+    ⇒ The layer holds a fraction $f\approx\ell_D\,S/V$ of the water: wall area times thickness, divided by the volume. This is where the **surface-to-volume ratio** $S/V$ comes in.
+
+    ⇒ The overall diffusivity is the bulk value minus what the surface pool loses, which is a fixed fraction of its share: $D(t)/D\approx1 - c\,f = 1 - c\,(S/V)\sqrt{Dt}$. The picture gives the form; the constant $c$ needs a calculation (Exercise 9).
+
+    The exact result holds for every pore shape with smooth walls ([Mitra, Sen, Schwartz & Le Doussal, *Phys. Rev. Lett.* 68:3555, 1992](https://doi.org/10.1103/PhysRevLett.68.3555)):
 
     $$\boxed{\ \frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t)\qquad\text{in } d \text{ dimensions}\ }.\tag{1.28}$$
 
@@ -1502,23 +1511,93 @@ def _(mo):
 
     → The first correction knows only $S/V$, nothing else about the shape. Curvature and absorbing walls appear one order later, in the $O(t)$ term ([Mitra, Sen & Schwartz 1993](https://doi.org/10.1103/PhysRevB.47.8565)). Measuring $D(t)$ at short times therefore gives $S/V$ directly; this was first done in porous rocks ([Latour et al. 1993](https://doi.org/10.1006/jmra.1993.1056)).
 
-    → The kurtosis grows at the same order: for a slab $K(t)\approx\frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}L$, the positive short-time kurtosis of Exercise 8(d). Both slab laws are the dashed lines in the figure above. Exercise 9 derives them with the method of images.
+    → The kurtosis grows at the same order: for a slab $K(t)\approx\frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}L$, the positive short-time kurtosis of Exercise 8(d): two pools that spread differently make a mixture of two Gaussians. Both slab laws are the dashed lines in the cumulant figure. Exercise 9 derives them, first with the two-pool picture and then exactly, with the method of images. [Callaghan (2011)](https://doi.org/10.1093/acprof:oso/9780199556984.001.0001) gives a clear account of the same boundary-layer picture.
     """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mt_t = mo.ui.slider(-1.5, 1.0, step=0.05, value=-0.5, label="log₁₀ t (ms)", show_value=True)
+    mt_t
+    return (mt_t,)
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_FREE, C_MAIN, mo, mt_t, np, plt):
+    _D, _t = 2.0, 10**mt_t.value
+    _ell = np.sqrt(_D * _t)
+
+    # left: a pore with the surface pool of thickness ℓ_D
+    _th = np.linspace(0, 2 * np.pi, 600)
+    _rr = 5.0 * (1 + 0.12 * np.cos(3 * _th) + 0.06 * np.sin(2 * _th))
+    _X, _Y = _rr * np.cos(_th), _rr * np.sin(_th)
+    _dX, _dY = np.gradient(_X), np.gradient(_Y)
+    _nrm = np.hypot(_dX, _dY)
+    _nx, _ny = _dY / _nrm, -_dX / _nrm                       # outward normal (counter-clockwise curve)
+    _Xi, _Yi = _X - _ell * _nx, _Y - _ell * _ny
+    _area = 0.5 * np.abs(np.sum(_X * np.roll(_Y, -1) - np.roll(_X, -1) * _Y))
+    _area_i = 0.5 * np.abs(np.sum(_Xi * np.roll(_Yi, -1) - np.roll(_Xi, -1) * _Yi))
+    _perim = np.sum(np.hypot(np.diff(_X), np.diff(_Y)))
+    _f_true, _f_est = 1 - _area_i / _area, _ell * _perim / _area
+
+    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(10.5, 4.3), gridspec_kw={"width_ratios": [1, 1.25]})
+    _a1.fill(_X, _Y, color=C_ALT, alpha=0.35, lw=0)
+    _a1.fill(_Xi, _Yi, color=C_MAIN, alpha=0.18, lw=0)
+    _a1.plot(_X, _Y, color=C_MAIN, lw=2.5)
+    _a1.plot(_Xi, _Yi, color=C_ALT, lw=1, ls="--")
+    _a1.text(0, 0.4, "bulk pool\nfree, D", ha="center", fontsize=10)
+    _j = 0
+    _a1.annotate("", xy=(_X[_j], _Y[_j]), xytext=(_Xi[_j], _Yi[_j]), arrowprops=dict(arrowstyle="<->", lw=1.2, color="k"))
+    _a1.text(_Xi[_j] - 0.3, _Yi[_j] - 0.9, r"$\ell_D = \sqrt{Dt}$", fontsize=10, ha="right")
+    _a1.text(_X[480] + 0.3, _Y[480] - 1.0, "surface pool:\nfeels the wall", fontsize=9, color=C_ALT)
+    _a1.set(aspect="equal", xticks=[], yticks=[], title=f"t = {_t:.3g} ms: surface pool {100 * _f_true:.0f}% of the water")
+    for _sp in _a1.spines.values():
+        _sp.set_visible(False)
+
+    # right: slab of width L, exact D(t) against the short-time laws
+    _L = 10.0
+    _tt = np.logspace(-2, 1.3, 200)
+    _n = np.arange(1, 4001, 2)[:, None]
+    _msd = _L**2 / 6 - 16 * _L**2 / np.pi**4 * (np.exp(-_D * (_n * np.pi / _L) ** 2 * _tt) / _n**4).sum(0)
+    _u = np.sqrt(_D * _tt) / _L
+    _a2.plot(_u, _msd / (2 * _D * _tt), color=C_MAIN, lw=2.4, label="exact (modes)")
+    _a2.plot(_u, 1 - 8 / (3 * np.sqrt(np.pi)) * _u, color="k", lw=1.1, ls="--", label=r"Mitra: $1 - \frac{4}{3\sqrt{\pi}}\frac{S}{V}\sqrt{Dt}$")
+    _a2.plot(_u, 1 - _u, color=C_ALT, lw=1.4, ls=":", label=r"two pools, half the normal motion lost: $1 - \frac{1}{2}\frac{S}{V}\sqrt{Dt}$")
+    _u0 = _ell / _L
+    _m0 = (_L**2 / 6 - 16 * _L**2 / np.pi**4 * (np.exp(-_D * (_n[:, 0] * np.pi / _L) ** 2 * _t) / _n[:, 0] ** 4).sum()) / (2 * _D * _t)
+    _a2.plot(_u0, _m0, "o", color=C_MAIN, ms=7, mec="k", mew=0.5)
+    _a2.set(xlabel=r"$\sqrt{Dt}/L$ (slab, $S/V = 2/L$)", ylabel="D(t) / D", xlim=(0, 0.35), ylim=(0.4, 1.02),
+            title="Slab of width L = 10 µm")
+    _a2.legend(frameon=False, fontsize=7.5, loc="lower left")
+    _fig.tight_layout()
+    mo.vstack([_fig, mo.md(
+        f"Pore: the surface pool is **{100 * _f_true:.1f}%** of the water; the estimate $\\ell_D S/V$ gives **{100 * _f_est:.1f}%** "
+        f"(they part as $\\ell_D$ approaches the radius of curvature of the wall). Slab: D(t)/D = **{_m0:.3f}** at the dot."
+    )])
     return
 
 
 @app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
-    Take one flat reflecting wall at $x = 0$, a molecule starting at height $x_0 > 0$, and a free Brownian increment $W\sim\mathcal N(0, 2Dt)$. By the method of images the reflected walker ends at $\lvert x_0 + W\rvert$, so its displacement is $r = \lvert x_0 + W\rvert - x_0$.
+    **(a)** *The two-pool picture.* Split the water at time $t$ into a surface pool within $\ell_D = \sqrt{Dt}$ of a wall and a bulk pool that diffuses freely.
 
-    **(a)** Show that $r^2 - W^2 = 4x_0^2 + 4x_0W$ when $x_0 + W < 0$, and $0$ otherwise. Average over $W$ and over $x_0$ (uniform, per unit wall area) to find the deficit $\int_0^\infty\langle r^2 - W^2\rangle_W\,dx_0$. Then put two such walls on a slab of width $L$, with the molecules spread uniformly, and recover $D(t)/D = 1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
+    (i) Show that the surface pool holds a fraction $f\approx\ell_D\,S/V$ of the water.
 
-    **(b)** *Any shape, any dimension.* Take a pore in $d$ dimensions with a smooth wall, and define $D(t) = \langle\lvert\mathbf r\rvert^2\rangle_{\mathbf x,\mathbf x_0}/(2dt)$. Argue that at short times (i) only molecules within a few $\sqrt{Dt}$ of the wall are affected, (ii) each of them sees a flat wall, and (iii) only the displacement component normal to that wall changes. Use the deficit of (a) to derive Mitra's law.
+    (ii) Suppose the surface pool loses a fraction $\beta$ of its mean-squared displacement. Show that $D(t)/D\approx1 - \beta\,(S/V)\sqrt{Dt}$: the form of Eq. (1.28).
 
-    **(c)** Do the same as in (a) for $r^4 - W^4$, and show that the slab kurtosis grows as $K(t) \approx \frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
+    (iii) A wall only stops motion along its normal, one of the $d$ directions. Estimate $\beta$ if a molecule in the layer loses half of its motion along the normal, and compare with the exact $4/(3\sqrt\pi\,d)$. Use the figure.
 
-    **(d)** In the figure above, up to which $Dt/L^2$ does each dashed line stay within 5% of the exact curve? (Read $Dt/L^2$ off with the sliders: for $L = 10$ µm and $D = 2$ µm²/ms, $Dt/L^2 = 0.01$ is $t = 0.5$ ms.) Why does the kurtosis line fail first?
+    For (b)–(e), take one flat reflecting wall at $x = 0$, a molecule starting at height $x_0 > 0$, and a free Brownian increment $W\sim\mathcal N(0, 2Dt)$. By the method of images the reflected walker ends at $\lvert x_0 + W\rvert$, so its displacement is $r = \lvert x_0 + W\rvert - x_0$.
+
+    **(b)** Show that $r^2 - W^2 = 4x_0^2 + 4x_0W$ when $x_0 + W < 0$, and $0$ otherwise. Average over $W$ and over $x_0$ (uniform, per unit wall area) to find the deficit $\int_0^\infty\langle r^2 - W^2\rangle_W\,dx_0$. Then put two such walls on a slab of width $L$, with the molecules spread uniformly, and recover $D(t)/D = 1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
+
+    **(c)** *Any shape, any dimension.* Take a pore in $d$ dimensions with a smooth wall, and define $D(t) = \langle\lvert\mathbf r\rvert^2\rangle_{\mathbf x,\mathbf x_0}/(2dt)$. Argue that at short times (i) only molecules within a few $\sqrt{Dt}$ of the wall are affected, (ii) each of them sees a flat wall, and (iii) only the displacement component normal to that wall changes. Use the deficit of (b) to derive Mitra's law.
+
+    **(d)** Do the same as in (b) for $r^4 - W^4$, and show that the slab kurtosis grows as $K(t) \approx \frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
+
+    **(e)** In the cumulant figure, up to which $Dt/L^2$ does each dashed line stay within 5% of the exact curve? (Read $Dt/L^2$ off with the sliders: for $L = 10$ µm and $D = 2$ µm²/ms, $Dt/L^2 = 0.01$ is $t = 0.5$ ms.) Why does the kurtosis line fail first?
     """, "9 · The surface-to-volume law")
     return
 
@@ -1526,10 +1605,11 @@ def _(exercise):
 @app.cell(hide_code=True)
 def _(hint):
     hint(r"""
-    - Scale lengths by $\sigma = \sqrt{2Dt}$: $x_0 = \sigma u$, $W = \sigma w$. The deficits become $\sigma^3 I_2$ and $\sigma^5 I_4$, with pure numbers $I_2$ and $I_4$.
+    - (a) The volume of a thin layer is its area times its thickness. For (ii), write the mean-squared displacement as a weighted sum over the two pools.
+    - (b)–(d): scale lengths by $\sigma = \sqrt{2Dt}$: $x_0 = \sigma u$, $W = \sigma w$. The deficits become $\sigma^3 I_2$ and $\sigma^5 I_4$, with pure numbers $I_2$ and $I_4$.
     - Swap the order of integration: for each $w < 0$, integrate over $u$ from 0 to $-w$ first. You need $\int_{-\infty}^0 \lvert w\rvert^k\,\phi(w)\,dw$ with $\phi$ the standard normal density: $\frac12, \frac1{\sqrt{2\pi}}, \frac12, \frac{2}{\sqrt{2\pi}}, \frac32, \frac{8}{\sqrt{2\pi}}$ for $k = 0..5$.
-    - (b) With uniform density $1/V$, the number of molecules per unit wall area, within reach of the wall, is the same as in (a). How much wall is there per unit volume?
-    - (c) Expand $\langle r^4\rangle_{x,x_0}/\langle r^2\rangle_{x,x_0}^2 - 3$ to first order in the small deficits.
+    - (c) With uniform density $1/V$, the number of molecules per unit wall area, within reach of the wall, is the same as in (b). How much wall is there per unit volume?
+    - (d) Expand $\langle r^4\rangle_{x,x_0}/\langle r^2\rangle_{x,x_0}^2 - 3$ to first order in the small deficits.
     """)
     return
 
@@ -1537,7 +1617,15 @@ def _(hint):
 @app.cell(hide_code=True)
 def _(answer):
     answer(r"""
-    **(a)** ⇒ If $x_0 + W\ge0$ nothing is reflected and $r = W$. If $x_0 + W < 0$, $r = -2x_0 - W$, so $r^2 - W^2 = 4x_0^2 + 4x_0W$.
+    **(a)** ⇒ (i) When $\ell_D$ is much smaller than the radius of curvature of the wall, the layer is a thin shell: volume $\approx S\,\ell_D$, so $f\approx S\ell_D/V$.
+
+    ⇒ (ii) Mean-squared displacement, weighted over the pools: $(1 - f)\cdot2dDt + f\cdot(1 - \beta)\,2dDt = 2dDt\,(1 - \beta f)$. Divide by $2dt$: $D(t)/D\approx1 - \beta f = 1 - \beta\,(S/V)\sqrt{Dt}$. ✓
+
+    ⇒ (iii) The $d - 1$ directions along the wall are free; only the normal one is hindered, so the loss is $1/d$ of a loss along the normal. Losing half of the normal motion gives $\beta\approx\frac{1}{2d}$. The exact constant is $\frac{4}{3\sqrt\pi\,d}\approx\frac{0.75}{d}$: the same form, about 1.5 times larger.
+
+    → The picture gets everything except the number: the $\sqrt t$, the $S/V$ and the $1/d$. The number is larger because molecules somewhat beyond $\ell_D$ still reach the wall, and those very close lose more than half. The method of images below counts both exactly.
+
+    **(b)** ⇒ If $x_0 + W\ge0$ nothing is reflected and $r = W$. If $x_0 + W < 0$, $r = -2x_0 - W$, so $r^2 - W^2 = 4x_0^2 + 4x_0W$.
 
     ⇒ Scale with $\sigma$: deficit $= \sigma^3 I_2$, $\ I_2 = \int_{-\infty}^0\phi(w)\int_0^{-w}(4u^2 + 4uw)\,du\,dw$. The inner integral is $\frac43\lvert w\rvert^3 - 2\lvert w\rvert^3 = -\frac23\lvert w\rvert^3$, so $I_2 = -\frac23\cdot\frac{2}{\sqrt{2\pi}} = -\frac{4}{3\sqrt{2\pi}}$.
 
@@ -1545,9 +1633,9 @@ def _(answer):
 
     $$\frac{D(t)}{D} = \frac{\langle r^2\rangle_{x,x_0}}{\sigma^2} = 1 + \frac{2\sigma I_2}{L} = 1 - \frac{8}{3\sqrt{2\pi}}\frac{\sqrt{2Dt}}{L} = 1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}{L}. \checkmark$$
 
-    → The deficit per unit wall area, $\sigma^3I_2 = -\frac{8}{3\sqrt\pi}(Dt)^{3/2}$, is all that (b) needs.
+    → The deficit per unit wall area, $\sigma^3I_2 = -\frac{8}{3\sqrt\pi}(Dt)^{3/2}$, is all that (c) needs.
 
-    **(b)** ⇒ (i) A molecule further than a few $\sigma$ from the wall does not reach it: the Gaussian tail beyond is exponentially small. (ii) On the scale $\sigma$ a smooth wall with radius of curvature $\gg\sigma$ is flat. (iii) Split the step into a normal part and $d - 1$ tangential parts. They are independent, and a flat wall reflects only the normal part, so each tangential part keeps its free $2Dt$ and the normal part gives $2Dt$ plus the deficit of (a).
+    **(c)** ⇒ (i) A molecule further than a few $\sigma$ from the wall does not reach it: the Gaussian tail beyond is exponentially small. (ii) On the scale $\sigma$ a smooth wall with radius of curvature $\gg\sigma$ is flat. (iii) Split the step into a normal part and $d - 1$ tangential parts. They are independent, and a flat wall reflects only the normal part, so each tangential part keeps its free $2Dt$ and the normal part gives $2Dt$ plus the deficit of (a).
 
     ⇒ With density $1/V$, the molecules near a piece of wall of area $dS$ give the deficit $\sigma^3I_2\,dS/V$. Summed over the wall:
 
@@ -1557,11 +1645,11 @@ def _(answer):
 
     $$\frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt}. \checkmark$$
 
-    ⇒ Slab: $S/V = 2/L$ and $d = 1$ give (a) back. ✓
+    ⇒ Slab: $S/V = 2/L$ and $d = 1$ give (b) back. ✓
 
     → The steps (i)–(iii) are exactly what fails one order later: curvature on the scale $\sigma$, and corners, give the $O(t)$ term. For a flat wall that term vanishes, and the slab line is exact until molecules from one wall reach the other.
 
-    **(c)** ⇒ For $x_0 + W < 0$: $r^4 - W^4 = (2x_0 + W)^4 - W^4$. The inner integral over $u\in[0,\lvert w\rvert]$ of $(2u + w)^4 - w^4$ is $\frac{(2u+w)^5}{10}\Big|_0^{\lvert w\rvert} - \lvert w\rvert^5 = \frac{\lvert w\rvert^5}{10} + \frac{\lvert w\rvert^5}{10} - \lvert w\rvert^5 = -\frac45\lvert w\rvert^5$, so $I_4 = -\frac45\cdot\frac{8}{\sqrt{2\pi}} = -\frac{32}{5\sqrt{2\pi}}$.
+    **(d)** ⇒ For $x_0 + W < 0$: $r^4 - W^4 = (2x_0 + W)^4 - W^4$. The inner integral over $u\in[0,\lvert w\rvert]$ of $(2u + w)^4 - w^4$ is $\frac{(2u+w)^5}{10}\Big|_0^{\lvert w\rvert} - \lvert w\rvert^5 = \frac{\lvert w\rvert^5}{10} + \frac{\lvert w\rvert^5}{10} - \lvert w\rvert^5 = -\frac45\lvert w\rvert^5$, so $I_4 = -\frac45\cdot\frac{8}{\sqrt{2\pi}} = -\frac{32}{5\sqrt{2\pi}}$.
 
     ⇒ $\langle r^4\rangle_{x,x_0} = 3\sigma^4 + 2\sigma^5I_4/L$ and $\langle r^2\rangle_{x,x_0}^2 = \sigma^4(1 + 4\sigma I_2/L + \dots)$, so
 
@@ -1569,7 +1657,7 @@ def _(answer):
 
     The mode sums give 1.79 at $Dt = 10^{-4}L^2$ and 1.75 at $10^{-3}L^2$, approaching 1.805.
 
-    **(d)** ⇒ $D(t)$: the line is exact (to $10^{-6}$) up to $Dt\approx0.03\,L^2$ and still within 0.2% at $0.08\,L^2$. The two walls act independently until the molecules from one wall reach the other. $K(t)$: within 5% only up to $Dt\approx 2\times10^{-3}L^2$; it peaks at $+0.20$ near $0.03\,L^2$ and changes sign near $0.08\,L^2$, on its way to $-3/5$.
+    **(e)** ⇒ $D(t)$: the line is exact (to $10^{-6}$) up to $Dt\approx0.03\,L^2$ and still within 0.2% at $0.08\,L^2$. The two walls act independently until the molecules from one wall reach the other. $K(t)$: within 5% only up to $Dt\approx 2\times10^{-3}L^2$; it peaks at $+0.20$ near $0.03\,L^2$ and changes sign near $0.08\,L^2$, on its way to $-3/5$.
 
     → The kurtosis is a small excess divided by $\langle r^2\rangle_{x,x_0}^2$. Its next correction is already of relative order $\sqrt{Dt}/L$, while for $D(t)$ next to a flat wall the next correction is exponentially small.
     """)
@@ -2603,6 +2691,7 @@ def _(mo):
     | 1992 | [P. P. Mitra, P. N. Sen, L. M. Schwartz & P. Le Doussal, *Phys. Rev. Lett.* 68:3555](https://doi.org/10.1103/PhysRevLett.68.3555) | short-time $D(t)$ and the surface-to-volume ratio |
     | 1994 | [T. M. de Swiet & P. N. Sen, *J. Chem. Phys.* 100:5597](https://doi.org/10.1063/1.467127) | bounded diffusion in a constant gradient; regimes set by length scales |
     | 2007 | [D. S. Grebenkov, *Rev. Mod. Phys.* 79:1077](https://doi.org/10.1103/RevModPhys.79.1077) | review: length scales, eigenmode (MCF) description, numerical methods |
+    | 2011 | [P. T. Callaghan, *Translational Dynamics and Magnetic Resonance*, Oxford University Press](https://doi.org/10.1093/acprof:oso/9780199556984.001.0001) | the boundary-layer picture of restricted diffusion, and much more |
     | 2014 | [D. V. Nguyen, J.-R. Li, D. Grebenkov & D. Le Bihan, *J. Comput. Phys.* 263:283](https://doi.org/10.1016/j.jcp.2014.01.009) | the multi-compartment Bloch–Torrey equation in weak form, with membranes as double nodes |
     | 2025 | [E. J. Canales-Rodríguez, C. M. W. Tax et al., *Front. Phys.* 13:1516630](https://doi.org/10.3389/fphy.2025.1516630) | diffusion on cylindrical surfaces; concentric cylinders for myelin |
     | 2026 | [E. J. Canales-Rodríguez, C. M. W. Tax et al., *Phys. Med. Biol.*](https://doi.org/10.1088/1361-6560/aeb2a0) | exact PGSE signal on a cylindrical surface with the spectral matrix formalism ([arXiv 2603.23421](https://arxiv.org/abs/2603.23421)) |
