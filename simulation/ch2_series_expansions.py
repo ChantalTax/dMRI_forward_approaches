@@ -778,7 +778,7 @@ def _(mo):
 
     $$\ln E = -b\,D_{\text{app}} + \frac16\,b^2D_{\text{app}}^2K_{\text{app}} + O(b^3).$$
 
-    **With narrow pulses** ($\delta \to 0$), the phase is $-q$ times the displacement $X$ (Chapter 3 derives this), and $b = q^2\Delta$. Then $D_{\text{app}}$ and $K_{\text{app}}$ are exactly the displacement cumulants of Chapter 1: $D(\Delta)$ and $K(\Delta)$.
+    **With narrow pulses** ($\delta \to 0$), the phase is $-q$ times the displacement $r$ (Chapter 3 derives this), and $b = q^2\Delta$. Then $D_{\text{app}}$ and $K_{\text{app}}$ are exactly the displacement cumulants of Chapter 1: $D(\Delta)$ and $K(\Delta)$.
 
     **With finite pulses** they are not. During a pulse the spin keeps moving, so the phase records a **time-averaged position** during each lobe, not the end points. The signal becomes the Fourier transform of a "centre-of-mass" propagator, and isolated pores look smaller than they are ([Mitra & Halperin 1995](https://doi.org/10.1006/jmra.1995.1060)). The measured cumulants are then time integrals of the multi-time correlation functions $\langle x(t_1)x(t_2)\rangle_{\text{paths}}$, $\langle x(t_1)x(t_2)x(t_3)x(t_4)\rangle_{\text{paths}}$, … weighted by the waveform.
 
@@ -836,7 +836,7 @@ def _(exercise):
 @app.cell(hide_code=True)
 def _(answer):
     answer(r"""
-    **(a)** ⇒ The $\delta = 0.05$ ms points. With pulses much shorter than $\tau_1$ (and than $\Delta$), the spins barely move during a lobe, the phase is $-qX$, and the signal cumulants are the displacement cumulants (Chapter 1, and Chapter 3 for the narrow-pulse limit). Even then the agreement is only as good as $\delta/\tau_1$ is small: the differences shrink linearly with $\delta$.
+    **(a)** ⇒ The $\delta = 0.05$ ms points. With pulses much shorter than $\tau_1$ (and than $\Delta$), the spins barely move during a lobe, the phase is $-qr$, and the signal cumulants are the displacement cumulants (Chapter 1, and Chapter 3 for the narrow-pulse limit). Even then the agreement is only as good as $\delta/\tau_1$ is small: the differences shrink linearly with $\delta$.
 
     **(b)** ⇒ $D_{\text{app}}$ is below the displacement value: the pore looks **smaller**. During a 10 ms lobe in an 8 µm slab ($\tau_1 \approx 3$ ms) each spin crosses the pore several times, so its time-averaged position sits closer to the centre than its instantaneous position. The phase measures that average, and the distribution of averages is narrower than the pore. This is the centre-of-mass effect of Mitra & Halperin (1995); Codd & Callaghan (1999) showed that long pulses therefore make pores look smaller if one assumes narrow pulses.
 
@@ -974,11 +974,11 @@ def _(mo):
 
     ① **Find the nearest zero $G^*$.** Look for a dip of $\lvert E\rvert$ along real $G$, or for dark spots of $\lvert E\rvert$ in the complex plane, and refine with Newton's method in complex $G$. The MCF needs no change for a complex $G$: it is the same matrix exponential.
 
-    ② **Choose a circle inside the disc**, $r < R$ (here $r = 0.7R$), with $M$ points $G_j = r\,e^{2\pi ij/M}$ ($M = 64$).
+    ② **Choose a circle inside the disc**, of radius $a < R$ (here $a = 0.7R$), with $M$ points $G_j = a\,e^{2\pi ij/M}$ ($M = 64$).
 
     ③ **Compute $\ln E(G_j)$** with its phase unwrapped along the circle.
 
-    ④ **FFT:** $c_k = \mathrm{FFT}(\ln E)_k\big/(M\,r^k)$. This is the trapezoidal rule for Cauchy's integral $c_k = \frac1{2\pi i}\oint\ln E(G)\,G^{-k-1}dG$. On a circle it converges geometrically, with an error of order $(r/R)^M$ ([Trefethen & Weideman 2014](https://doi.org/10.1137/130932132)).
+    ④ **FFT:** $c_k = \mathrm{FFT}(\ln E)_k\big/(M\,a^k)$. This is the trapezoidal rule for Cauchy's integral $c_k = \frac1{2\pi i}\oint\ln E(G)\,G^{-k-1}dG$. On a circle it converges geometrically, with an error of order $(r/R)^M$ ([Trefethen & Weideman 2014](https://doi.org/10.1137/130932132)).
 
     ⑤ **Check:** $c_0\approx0$ (since $E(0) = 1$) and all odd $c_k\approx0$. If the circle encloses a zero, the unwrapped phase does not return to its start: it gains $2\pi$ per zero inside (the argument principle), and both checks fail.
 
@@ -1096,7 +1096,7 @@ def _(
     _cb.set_label("log₁₀ |E(G)|")
     _th = np.linspace(-np.pi / 2, np.pi / 2, 200)
     _a1.plot(rc_R * np.cos(_th), rc_R * np.sin(_th), color=C_ALT, lw=1.6, ls="--", label="|G| = R (radius of convergence)")
-    _a1.plot(rc_r * np.cos(_th), rc_r * np.sin(_th), color="w", lw=1.2, ls=":", label="Cauchy circle, r = 0.7R")
+    _a1.plot(rc_r * np.cos(_th), rc_r * np.sin(_th), color="w", lw=1.2, ls=":", label="Cauchy circle, radius a = 0.7R")
     _tj = 2 * np.pi * np.arange(64) / 64
     _keep = np.cos(_tj) >= 0
     _a1.plot(rc_r * np.cos(_tj[_keep]), rc_r * np.sin(_tj[_keep]), ".", color="w", ms=3)
@@ -1129,7 +1129,7 @@ def _(
                  f"in b-units b\\* = **{_beta * rc_R**2:.2f} ms/µm²**, and b\\*·D_app = **{_beta * rc_R**2 * _Dapp:.2f}**.")
     mo.vstack([_fig, mo.md(
         _ztxt + f" From the circle: D_app/D = **{_Dapp / D0:.4f}**, K_app = **{_Kapp:+.3f}**. "
-        f"Checks: |c₀| = {abs(rc_c[0]):.1e}, largest odd |cₖ|·r = {_odd:.1e}, winding number = {rc_wind}."
+        f"Checks: |c₀| = {abs(rc_c[0]):.1e}, largest odd |cₖ|·a = {_odd:.1e}, winding number = {rc_wind}."
     )])
     return
 
@@ -1248,7 +1248,7 @@ def _(mo):
     | GPA from the modes | $\langle\varphi^2\rangle_{\text{paths}} = \gamma^2\iint g(t_1)g(t_2)\langle x(t_1)x(t_2)\rangle_{\text{paths}} dt_1dt_2$, $\ \langle x(t_1)x(t_2)\rangle_{\text{paths}} = \frac1L\iint x_0\,x\,P(x\mid x_0,\lvert t_2-t_1\rvert)\,dx\,dx_0 = \sum_n B_{0n}^2e^{-D\lambda_n\lvert t_1-t_2\rvert}$ |
     | Limits of the GPA | large pore: $e^{-bD}$; small pore: $\ln E = -\gamma^2G^2L^4T/(120D)$ |
     | Radius of the cumulant series | $R = \lvert G^*\rvert$, the nearest complex zero of $E(G)$; zeros in fours $\pm G^*, \pm\bar G^*$; $c_{2k}\approx-\frac2k R^{-2k}\cos2k\theta^*$ |
-    | Cumulants in practice | $c_k = \mathrm{FFT}(\ln E)_k/(Mr^k)$ on a circle $r < R$; check $c_0\approx0$ and the winding number; polynomial fits in $b$ are biased by the omitted terms |
+    | Cumulants in practice | $c_k = \mathrm{FFT}(\ln E)_k/(Ma^k)$ on a circle of radius $a < R$; check $c_0\approx0$ and the winding number; polynomial fits in $b$ are biased by the omitted terms |
     | Finite pulses | $D_{\text{app}}$, $K_{\text{app}}$ depend on $\delta$: the centre-of-mass effect |
     | Diffusion spectrum | $\langle\varphi^2\rangle_{\text{paths}} = \frac2\pi\int_0^\infty\lvert Q\rvert^2\mathcal D(\omega)d\omega$, $\ \mathcal D = \sum w_nD\lambda_n\,\omega^2/((D\lambda_n)^2 + \omega^2)$ |
     | The link | Dyson series of $c_0(T)$: products $[\mathbf B e^{-D\Lambda\tau}\mathbf B\cdots]_{00}$ = multi-time correlation functions |
@@ -1259,7 +1259,7 @@ def _(mo):
     **Chapter 3 · Analytical formulas: a map of the PGSE parameter space**
 
     - **The PGSE box:** three dimensionless numbers, $D\Delta/L^2$, $D\delta/L^2$ and $\gamma gL^3/D$, with a narrow-pulse face and a long-pulse face.
-    - **Narrow pulses, the $(q,t)$ map:** $E = \langle e^{iqX}\rangle_{x,x_0}$ (Tanner & Stejskal 1968); free diffusion and the $b$-matrix; the surface-to-volume ratio and the short-time kurtosis (Mitra et al. 1992); closed pores, tortuosity and disorder (Novikov et al. 2014); diffraction and the form factors of slab, cylinder and sphere (Callaghan et al. 1991); where the cumulant series stops, $qX_{\text{rms}}\approx1$.
+    - **Narrow pulses, the $(q,t)$ map:** $E = \langle e^{iqr}\rangle_{x,x_0}$ (Tanner & Stejskal 1968); free diffusion and the $b$-matrix; the surface-to-volume ratio and the short-time kurtosis (Mitra et al. 1992); closed pores, tortuosity and disorder (Novikov et al. 2014); diffraction and the form factors of slab, cylinder and sphere (Callaghan et al. 1991); where the cumulant series stops, $qr_{\text{rms}}\approx1$.
     - **Long pulses, the $(g,T)$ map:** free diffusion, motional narrowing (Robertson 1966; Neuman 1974) and localisation (Stoller, Happer & Dyson 1991; Hürlimann et al. 1995), with the triple point.
     - **Inside the box:** when the Gaussian phase approximation of 2b holds for a real PGSE, tested against the exact MCF of 2a.
     - **Extra axes:** relaxing walls (Brownstein & Tarr 1979) and exchange (Kärger 1985).

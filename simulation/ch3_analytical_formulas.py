@@ -182,7 +182,7 @@ def _(mo):
     **What you'll take away**
 
     1. A PGSE experiment in a pore is fixed by **three dimensionless numbers**, $D\Delta/L^2$, $D\delta/L^2$ and $\gamma gL^3/D$. Every closed formula lives in one corner of this box.
-    2. On the **narrow-pulse face** the signal is $\langle e^{iqX}\rangle_{x,x_0}$. The $(q,t)$ map has four regions: free diffusion, short times (surface-to-volume ratio), long times (the pore form factor and diffraction), and the region where cumulants work.
+    2. On the **narrow-pulse face** the signal is $\langle e^{iqr}\rangle_{x,x_0}$. The $(q,t)$ map has four regions: free diffusion, short times (surface-to-volume ratio), long times (the pore form factor and diffraction), and the region where cumulants work.
     3. On the **long-pulse face** the $(g,T)$ map has three regimes, free diffusion, motional narrowing and localisation, which meet at a triple point.
     4. **Inside the box**, for real PGSE sequences: how the edge of the cumulant region moves with $\delta/\Delta$, and a rule for it, tested against the exact signal.
     5. Two **extra axes**: walls that relax magnetization (Brownstein–Tarr) and exchange between compartments (Kärger).
@@ -247,9 +247,9 @@ def _(mo):
     | --- | --- |
     | Length scales | pore size $L$; diffusion length $\ell_D = \sqrt{Dt}$; gradient length $\ell_g = (D/\gamma g)^{1/3}$; phase wavelength $1/q$ |
     | Averages (Ch 1) | the subscript says over what: $\langle f\rangle_{x,x_0}$ over start (uniform in the pore, volume $V$) and end; $\langle f\rangle_{\text{paths}}$ over whole random paths, the mean over $N\to\infty$ walkers; $\langle f\rangle_x$ over the pore; $\langle f\rangle_W$ over a random step $W$ |
-    | … of the displacement | $X = x(t) - x_0$: $\ \langle f(X)\rangle_{x,x_0} = \int f(X)\,\bar P(X,t)\,dX$, with the average propagator $\bar P(X,t) = \frac1V\int_V P(x_0 + X\mid x_0,t)\,dx_0$ |
-    | Displacement cumulants | $\langle X^2\rangle_{x,x_0} = \int X^2\bar P(X,t)\,dX = 2D(t)\,t$, $\ K(t) = \langle X^4\rangle_{x,x_0}/\langle X^2\rangle_{x,x_0}^2 - 3$, with $\langle X^4\rangle_{x,x_0} = \int X^4\bar P(X,t)\,dX$ |
-    | Slab, limits | $D(t)\to D$ and $K\to0$ for $t\to0$; $\ \langle X^2\rangle_{x,x_0}\to L^2/6$ and $K\to-3/5$ for $t\to\infty$ |
+    | … of the displacement | $r = x(t) - x_0$: $\ \langle f(r)\rangle_{x,x_0} = \int f(r)\,\bar P(r,t)\,dr$, with the ensemble-average propagator $\bar P(r,t) = \frac1V\int_V P(x_0 + r\mid x_0,t)\,dx_0$ |
+    | Displacement cumulants | $\langle r^2\rangle_{x,x_0} = \int r^2\bar P(r,t)\,dr = 2D(t)\,t$, $\ K(t) = \langle r^4\rangle_{x,x_0}/\langle r^2\rangle_{x,x_0}^2 - 3$, with $\langle r^4\rangle_{x,x_0} = \int r^4\bar P(r,t)\,dr$ |
+    | Slab, limits | $D(t)\to D$ and $K\to0$ for $t\to0$; $\ \langle r^2\rangle_{x,x_0}\to L^2/6$ and $K\to-3/5$ for $t\to\infty$ |
     | Slab modes | $u_0 = 1/\sqrt L$, $\ u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$, $\ \tau_1 = L^2/(\pi^2D)$ |
     | Path picture | $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ |
     | Exact PGSE (MCF) | $E = [e^{-(D\Lambda - i\gamma G\mathbf B)\delta}\,e^{-D\Lambda(\Delta-\delta)}\,e^{-(D\Lambda + i\gamma G\mathbf B)\delta}]_{00}$ |
@@ -374,13 +374,13 @@ def _(mo):
     ---
     # 3a · The narrow-pulse face: the $(q,t)$ map
 
-    ## From the path picture to $\langle e^{iqX}\rangle_{x,x_0}$
+    ## From the path picture to $\langle e^{iqr}\rangle_{x,x_0}$
 
-    Suppose both gradient pulses are so short that spins do not move while they are on. The first pulse gives each spin the phase $\gamma g\delta\,x(0)$. After the refocusing pulse, the second removes $\gamma g\delta\,x(\Delta)$. So $\varphi = -qX$, with $q = \gamma g\delta$ and the displacement $X = x(\Delta) - x(0)$, and
+    Suppose both gradient pulses are so short that spins do not move while they are on. The first pulse gives each spin the phase $\gamma g\delta\,x(0)$. After the refocusing pulse, the second removes $\gamma g\delta\,x(\Delta)$. So $\varphi = -qr$, with $q = \gamma g\delta$ and the displacement $r = x(\Delta) - x(0)$, and
 
-    $$E(q,\Delta) = \big\langle e^{iqX}\big\rangle_{x,x_0} = \int \bar P(X,\Delta)\,e^{iqX}\,dX ,$$
+    $$E(q,\Delta) = \big\langle e^{iqr}\big\rangle_{x,x_0} = \int \bar P(r,\Delta)\,e^{iqr}\,dr ,$$
 
-    the characteristic function of the displacement: the Fourier transform of the average propagator $\bar P$ of Chapter 1 ([Stejskal & Tanner 1965](https://doi.org/10.1063/1.1695690); [Tanner & Stejskal 1968](https://doi.org/10.1063/1.1670306)). In powers of $q$, the cumulants of $\ln E$ are exactly the displacement cumulants, $\langle X^2\rangle_{x,x_0}$, $K(t)$, …. With finite pulses this identity breaks, because the phase then depends on the whole path, not only on its two end points (Chapter 2, Exercise 6).
+    the characteristic function of the displacement: the Fourier transform of the ensemble-average propagator $\bar P$ of Chapter 1 ([Stejskal & Tanner 1965](https://doi.org/10.1063/1.1695690); [Tanner & Stejskal 1968](https://doi.org/10.1063/1.1670306)). In powers of $q$, the cumulants of $\ln E$ are exactly the displacement cumulants, $\langle r^2\rangle_{x,x_0}$, $K(t)$, …. With finite pulses this identity breaks, because the phase then depends on the whole path, not only on its two end points (Chapter 2, Exercise 6).
 
     → **When is a pulse narrow?** A spin must not move far during a pulse compared with the two lengths the signal resolves: $\sqrt{D\delta} \ll L$ and $\sqrt{D\delta} \ll 1/q$. In addition $\delta \ll \Delta$.
 
@@ -479,11 +479,11 @@ def _(mo):
     1. **free** diffusion, $E = e^{-q^2Dt}$;
     2. **short times**, a Gaussian with the wall-corrected $D(t)$ of Mitra et al. (below);
     3. **form factor**, the $t\to\infty$ limit $\operatorname{sinc}^2(qL/2)$;
-    4. **Gaussian cumulant**, $e^{-q^2\langle X^2\rangle_{x,x_0}/2}$, using the exact $\langle X^2\rangle_{x,x_0}$ of Chapter 1.
+    4. **Gaussian cumulant**, $e^{-q^2\langle r^2\rangle_{x,x_0}/2}$, using the exact $\langle r^2\rangle_{x,x_0}$ of Chapter 1.
 
     White means that none of them works: there you need the full solution (Chapter 2, 4 or 5). Two grey zones are excluded. **Light grey**: $E > 0.97$, where the signal has hardly decayed and every formula trivially agrees. **Dark grey**: $E < 10^{-3}$, below a typical noise floor.
 
-    The lines are the length-scale estimates: $\ell_D = L$ (horizontal), $q\ell_D = 1$ (diagonal), $qL = 1$ and $qL = 2\pi$ (vertical), and $q X_{\text{rms}} = 1$ (curved, with $X_{\text{rms}} = \sqrt{\langle X^2\rangle_{x,x_0}}$). Pick a time with the slider to see the signal along a horizontal cut.
+    The lines are the length-scale estimates: $\ell_D = L$ (horizontal), $q\ell_D = 1$ (diagonal), $qL = 1$ and $qL = 2\pi$ (vertical), and $q r_{\text{rms}} = 1$ (curved, with $r_{\text{rms}} = \sqrt{\langle r^2\rangle_{x,x_0}}$). Pick a time with the slider to see the signal along a horizontal cut.
     """)
     return
 
@@ -622,7 +622,7 @@ def _(mo):
     | free | below a line parallel to $q\ell_D = 1$, a factor of 5–10 lower in $t$ | $q\ell_D = 1$ | the fraction of spins that have met a wall, $\sim\ell_D/L$ |
     | short times | up to $Dt \approx 0.1\,L^2$, and up to $q\ell_D \approx 1$ | $\ell_D = L$ and $q\ell_D = 1$ | the two walls start to see each other; non-Gaussian displacement |
     | form factor | $Dt \gtrsim 0.2$–$0.5\,L^2$ at $qL \gtrsim 2$; all $q$ once $Dt \gtrsim L^2$ | $\ell_D = L$ | the slowest mode, $e^{-Dt/\tau_1}$, has died out |
-    | Gaussian cumulant | left of $qX_{\text{rms}}\approx 1.1$–$1.8$ | $qX_{\text{rms}} = 1$, or $q\min(\ell_D, L) = 1$ | the fourth cumulant, then the first zero |
+    | Gaussian cumulant | left of $qr_{\text{rms}}\approx 1.1$–$1.8$ | $qr_{\text{rms}} = 1$, or $q\min(\ell_D, L) = 1$ | the fourth cumulant, then the first zero |
 
     The white band between the cumulant region and the form-factor region, around $qL \approx 2\pi$ at intermediate times, is where no closed formula works. It is exactly where diffraction is still forming.
 
@@ -718,7 +718,7 @@ def _(exercise):
 @app.cell(hide_code=True)
 def _(hint):
     hint(r"""
-    - At $x_0 = 0$, $X = \lvert W\rvert$. Compare $\langle\cos(q\lvert W\rvert)\rangle_W$ with $\langle\cos(qW)\rangle_W$.
+    - At $x_0 = 0$, $r = \lvert W\rvert$. Compare $\langle\cos(q\lvert W\rvert)\rangle_W$ with $\langle\cos(qW)\rangle_W$.
     """)
     return
 
@@ -728,7 +728,7 @@ def _(answer):
     answer(r"""
     ⇒ The bright layer is about $\ell_D$ thick (the shaded bands); the real part peaks at roughly $x_0\approx\ell_D/2$ to $\ell_D$.
 
-    ⇒ At $x_0 = 0$ the displacement is $X = \lvert W\rvert$. The cosine is even, so $\langle\cos(q\lvert W\rvert)\rangle_W = \langle\cos qW\rangle_W = e^{-q^2Dt}$: the real part is exactly the bulk value. The magnitude is larger only because $\langle\sin(q\lvert W\rvert)\rangle_W\ne0$. The displacement is one-sided, which gives a phase, and the phases from the two walls cancel in the echo.
+    ⇒ At $x_0 = 0$ the displacement is $r = \lvert W\rvert$. The cosine is even, so $\langle\cos(q\lvert W\rvert)\rangle_W = \langle\cos qW\rangle_W = e^{-q^2Dt}$: the real part is exactly the bulk value. The magnitude is larger only because $\langle\sin(q\lvert W\rvert)\rangle_W\ne0$. The displacement is one-sided, which gives a phase, and the phases from the two walls cancel in the echo.
 
     → The extra echo comes from spins a little away from the wall, $0 < x_0\lesssim\ell_D$. The paths that would have carried them far past the wall are folded back, so their displacements are shorter than free ones. A magnitude image (dashed curve) shows the bright edge more strongly than the echo does.
     """)
@@ -740,9 +740,9 @@ def _(mo):
     mo.md(r"""
     ## ② Long times: closed pores, tortuosity and disorder
 
-    **A closed pore.** Once $\ell_D \gg L$, a spin has forgotten where it started. Its end point is uniform in the pore and independent of its start, so the displacement $X = x - x_0$ is the difference of two independent uniform positions. For a slab, $\bar P(X)$ is a **triangle** of half-width $L$:
+    **A closed pore.** Once $\ell_D \gg L$, a spin has forgotten where it started. Its end point is uniform in the pore and independent of its start, so the displacement $r = x - x_0$ is the difference of two independent uniform positions. For a slab, $\bar P(r)$ is a **triangle** of half-width $L$:
 
-    $$\bar P(X) = \frac{L-\lvert X\rvert}{L^2},\qquad \langle X^2\rangle_{x,x_0} = \frac{L^2}{6},\qquad D(t) = \frac{\langle X^2\rangle_{x,x_0}}{2t} = \frac{L^2}{12\,t},\qquad K = -\frac35 .$$
+    $$\bar P(r) = \frac{L-\lvert r\rvert}{L^2},\qquad \langle r^2\rangle_{x,x_0} = \frac{L^2}{6},\qquad D(t) = \frac{\langle r^2\rangle_{x,x_0}}{2t} = \frac{L^2}{12\,t},\qquad K = -\frac35 .$$
 
     Its Fourier transform is the form factor of ③, $E = \operatorname{sinc}^2(qL/2)$. In a closed pore $D(t)$ falls to zero as $1/t$, and $K$ stays negative: the displacement is bounded, so the distribution has lighter tails than a Gaussian.
 
@@ -761,7 +761,7 @@ def _(mo):
     | short-range disorder in $d$ dimensions | $D(t) - D_\infty \propto t^{-d/2}$ | 1D: random beads or membranes along an axon, $t^{-1/2}$ |
     | general | $t^{-\vartheta}$, $\ \vartheta = (p + d)/2$ | $p$ = structural exponent of the disorder |
 
-    The $1/t$ of an ordered medium is the general constant offset in $\langle X^2\rangle_{x,x_0} = 2D_\infty t + c$. Short-range disorder decays more slowly, so it dominates. The $t^{-1/2}$ law along axons is what [Burcaw et al. (2015)](https://doi.org/10.1016/j.neuroimage.2015.03.061) used to model $D(t)$ in white matter.
+    The $1/t$ of an ordered medium is the general constant offset in $\langle r^2\rangle_{x,x_0} = 2D_\infty t + c$. Short-range disorder decays more slowly, so it dominates. The $t^{-1/2}$ law along axons is what [Burcaw et al. (2015)](https://doi.org/10.1016/j.neuroimage.2015.03.061) used to model $D(t)$ in white matter.
     """)
     return
 
@@ -769,7 +769,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
-    **(a)** Derive the triangle $\bar P(X)$ for $\ell_D\gg L$. Compute $\langle X^2\rangle_{x,x_0}$ and $\langle X^4\rangle_{x,x_0}$, and show that $K = -3/5$. Then show that its Fourier transform is $\operatorname{sinc}^2(qL/2)$, without integrating the triangle.
+    **(a)** Derive the triangle $\bar P(r)$ for $\ell_D\gg L$. Compute $\langle r^2\rangle_{x,x_0}$ and $\langle r^4\rangle_{x,x_0}$, and show that $K = -3/5$. Then show that its Fourier transform is $\operatorname{sinc}^2(qL/2)$, without integrating the triangle.
 
     **(b)** Derive $1/D_\infty = 1/D + 1/(\kappa L)$ from a steady flux $J$ through many cells: in each cell, the concentration drops across the water layer and jumps across the membrane. Evaluate it for the running example ($L = 8$ µm, $D = 2$ µm²/ms) with $\kappa = 0.1$ µm/ms. When is the membrane the bottleneck?
 
@@ -783,7 +783,7 @@ def _(hint):
     hint(r"""
     - (a) The density of a sum (or difference) of independent variables is the convolution of their densities. The Fourier transform of a convolution is the product of the transforms.
     - (b) In one cell of width $L$: $\Delta C_{\text{water}} = JL/D$ and $\Delta C_{\text{membrane}} = J/\kappa$. Define $D_\infty$ by $J = D_\infty\,\Delta C_{\text{cell}}/L$.
-    - (c) From Chapter 1, $\langle X^2\rangle_{x,x_0}/L^2 = \frac16 - \frac{16}{\pi^4}e^{-\pi^2Dt/L^2} - \dots$, and $D(t)/D = \langle X^2\rangle_{x,x_0}/(2Dt)$.
+    - (c) From Chapter 1, $\langle r^2\rangle_{x,x_0}/L^2 = \frac16 - \frac{16}{\pi^4}e^{-\pi^2Dt/L^2} - \dots$, and $D(t)/D = \langle r^2\rangle_{x,x_0}/(2Dt)$.
     """)
     return
 
@@ -791,13 +791,13 @@ def _(hint):
 @app.cell(hide_code=True)
 def _(answer):
     answer(r"""
-    **(a)** ⇒ $x$ and $x_0$ are independent and uniform on $[0,L]$, so the density of $X = x - x_0$ is the box convolved with its mirror image: a triangle, $\bar P(X) = (L-\lvert X\rvert)/L^2$ on $\lvert X\rvert\le L$.
+    **(a)** ⇒ $x$ and $x_0$ are independent and uniform on $[0,L]$, so the density of $r = x - x_0$ is the box convolved with its mirror image: a triangle, $\bar P(r) = (L-\lvert r\rvert)/L^2$ on $\lvert r\rvert\le L$.
 
-    ⇒ $\langle X^2\rangle_{x,x_0} = 2\int_0^L X^2\frac{L-X}{L^2}dX = 2L^2\big(\frac13-\frac14\big) = \frac{L^2}{6}$; $\ \langle X^4\rangle_{x,x_0} = 2L^4\big(\frac15-\frac16\big) = \frac{L^4}{15}$.
+    ⇒ $\langle r^2\rangle_{x,x_0} = 2\int_0^L r^2\frac{L-r}{L^2}dr = 2L^2\big(\frac13-\frac14\big) = \frac{L^2}{6}$; $\ \langle r^4\rangle_{x,x_0} = 2L^4\big(\frac15-\frac16\big) = \frac{L^4}{15}$.
 
     ⇒ $K = \frac{L^4/15}{L^4/36} - 3 = \frac{36}{15} - 3 = -\frac35$. ✓
 
-    ⇒ Fourier: $\langle e^{iqX}\rangle_{x,x_0} = \langle e^{iqx}\rangle_x\langle e^{-iqx_0}\rangle_{x_0} = \lvert\langle e^{iqx}\rangle_x\rvert^2 = \operatorname{sinc}^2(qL/2)$, using the box transform from the "refresh first" box. The form factor is the squared Fourier transform of the pore shape, because the end points are independent.
+    ⇒ Fourier: $\langle e^{iqr}\rangle_{x,x_0} = \langle e^{iqx}\rangle_x\langle e^{-iqx_0}\rangle_{x_0} = \lvert\langle e^{iqx}\rangle_x\rvert^2 = \operatorname{sinc}^2(qL/2)$, using the box transform from the "refresh first" box. The form factor is the squared Fourier transform of the pore shape, because the end points are independent.
 
     **(b)** ⇒ Per cell, $\Delta C_{\text{cell}} = JL/D + J/\kappa$. With $J = D_\infty\Delta C_{\text{cell}}/L$: $\ L/D_\infty = L/D + 1/\kappa$, so $1/D_\infty = 1/D + 1/(\kappa L)$. ✓
 
@@ -805,7 +805,7 @@ def _(answer):
 
     → The membrane is the bottleneck when $D/(\kappa L)\gg1$, i.e. $\kappa L/D\ll1$. That is the same condition under which the Kärger model of Section 3d applies: exchange limited by the barrier, with well-mixed compartments.
 
-    **(c)** ⇒ The ratio of $D(t)/D$ to $L^2/(12Dt)$ is $\langle X^2\rangle_{x,x_0}/(L^2/6)$. With $\langle X^2\rangle_{x,x_0}/L^2 = \frac16 - \frac{16}{\pi^4}e^{-\pi^2Dt/L^2} - \dots$, the correction is 5% of $\frac16$ when $e^{-\pi^2Dt/L^2} = 0.05\pi^4/96 = 0.051$, at $Dt/L^2 = 0.30$, i.e. $t \approx 3\tau_1$.
+    **(c)** ⇒ The ratio of $D(t)/D$ to $L^2/(12Dt)$ is $\langle r^2\rangle_{x,x_0}/(L^2/6)$. With $\langle r^2\rangle_{x,x_0}/L^2 = \frac16 - \frac{16}{\pi^4}e^{-\pi^2Dt/L^2} - \dots$, the correction is 5% of $\frac16$ when $e^{-\pi^2Dt/L^2} = 0.05\pi^4/96 = 0.051$, at $Dt/L^2 = 0.30$, i.e. $t \approx 3\tau_1$.
     """)
     return
 
@@ -908,7 +908,7 @@ def _(answer):
 
     ⇒ The dip reaches $10^{-2}$ when $0.360\,e^{-\pi^2Dt/L^2}\approx0.01$: $Dt/L^2 = \ln(36)/\pi^2 = 0.36$, i.e. $\Delta\approx11.6$ ms for $L = 8$ µm. About $3.6\,\tau_1$. The slider gives $E(2\pi) = 1.00\times10^{-2}$ at $D\Delta/L^2 = 0.363$.
 
-    **(c)** ⇒ $\ln\operatorname{sinc}^2(qL/2)$ is singular where $\operatorname{sinc}(qL/2) = 0$, first at $qL = 2\pi$. So at long times the cumulant series in $q$ converges only for $qL < 2\pi$, i.e. $qX_{\text{rms}} < 2\pi/\sqrt6 = 2.57$. Adding cumulants cannot take you past the first diffraction minimum.
+    **(c)** ⇒ $\ln\operatorname{sinc}^2(qL/2)$ is singular where $\operatorname{sinc}(qL/2) = 0$, first at $qL = 2\pi$. So at long times the cumulant series in $q$ converges only for $qL < 2\pi$, i.e. $qr_{\text{rms}} < 2\pi/\sqrt6 = 2.57$. Adding cumulants cannot take you past the first diffraction minimum.
 
     → Chapter 2 found the same thing for finite pulses: the radius of convergence of the cumulant series in $G$ is set by the nearest zero of $E(G)$. For narrow pulses at long times that zero is on the real axis, at $qL = 2\pi$. For finite pulses or finite $t$ it moves off the real axis ($463 + 20i$ mT/m in the Chapter 2 example), so $E$ only dips without reaching zero, but the series still stops there.
     """)
@@ -920,25 +920,25 @@ def _(mo):
     mo.md(r"""
     ## ④ The cumulant boundary
 
-    The cumulant series is an expansion in the phase spread, $q$ times the typical displacement. The typical displacement is the root-mean-square $X_{\text{rms}} = \sqrt{\langle X^2\rangle_{x,x_0}} = \sqrt{2D(t)\,t}$, which runs from $\sqrt{2Dt}$ at short times to $L/\sqrt6$ at long times. So the region where the Gaussian (second cumulant) works is
+    The cumulant series is an expansion in the phase spread, $q$ times the typical displacement. The typical displacement is the root-mean-square $r_{\text{rms}} = \sqrt{\langle r^2\rangle_{x,x_0}} = \sqrt{2D(t)\,t}$, which runs from $\sqrt{2Dt}$ at short times to $L/\sqrt6$ at long times. So the region where the Gaussian (second cumulant) works is
 
-    $$q\,X_{\text{rms}}\lesssim 1 \qquad\Longleftrightarrow\qquad q\min(\ell_D, L)\lesssim 1\ \text{ (up to constants)} \qquad\Longleftrightarrow\qquad b\,D(t)\lesssim\tfrac12 ,$$
+    $$q\,r_{\text{rms}}\lesssim 1 \qquad\Longleftrightarrow\qquad q\min(\ell_D, L)\lesssim 1\ \text{ (up to constants)} \qquad\Longleftrightarrow\qquad b\,D(t)\lesssim\tfrac12 ,$$
 
-    since $q^2X_{\text{rms}}^2 = 2q^2D(t)\,t = 2bD(t)$ for narrow pulses.
+    since $q^2r_{\text{rms}}^2 = 2q^2D(t)\,t = 2bD(t)$ for narrow pulses.
 
-    **How large is "$\lesssim 1$"?** The first correction is the fourth cumulant. With $\kappa_4 = K\,X_{\text{rms}}^4$,
+    **How large is "$\lesssim 1$"?** The first correction is the fourth cumulant. With $\kappa_4 = K\,r_{\text{rms}}^4$,
 
-    $$\ln E = -\frac{(qX_{\text{rms}})^2}{2} + \frac{K\,(qX_{\text{rms}})^4}{24} - \dots$$
+    $$\ln E = -\frac{(qr_{\text{rms}})^2}{2} + \frac{K\,(qr_{\text{rms}})^4}{24} - \dots$$
 
-    The Gaussian is 5% off when the second term reaches 0.05: $(qX_{\text{rms}})^* \approx (1.2/\lvert K\rvert)^{1/4}$. A scan of the exact slab signal gives:
+    The Gaussian is 5% off when the second term reaches 0.05: $(qr_{\text{rms}})^* \approx (1.2/\lvert K\rvert)^{1/4}$. A scan of the exact slab signal gives:
 
     | $Dt/L^2$ | 0.003 | 0.01 | 0.03 | 0.1 | 0.3 | $\ge1$ |
     | --- | --- | --- | --- | --- | --- | --- |
     | $K(t)$ | +0.09 | +0.16 | +0.20 | −0.08 | −0.53 | −0.60 |
-    | $(qX_{\text{rms}})^*$, 5% | 1.76 | 1.58 | 1.48 | 1.80 | 1.19 | 1.14 |
+    | $(qr_{\text{rms}})^*$, 5% | 1.76 | 1.58 | 1.48 | 1.80 | 1.19 | 1.14 |
     | $(1.2/\lvert K\rvert)^{1/4}$ | 1.89 | 1.67 | 1.57 | 1.97 | 1.23 | 1.19 |
 
-    So **$qX_{\text{rms}}\approx1$ is a safe rule**: the Gaussian fails between 1.1 and 1.8, and the kurtosis predicts where. The curved line on the map is $qX_{\text{rms}} = 1$. This refines the cruder $q\min(\sqrt{Dt}, L)\approx1$, which has the right shape but a constant that drifts from about 1.2 at short times to 2.8 at long times. Near $Dt\approx0.1L^2$, where $K$ changes sign, the kurtosis estimate is only an upper bound: there the sixth cumulant takes over.
+    So **$qr_{\text{rms}}\approx1$ is a safe rule**: the Gaussian fails between 1.1 and 1.8, and the kurtosis predicts where. The curved line on the map is $qr_{\text{rms}} = 1$. This refines the cruder $q\min(\sqrt{Dt}, L)\approx1$, which has the right shape but a constant that drifts from about 1.2 at short times to 2.8 at long times. Near $Dt\approx0.1L^2$, where $K$ changes sign, the kurtosis estimate is only an upper bound: there the sixth cumulant takes over.
     """)
     return
 
@@ -946,7 +946,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
-    **(a)** Use the map's right-hand panel (set $Dt/L^2 = 3$). Where do the solid black and the dashed purple curves part by 5%? Express it as $qL$ and as $qX_{\text{rms}}$, and compare with $(1.2/\lvert K\rvert)^{1/4}$.
+    **(a)** Use the map's right-hand panel (set $Dt/L^2 = 3$). Where do the solid black and the dashed purple curves part by 5%? Express it as $qL$ and as $qr_{\text{rms}}$, and compare with $(1.2/\lvert K\rvert)^{1/4}$.
 
     **(b)** Translate the rule into $b$-values for the running example at long times, and for free water ($D = 2$ µm²/ms) at short times. Why is the long-time limit not a statement about $b$ alone?
 
@@ -958,15 +958,15 @@ def _(exercise):
 @app.cell(hide_code=True)
 def _(answer):
     answer(r"""
-    **(a)** ⇒ At long times they part at $qL\approx2.8$, i.e. $qL/2\pi\approx0.45$. With $X_{\text{rms}} = L/\sqrt6 = 0.408L$: $qX_{\text{rms}}\approx1.14$. The kurtosis estimate with $K = -3/5$ is $(1.2/0.6)^{1/4} = 1.19$. ✓
+    **(a)** ⇒ At long times they part at $qL\approx2.8$, i.e. $qL/2\pi\approx0.45$. With $r_{\text{rms}} = L/\sqrt6 = 0.408L$: $qr_{\text{rms}}\approx1.14$. The kurtosis estimate with $K = -3/5$ is $(1.2/0.6)^{1/4} = 1.19$. ✓
 
-    **(b)** ⇒ $qX_{\text{rms}}\le1$ means $bD(t)\le\frac12$. At long times $D(t) = L^2/(12t)$, so $bD(t) = q^2L^2/12$, independent of $t$: the condition is on $qL\le\sqrt6 = 2.45$, not on $b$. For $L = 8$ µm that is $q\le0.31$ µm⁻¹.
+    **(b)** ⇒ $qr_{\text{rms}}\le1$ means $bD(t)\le\frac12$. At long times $D(t) = L^2/(12t)$, so $bD(t) = q^2L^2/12$, independent of $t$: the condition is on $qL\le\sqrt6 = 2.45$, not on $b$. For $L = 8$ µm that is $q\le0.31$ µm⁻¹.
 
     ⇒ At short times $D(t)\approx D$, so $b\lesssim1/(2D) = 0.25$ ms/µm² $= 250$ s/mm² for the strict rule, and up to $(1.75)^2/(2D) = 0.77$ ms/µm² $= 770$ s/mm² for 5% at $Dt = 0.003L^2$, where $K$ is small.
 
     → In a closed pore the long-time signal stops depending on $\Delta$: increasing $\Delta$ at fixed $q$ increases $b$ but not the attenuation. A rule written in $b$ alone hides this.
 
-    **(c)** ⇒ At long times the dotted curve stays within 5% of the exact one up to $qL\approx3.8$ ($qX_{\text{rms}}\approx1.57$) instead of 2.8. It can never pass $qL = 2\pi$ ($qX_{\text{rms}} = 2.57$), where the series diverges (Exercise 4c). More cumulants buy less and less.
+    **(c)** ⇒ At long times the dotted curve stays within 5% of the exact one up to $qL\approx3.8$ ($qr_{\text{rms}}\approx1.57$) instead of 2.8. It can never pass $qL = 2\pi$ ($qr_{\text{rms}} = 2.57$), where the series diverges (Exercise 4c). More cumulants buy less and less.
     """)
     return
 
@@ -1548,7 +1548,7 @@ def _(mo):
     | **Short times** (narrow pulses) | $Dt\lesssim0.1L^2$, $q\ell_D\lesssim1$ | $D(t)/D = 1 - \frac{8}{3\sqrt\pi}\frac{\sqrt{Dt}}L$; $\ K\approx\frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}L$ | $1 - \frac4{3\sqrt\pi\,d}\frac SV\sqrt{Dt}$, $S/V = 2/R$ ($d = 2$), $3/R$ ($d = 3$) | Mitra et al. 1992 |
     | **Long times**, closed pore | $Dt\gtrsim0.3L^2$ | $D(t) = L^2/(12t)$, $K = -3/5$ | $D(t) = R^2/(4t)$ / $R^2/(5t)$ | Robertson 1966; Tanner & Stejskal 1968 |
     | **Form factor** | $Dt\gtrsim0.3L^2$ (dip $< 10^{-2}$ for $Dt > 0.36L^2$) | $\operatorname{sinc}^2(qL/2)$, zero at $qL = 2\pi$ | $[2J_1(qR)/qR]^2$, zero $qR = 3.832$ / $[3j_1(qR)/qR]^2$, zero $qR = 4.493$ | Tanner & Stejskal 1968; Callaghan et al. 1991 |
-    | **Cumulant edge** (narrow pulses) | — | $qX_{\text{rms}}\lesssim1$; 5% at $(1.2/\lvert K\rvert)^{1/4}$; never past $qL = 2\pi$ | same rule with $X_{\text{rms}}$ of the pore | this chapter |
+    | **Cumulant edge** (narrow pulses) | — | $qr_{\text{rms}}\lesssim1$; 5% at $(1.2/\lvert K\rvert)^{1/4}$; never past $qL = 2\pi$ | same rule with $r_{\text{rms}}$ of the pore | this chapter |
     | Tortuosity | connected medium | $1/D_\infty = 1/D + 1/(\kappa L)$ | — | — |
     | Disorder | $t\to\infty$ | $D(t) - D_\infty\propto t^{-(p+d)/2}$; 1D short-range: $t^{-1/2}$ | — | Novikov et al. 2014 |
     | **Free**, long pulses | $\ell_D < \ell_g, L$ | $\ln E = -\gamma^2g^2DT^3/12$ | same | Carr & Purcell 1954 |
@@ -1586,8 +1586,8 @@ def _(mo):
     | Idea | Formula |
     | --- | --- |
     | The PGSE box | $\tilde\Delta = D\Delta/L^2$, $\ \tilde\delta = D\delta/L^2$, $\ \Gamma = \gamma gL^3/D = (L/\ell_g)^3$ |
-    | Narrow-pulse face | $E(q,t) = \langle e^{iqX}\rangle_{x,x_0} = \int\bar P(X,t)\,e^{iqX}dX = \sum_n e^{-D\lambda_nt}\lvert\tilde u_n(q)\rvert^2/L\ \ge0$ |
-    | Its four regions | free; short times ($S/V$); form factor; Gaussian cumulant, edge $qX_{\text{rms}}\approx1$ |
+    | Narrow-pulse face | $E(q,t) = \langle e^{iqr}\rangle_{x,x_0} = \int\bar P(r,t)\,e^{iqr}dr = \sum_n e^{-D\lambda_nt}\lvert\tilde u_n(q)\rvert^2/L\ \ge0$ |
+    | Its four regions | free; short times ($S/V$); form factor; Gaussian cumulant, edge $qr_{\text{rms}}\approx1$ |
     | Long-pulse face | free $g^2T^3$; motional narrowing $g^2T$; localisation $g^{2/3}T$; triple point $\ell_D = \ell_g = L$ |
     | Inside the box | GPA safe for $H_2 = \gamma g\ell\min(\delta, \ell^2/D)\lesssim1$, $\ell = \min(\sqrt{D\Delta}, L)$ |
     | Lines vs regions | the lines give the shape; the constants shift the edges by factors 0.5–3; around the lines are crossover bands |

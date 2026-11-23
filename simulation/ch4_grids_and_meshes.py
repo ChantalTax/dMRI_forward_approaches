@@ -391,7 +391,7 @@ def _(mo):
 
     | Idea | Formula |
     | --- | --- |
-    | Bloch–Torrey | $\partial M/\partial t = \nabla\cdot(D\nabla M) - i\gamma\,g(t)\,x\,M$, $\ M(\mathbf r, 0) = 1$, $\ E = \frac1V\int M(\mathbf r, T)\,d\mathbf r$ |
+    | Bloch–Torrey | $\partial M/\partial t = \nabla\cdot(D\nabla M) - i\gamma\,g(t)\,x\,M$, $\ M(\mathbf x, 0) = 1$, $\ E = \frac1V\int M(\mathbf x, T)\,d\mathbf x$ |
     | Wall and interface conditions | impermeable: $D\,\partial M/\partial n = 0$; membrane: continuous flux $= \kappa\times$ jump in $M$; relaxing wall: $D\,\partial M/\partial n + \rho M = 0$ |
     | The full problem (Ch 1) | compartments $\Omega_n$ with $D_n$, $T_{2,n}$ and spin density $\rho_n$; reflecting outer boundary; on a membrane $\Gamma_{nm}$ continuous flux $= \kappa_{nm}(c_{nm}M_m - c_{mn}M_n)$, $\ c_{nm} = 2\rho_n/(\rho_n + \rho_m)$; the gradient $f(t)\,\mathbf g$ |
     | Weak form (Ch 1) | $\int w\,\partial_tM + \int D\nabla w\cdot\nabla M + i\gamma g\int w\,x\,M = \oint wD\,\partial_nM$ for every $w$; walls natural; modes as test functions give Chapter 2 |
@@ -793,7 +793,7 @@ def _(mo):
 
     **Relaxation and gradient as one factor.** Over one step, relaxation and the gradient act on every cell separately, so they can be applied exactly:
 
-    $$\Phi_j = \exp\!\Big(-i\gamma f(t)\,(\mathbf g\cdot\mathbf r_j)\,\delta t - \frac{\delta t}{T_{2,j}}\Big),\qquad \mathbf M^{n+1} = \boldsymbol\Phi\odot(\mathbf I + \mathbf S)\,\mathbf M^n,$$
+    $$\Phi_j = \exp\!\Big(-i\gamma f(t)\,(\mathbf g\cdot\mathbf x_j)\,\delta t - \frac{\delta t}{T_{2,j}}\Big),\qquad \mathbf M^{n+1} = \boldsymbol\Phi\odot(\mathbf I + \mathbf S)\,\mathbf M^n,$$
 
     where $\odot$ multiplies entry by entry. This is the **matrix-based finite-difference (MFD)** update of [Xu, Does & Gore (2007)](https://doi.org/10.1088/0031-9155/52/7/N01): diffusion explicitly, everything local exactly. It removes the phase-term trap of ④.
 
@@ -955,7 +955,7 @@ def _(exercise):
 
     **(b)** Without membranes, what must the single-cell simulation give? Explain why a single cell then reproduces free diffusion exactly, whatever its width.
 
-    **(c)** In the right panel, $D_{\text{app}}$ approaches $D_\infty$ as $1/\Delta$. Chapter 3 said that ordered (periodic) structures approach as $1/t$. Explain the $1/\Delta$ from $\langle X^2\rangle_{x,x_0} = 2D_\infty t + c$.
+    **(c)** In the right panel, $D_{\text{app}}$ approaches $D_\infty$ as $1/\Delta$. Chapter 3 said that ordered (periodic) structures approach as $1/t$. Explain the $1/\Delta$ from $\langle (x - x_0)^2\rangle_{x,x_0} = 2D_\infty t + c$.
 
     **(d)** Make the membranes very permeable ($\kappa = 10$ µm/ms) and then nearly closed ($\kappa = 0.01$). How long must $\Delta$ be in each case before $D_{\text{app}}$ is within 5% of $D_\infty$? Relate it to the exchange time between cells.
     """, "5 · A periodic cell")
@@ -971,7 +971,7 @@ def _(answer):
 
     **(b)** ⇒ Without membranes the periodic medium is free space, so $E = e^{-bD}$. The single cell has no walls; with $m$ uniform at the start, the stencil keeps it uniform in space, and $m$ just decays through the phase factors: $m(t) = \exp(-D\int_0^tq^2dt')$, exactly $e^{-bD}$ at the echo. The cell width does not matter. The simulation gives 0.995582 against $e^{-bD} = 0.995582$ for $\delta = 2$, $\Delta = 20$ ms, $G = 20$ mT/m.
 
-    **(c)** ⇒ At long times $\langle X^2\rangle_{x,x_0} = 2D_\infty t + c$, where $c$ is a constant set by the structure of one cell. Then $D(t) = \langle X^2\rangle_{x,x_0}/2t = D_\infty + c/(2t)$: a $1/t$ approach. In the figure $(D_{\text{app}} - D_\infty)\Delta\approx2.0$ µm² for $\kappa = 0.1$ µm/ms, from 100 to 1000 ms.
+    **(c)** ⇒ At long times $\langle (x - x_0)^2\rangle_{x,x_0} = 2D_\infty t + c$, where $c$ is a constant set by the structure of one cell. Then $D(t) = \langle (x - x_0)^2\rangle_{x,x_0}/2t = D_\infty + c/(2t)$: a $1/t$ approach. In the figure $(D_{\text{app}} - D_\infty)\Delta\approx2.0$ µm² for $\kappa = 0.1$ µm/ms, from 100 to 1000 ms.
 
     **(d)** ⇒ $\kappa = 10$: $\kappa L/D = 40$, the membranes hardly matter, $D_\infty = 1.95$, and $D_{\text{app}}$ is within 5% almost at once (it starts close to $D$ anyway). $\kappa = 0.01$: $D_\infty = 0.077$; $D_{\text{app}}$ is still above $D_\infty$ by about 5% only around $\Delta\approx 1000$ ms.
 
@@ -1002,7 +1002,7 @@ def _(mo):
 
     ⇒ Cut $\Omega$ into elements (intervals in 1D, triangles in 2D, tetrahedra in 3D) with nodes at their corners.
 
-    ⇒ Give each node $j$ a **hat function** $N_j$: 1 at node $j$, 0 at every other node ($N_j(\mathbf r_i) = \delta_{ij}$), linear on each element. Write $M(\mathbf r, t)\approx\sum_jM_j(t)\,N_j(\mathbf r)$: the unknowns are the nodal values.
+    ⇒ Give each node $j$ a **hat function** $N_j$: 1 at node $j$, 0 at every other node ($N_j(\mathbf x_i) = \delta_{ij}$), linear on each element. Write $M(\mathbf x, t)\approx\sum_jM_j(t)\,N_j(\mathbf x)$: the unknowns are the nodal values.
 
     ⇒ Use the same hats as weights, $w = N_i$ for each $i$ (**Galerkin**'s choice, 1915). Each weight gives one equation, so there are as many equations as unknowns.
 
@@ -1033,7 +1033,7 @@ def _(mo):
     | $\boldsymbol{\mathcal M}$, mass | $\int\varphi_k\varphi_l$ | the time derivative |
     | $\mathbf S$, stiffness | $\int D_n\nabla\varphi_k\cdot\nabla\varphi_l$ | diffusion |
     | $\mathbf R$, relaxation | $\frac1{T_{2,n}}\int_{\Omega_n}\varphi_k\varphi_l$: each compartment's mass matrix divided by its $T_2$ | relaxation |
-    | $\mathbf J(\mathbf g)$, gradient | $\int\varphi_k\,(\mathbf g\cdot\mathbf r)\,\varphi_l$ | the gradient |
+    | $\mathbf J(\mathbf g)$, gradient | $\int\varphi_k\,(\mathbf g\cdot\mathbf x)\,\varphi_l$ | the gradient |
     | $\mathbf Q$, interface | $\kappa_{nm}\int_{\Gamma_{nm}}\varphi_k\varphi_l$, weighted by $c_{mn}$ or $-c_{nm}$ (Chapter 1, Exercise 13) | the membrane term of the weak form |
 
     → In the 1D notation of ③, $\mathbf K = \mathbf S + \mathbf Q$, $f(t)\,\mathbf J(\mathbf g)$ is $g(t)\,\mathbf J$, and $\mathbf R = 0$.
@@ -1462,7 +1462,7 @@ def _(mo):
     | Face rules | bulk $D/h$; wall 0; membrane $1/(h/D + 1/\kappa)$; relaxing wall $1/(h/2D + 1/\rho)$: resistances in series |
     | Time stepping | explicit Euler (order 1, $\delta t\le h^2/2dD$); implicit Euler (order 1); Crank–Nicolson (order 2); both implicit methods unconditionally stable |
     | Amplification | $G_{\text{EE}} = 1 - 4r\sin^2\frac{kh}2$, $\ r = D\delta t/h^2$ |
-    | MFD update | $\mathbf M^{n+1} = \boldsymbol\Phi\odot(\mathbf I + \mathbf S)\mathbf M^n$; jump probabilities $s_{j\to k} = c_{jk}\delta t/h$, columns of $\mathbf S$ sum to 0; $\Phi_j = e^{-i\gamma f(\mathbf g\cdot\mathbf r_j)\delta t - \delta t/T_{2,j}}$ |
+    | MFD update | $\mathbf M^{n+1} = \boldsymbol\Phi\odot(\mathbf I + \mathbf S)\mathbf M^n$; jump probabilities $s_{j\to k} = c_{jk}\delta t/h$, columns of $\mathbf S$ sum to 0; $\Phi_j = e^{-i\gamma f(\mathbf g\cdot\mathbf x_j)\delta t - \delta t/T_{2,j}}$ |
     | Periodic cell | $M = m\,e^{-iq(t)x}$: $\ \partial_tm = D(\partial_x - iq)^2m$, $m$ periodic; neighbour factors $e^{\mp iqh}$, or only the wrap face $e^{\mp iqL}$ |
     | Weak form (Ch 1) | walls natural, membranes couple the two sides: what makes finite elements easy on any shape |
     | 1D element matrices | $\boldsymbol{\mathcal M}^e = \frac h6(2,1;1,2)$, $\ \mathbf K^e = \frac Dh(1,-1;-1,1)$, $\ \mathbf J^e = \frac h{12}(3x_a + x_b, x_a + x_b; x_a + x_b, x_a + 3x_b)$ |
