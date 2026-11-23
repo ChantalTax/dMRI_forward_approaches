@@ -185,14 +185,14 @@ def _(mo):
 
     | Idea | Formula |
     | --- | --- |
-    | Eigenmodes of a pore | $-\nabla^2u_n = \lambda_nu_n$, $\ \partial u_n/\partial n = 0$ on the walls, $\ \int u_nu_m = \delta_{nm}$ |
+    | Eigenmodes of a pore | $-\nabla^2u_n = \lambda_nu_n$, $\ \partial u_n/\partial n = 0$ on the walls, $\ \int u_nu_m = \delta_{nm}$ (Eq. 1.8) |
     | Slab | $u_0 = 1/\sqrt L$, $\ u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$ |
-    | Propagator | $P(x\mid x_0,t) = \sum_n u_n(x)u_n(x_0)e^{-D\lambda_nt}$ |
+    | Propagator | $P(x\mid x_0,t) = \sum_n u_n(x)u_n(x_0)e^{-D\lambda_nt}$ (Eq. 1.14) |
     | Averages (Ch 1) | the subscript says over what: $\langle f\rangle_{x,x_0} = \frac1L\iint f(x, x_0)\,P(x\mid x_0,t)\,dx\,dx_0$ over start (uniform) and end; $\langle f\rangle_{\text{paths}}$ over whole random paths with a uniform start, the mean over $N\to\infty$ walkers; $\langle f\rangle_x = \frac1L\int f\,dx$ over the pore |
-    | MSD weights in a slab | $\langle(x-x_0)^2\rangle_{x,x_0} = \frac1L\iint(x-x_0)^2P(x\mid x_0,t)\,dx\,dx_0 = \frac{L^2}{6} - 2\sum_{n\ \text{odd}} \frac{8L^2}{(n\pi)^4}e^{-D\lambda_nt}$ |
-    | Bloch–Torrey | $\partial m/\partial t = D\nabla^2m - i\gamma\,g(t)\,x\,m$, $\ E = \int m\,dx\big/\int m(x,0)\,dx$ |
-    | Path picture | $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ |
-    | Gradient length | $\ell_g = (D/\gamma g)^{1/3}$ |
+    | MSD weights in a slab | $\langle(x-x_0)^2\rangle_{x,x_0} = \frac1L\iint(x-x_0)^2P(x\mid x_0,t)\,dx\,dx_0 = \frac{L^2}{6} - 2\sum_{n\ \text{odd}} \frac{8L^2}{(n\pi)^4}e^{-D\lambda_nt}$ (Eq. 1.16) |
+    | Bloch–Torrey | $\partial m/\partial t = D\nabla^2m - i\gamma\,g(t)\,x\,m$, $\ E = \int m\,dx\big/\int m(x,0)\,dx$ (Eq. 1.32) |
+    | Path picture | $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ (Eq. 1.36) |
+    | Gradient length | $\ell_g = (D/\gamma g)^{1/3}$ (Eq. 1.39) |
 
     ## Two kinds of series
 
@@ -221,18 +221,18 @@ def _(mo):
 
     The eigenmodes of a pore are a complete set: any magnetization that satisfies the interface conditions can be written as a sum of them. So write
 
-    $$m(x,t) = \sum_n c_n(t)\,u_n(x).$$
+    $$m(x,t) = \sum_n c_n(t)\,u_n(x).\tag{2.1}$$
 
     Putting this into Bloch–Torrey turns one partial differential equation into a set of ordinary ones, one per mode:
 
-    $$\frac{d\mathbf c}{dt} = -\big(D\Lambda + i\gamma\,g(t)\,\mathbf B\big)\,\mathbf c,\qquad \Lambda = \mathrm{diag}(\lambda_0,\lambda_1,\dots),\qquad B_{nm} = \int u_n(x)\,x\,u_m(x)\,dx .$$
+    $$\frac{d\mathbf c}{dt} = -\big(D\Lambda + i\gamma\,g(t)\,\mathbf B\big)\,\mathbf c,\qquad \Lambda = \mathrm{diag}(\lambda_0,\lambda_1,\dots),\qquad B_{nm} = \int u_n(x)\,x\,u_m(x)\,dx .\tag{2.2}$$
 
     - **The modes do not change.** They are the modes of the pore from Chapter 1, fixed by its shape and interface conditions. The gradient does not create new ones.
     - **Diffusion is diagonal.** On its own, each mode decays at its own rate $D\lambda_n$.
     - **The gradient couples the modes.** The field $x$ is not a mode, so multiplying a mode by $x$ spreads it over the others; $\mathbf B$ says how much goes where. All the geometry is in $\Lambda$ and $\mathbf B$.
     - **Start and finish.** Spins start uniform, $m(x,0) = u_0$, so $\mathbf c(0) = \mathbf e_0 = (1,0,0,\dots)$. Only the uniform mode has a nonzero integral, so the signal is just the first component at the echo: $E = c_0(T)$.
 
-    $\mathbf B$ is the **position matrix** of Chapter 1 (Exercise 5): real, symmetric, nonzero only between modes of opposite parity, with couplings that fall off as $1/n^2$, and $B_{0n}^2$ equal to the MSD weights. Together, $\Lambda$ and $\mathbf B$ are everything the geometry contributes.
+    $\mathbf B$ is the **position matrix** of Chapter 1 (Eq. 1.17, Exercise 5): real, symmetric, nonzero only between modes of opposite parity, with couplings that fall off as $1/n^2$, and $B_{0n}^2$ equal to the MSD weights. Together, $\Lambda$ and $\mathbf B$ are everything the geometry contributes.
 
     The whole simulation problem is now: propagate $\mathbf c$ from $\mathbf e_0$ to the echo, and read off $c_0$. The methods below differ only in **how they step through time**.
     """)
@@ -244,11 +244,11 @@ def _(maths):
     maths(r"""
     ⇒ Insert $m = \sum_m c_m(t)u_m(x)$ in $\partial m/\partial t = D\nabla^2m - i\gamma g(t)\,x\,m$, and use $\nabla^2u_m = -\lambda_mu_m$:
 
-    $$\sum_m \dot c_m\,u_m = -D\sum_m\lambda_m c_m\,u_m - i\gamma g\sum_m c_m\,x\,u_m .$$
+    $$\sum_m \dot c_m\,u_m = -D\sum_m\lambda_m c_m\,u_m - i\gamma g\sum_m c_m\,x\,u_m .\tag{2.3}$$
 
     ⇒ Multiply by $u_n$ and integrate over the pore. Orthonormality, $\int u_nu_m = \delta_{nm}$, picks out one term on the left and in the first sum:
 
-    $$\dot c_n = -D\lambda_n c_n - i\gamma g\sum_m\Big(\int u_n\,x\,u_m\,dx\Big)c_m = -D\lambda_n c_n - i\gamma g\sum_m B_{nm}c_m .$$
+    $$\dot c_n = -D\lambda_n c_n - i\gamma g\sum_m\Big(\int u_n\,x\,u_m\,dx\Big)c_m = -D\lambda_n c_n - i\gamma g\sum_m B_{nm}c_m .\tag{2.4}$$
 
     → Every $u_m$ already satisfies the interface conditions, so the sum does too: nothing else to impose.
 
@@ -268,7 +268,7 @@ def _(mo):
 
     A PGSE sequence is piecewise constant: a lobe of $+G$ for $\delta$, no gradient for $\Delta - \delta$, and a second lobe. The refocusing pulse flips the phase, which is the same as flipping the sign of the second lobe (the "effective gradient"). So the exact signal is a product of three matrices, sandwiched between the uniform mode:
 
-    $$E = \Big[\,e^{-(D\Lambda - i\gamma G\mathbf B)\,\delta}\;e^{-D\Lambda(\Delta-\delta)}\;e^{-(D\Lambda + i\gamma G\mathbf B)\,\delta}\,\Big]_{00}.$$
+    $$E = \Big[\,e^{-(D\Lambda - i\gamma G\mathbf B)\,\delta}\;e^{-D\Lambda(\Delta-\delta)}\;e^{-(D\Lambda + i\gamma G\mathbf B)\,\delta}\,\Big]_{00}.\tag{2.5}$$
 
     This is the **MCF** method in the form of [Grebenkov (2007)](https://doi.org/10.1103/RevModPhys.79.1077), building on [Barzykin (1999)](https://doi.org/10.1006/jmre.1999.1778). It is exact for any piecewise-constant waveform; the only approximation is the number of modes $N$ kept. Read the product from right to left: that is the order in time.
 
@@ -352,7 +352,7 @@ def _(mo):
 
     **2 · Multiple propagator.** Cut the whole sequence into $M$ steps of length $\tau$ and, within each step, **separate** diffusion from dephasing: half a step of diffusion, a phase kick, half a step of diffusion,
 
-    $$\mathbf c \;\leftarrow\; e^{-D\Lambda\tau/2}\;e^{-i\gamma g\,\tau\,\mathbf B}\;e^{-D\Lambda\tau/2}\;\mathbf c .$$
+    $$\mathbf c \;\leftarrow\; e^{-D\Lambda\tau/2}\;e^{-i\gamma g\,\tau\,\mathbf B}\;e^{-D\Lambda\tau/2}\;\mathbf c .\tag{2.6}$$
 
     Diffusion is diagonal, so $e^{-D\Lambda\tau/2}$ is just a list of numbers. The kick is diagonal in the eigenbasis of $\mathbf B$, which you diagonalise once. So a step costs only two matrix–vector products. This is the multiple (narrow-pulse) propagator of [Caprihan et al. (1996)](https://doi.org/10.1006/jmra.1996.0013) and [Callaghan (1997)](https://doi.org/10.1006/jmre.1997.1233), in the symmetric splitting of [Strang (1968)](https://doi.org/10.1137/0705041). Callaghan writes the kick in the position basis as the matrix $A_{nm}(q) = \int u_n e^{-iqx} u_m$, with $q = \gamma g\tau$: the same thing.
 
@@ -605,7 +605,7 @@ def _(mo):
 
     The path picture gives $E = \langle e^{-i\varphi}\rangle_{\text{paths}}$: the **characteristic function** of the phase. As for the displacement in Chapter 1, its logarithm is a series of cumulants:
 
-    $$\ln E = \sum_{n\ge1}\frac{(-i)^n}{n!}\,\kappa_n(\varphi) = -\frac12\langle\varphi^2\rangle_{\text{paths}} + \frac1{24}\Big(\langle\varphi^4\rangle_{\text{paths}} - 3\langle\varphi^2\rangle_{\text{paths}}^2\Big) - \dots$$
+    $$\ln E = \sum_{n\ge1}\frac{(-i)^n}{n!}\,\kappa_n(\varphi) = -\frac12\langle\varphi^2\rangle_{\text{paths}} + \frac1{24}\Big(\langle\varphi^4\rangle_{\text{paths}} - 3\langle\varphi^2\rangle_{\text{paths}}^2\Big) - \dots\tag{2.7}$$
 
     The odd cumulants vanish for a refocused echo in a symmetric pore (the phase is as likely to be $+\varphi$ as $-\varphi$). Since $\varphi \propto g$, this is a series in **powers of the gradient**: $\kappa_2 \propto g^2$, $\kappa_4 \propto g^4$, and so on.
 
@@ -615,11 +615,11 @@ def _(mo):
 
     $\varphi = \gamma\int g(t)\,x(t)\,dt$ is linear in the path, so its variance only needs the **position autocorrelation**:
 
-    $$\langle\varphi^2\rangle_{\text{paths}} = \gamma^2\iint g(t_1)\,g(t_2)\,\langle x(t_1)\,x(t_2)\rangle_{\text{paths}}\,dt_1\,dt_2 .$$
+    $$\langle\varphi^2\rangle_{\text{paths}} = \gamma^2\iint g(t_1)\,g(t_2)\,\langle x(t_1)\,x(t_2)\rangle_{\text{paths}}\,dt_1\,dt_2 .\tag{2.8}$$
 
     In a pore, with spins starting uniformly and $x$ measured from the centre, the propagator of Chapter 1 gives
 
-    $$\langle x(t_1)\,x(t_2)\rangle_{\text{paths}} = \sum_{n\ge1} B_{0n}^2\; e^{-D\lambda_n|t_1-t_2|}.$$
+    $$\langle x(t_1)\,x(t_2)\rangle_{\text{paths}} = \sum_{n\ge1} B_{0n}^2\; e^{-D\lambda_n|t_1-t_2|}.\tag{2.9}$$
 
     So the GPA needs only two lists per geometry: the weights $w_n = B_{0n}^2$ and the rates $D\lambda_n$. For the slab they are the MSD weights $8L^2/(n\pi)^4$ and $D(n\pi/L)^2$. Each mode contributes a double integral of the waveform against one exponential, which you can do once and for all for a PGSE (Murday & Cotts 1968; Neuman 1974; for any waveform, Stepišnik 1993 and van Gelderen et al. 1994).
     """)
@@ -647,7 +647,7 @@ def _(exercise):
 
     **(b)** For a PGSE (effective gradient $+G$ on $[0,\delta]$, $-G$ on $[\Delta,\Delta+\delta]$) and one exponential $e^{-a|t_1-t_2|}$, show that
 
-    $$\iint g(t_1)g(t_2)\,e^{-a|t_1-t_2|}\,dt_1dt_2 = \frac{G^2}{a^2}\Big[4\big(a\delta - 1 + e^{-a\delta}\big) - 4e^{-a\Delta}\big(\cosh a\delta - 1\big)\Big].$$
+    $$\iint g(t_1)g(t_2)\,e^{-a|t_1-t_2|}\,dt_1dt_2 = \frac{G^2}{a^2}\Big[4\big(a\delta - 1 + e^{-a\delta}\big) - 4e^{-a\Delta}\big(\cosh a\delta - 1\big)\Big].\tag{2.10}$$
 
     **(c)** Check two limits for the slab, using $w_n = 8L^2/(n\pi)^4$, $\sum_n w_n\lambda_n = 1$ and $\sum_{n\ \text{odd}} n^{-6} = \pi^6/960$.
 
@@ -776,7 +776,7 @@ def _(mo):
 
     Diffusion kurtosis imaging ([Jensen et al. 2005](https://doi.org/10.1002/mrm.20508)) fits the first two terms in powers of $b$:
 
-    $$\ln E = -b\,D_{\text{app}} + \frac16\,b^2D_{\text{app}}^2K_{\text{app}} + O(b^3).$$
+    $$\ln E = -b\,D_{\text{app}} + \frac16\,b^2D_{\text{app}}^2K_{\text{app}} + O(b^3).\tag{2.11}$$
 
     **With narrow pulses** ($\delta \to 0$), the phase is $-q$ times the displacement $r$ (Chapter 3 derives this), and $b = q^2\Delta$. Then $D_{\text{app}}$ and $K_{\text{app}}$ are exactly the displacement cumulants of Chapter 1: $D(\Delta)$ and $K(\Delta)$.
 
@@ -852,11 +852,11 @@ def _(mo):
 
     Write the variance of the phase in the frequency domain. With $Q(\omega) = \int q(t)\,e^{i\omega t}dt$,
 
-    $$\langle\varphi^2\rangle_{\text{paths}} = \frac2\pi\int_0^\infty |Q(\omega)|^2\,\mathcal D(\omega)\,d\omega ,$$
+    $$\langle\varphi^2\rangle_{\text{paths}} = \frac2\pi\int_0^\infty |Q(\omega)|^2\,\mathcal D(\omega)\,d\omega ,\tag{2.12}$$
 
     where $\mathcal D(\omega)$ is the **diffusion spectrum**, the Fourier transform of the velocity autocorrelation (Stepišnik 1993). The gradient waveform acts as a filter $|Q(\omega)|^2$ that picks which frequencies of the motion are seen. For free diffusion $\mathcal D(\omega) = D$ at every frequency and Parseval gives back $2bD$. For a pore, the modes give
 
-    $$\mathcal D(\omega) = \sum_{n\ge1} w_n\,D\lambda_n\,\frac{\omega^2}{(D\lambda_n)^2 + \omega^2},$$
+    $$\mathcal D(\omega) = \sum_{n\ge1} w_n\,D\lambda_n\,\frac{\omega^2}{(D\lambda_n)^2 + \omega^2},\tag{2.13}$$
 
     which rises from 0 (no long-range motion in a closed pore) to $D$ (at high frequency the walls are not felt). **Oscillating gradients** (OGSE) have $|Q|^2$ peaked at their frequency, so they sample $\mathcal D(\omega)$ there: high frequencies probe short times.
     """)
@@ -889,11 +889,11 @@ def _(mo):
 
     The two halves of this chapter look different, but they are built from the same $\Lambda$ and $\mathbf B$. Expand the exact solution of 2a in powers of the gradient. Treating $i\gamma g\mathbf B$ as a perturbation of $D\Lambda$ (variation of constants, applied repeatedly):
 
-    $$c_0(T) = 1 \;-\; i\gamma\int_0^T g(t)\,B_{00}\,dt \;-\; \gamma^2\int_0^T\!dt_2\int_0^{t_2}\!dt_1\;g(t_2)\,g(t_1)\,\big[\mathbf B\,e^{-D\Lambda(t_2-t_1)}\mathbf B\big]_{00} \;+\;\dots$$
+    $$c_0(T) = 1 \;-\; i\gamma\int_0^T g(t)\,B_{00}\,dt \;-\; \gamma^2\int_0^T\!dt_2\int_0^{t_2}\!dt_1\;g(t_2)\,g(t_1)\,\big[\mathbf B\,e^{-D\Lambda(t_2-t_1)}\mathbf B\big]_{00} \;+\;\dots\tag{2.14}$$
 
     The $n$-th term holds $n$ factors of $\mathbf B$ separated by diffusion propagators. Each such sandwich is a **multi-time correlation function** of the position,
 
-    $$\big[\mathbf B\,e^{-D\Lambda(t_2-t_1)}\mathbf B\big]_{00} = \langle x(t_1)\,x(t_2)\rangle_{\text{paths}},\qquad \big[\mathbf B e^{-D\Lambda\tau_3}\mathbf B e^{-D\Lambda\tau_2}\mathbf B e^{-D\Lambda\tau_1}\mathbf B\big]_{00} = \langle x(t_1)\,x(t_2)\,x(t_3)\,x(t_4)\rangle_{\text{paths}},\ \dots$$
+    $$\big[\mathbf B\,e^{-D\Lambda(t_2-t_1)}\mathbf B\big]_{00} = \langle x(t_1)\,x(t_2)\rangle_{\text{paths}},\qquad \big[\mathbf B e^{-D\Lambda\tau_3}\mathbf B e^{-D\Lambda\tau_2}\mathbf B e^{-D\Lambda\tau_1}\mathbf B\big]_{00} = \langle x(t_1)\,x(t_2)\,x(t_3)\,x(t_4)\rangle_{\text{paths}},\ \dots\tag{2.15}$$
 
     which is where the name of the method comes from: **MCF = multiple correlation function** (Grebenkov 2007). The time-ordered exponential of Axelrod & Sen (2001) is the same expansion written compactly.
 
@@ -958,7 +958,7 @@ def _(mo):
 
     **What the zero does to the coefficients.** Write $\ln E = \sum_k c_{2k}G^{2k}$. Close to its nearest zeros, $\ln E$ behaves like $\ln(1 - G^2/G^{*2}) + \ln(1 - G^2/\bar G^{*2})$ plus a part that is analytic in a larger disc. Expanding $\ln(1-u) = -\sum_k u^k/k$ gives, for large $k$ (Darboux 1878),
 
-    $$c_{2k}\approx-\frac2k\,\lvert G^*\rvert^{-2k}\cos(2k\theta^*),\qquad \theta^* = \arg G^* .$$
+    $$c_{2k}\approx-\frac2k\,\lvert G^*\rvert^{-2k}\cos(2k\theta^*),\qquad \theta^* = \arg G^* .\tag{2.16}$$
 
     → The coefficients shrink like $R^{-2k}$: the cumulant series behaves like a geometric series in $(G/R)^2$. Truncating it after the $G^{2K}$ term leaves an error of order $(G/R)^{2K+2}/K$. That is tiny for $G\ll R$ and useless near $R$, however many terms you keep.
 

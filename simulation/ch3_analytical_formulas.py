@@ -245,15 +245,15 @@ def _(mo):
 
     | Idea | Formula |
     | --- | --- |
-    | Length scales | pore size $L$; diffusion length $\ell_D = \sqrt{Dt}$; gradient length $\ell_g = (D/\gamma g)^{1/3}$; phase wavelength $1/q$ |
+    | Length scales | pore size $L$; diffusion length $\ell_D = \sqrt{Dt}$; gradient length $\ell_g = (D/\gamma g)^{1/3}$; phase wavelength $1/q$ (Eq. 1.39) |
     | Averages (Ch 1) | the subscript says over what: $\langle f\rangle_{x,x_0}$ over start (uniform in the pore, volume $V$) and end; $\langle f\rangle_{\text{paths}}$ over whole random paths, the mean over $N\to\infty$ walkers; $\langle f\rangle_x$ over the pore; $\langle f\rangle_W$ over a random step $W$ |
-    | … of the displacement | $r = x(t) - x_0$: $\ \langle f(r)\rangle_{x,x_0} = \int f(r)\,\bar P(r,t)\,dr$, with $\bar P(r,t)$ the ensemble-average propagator of Chapter 1 |
-    | Displacement cumulants | $\langle r^2\rangle_{x,x_0} = \int r^2\bar P(r,t)\,dr = 2D(t)\,t$, $\ K(t) = \langle r^4\rangle_{x,x_0}/\langle r^2\rangle_{x,x_0}^2 - 3$, with $\langle r^4\rangle_{x,x_0} = \int r^4\bar P(r,t)\,dr$ |
+    | … of the displacement | $r = x(t) - x_0$: $\ \langle f(r)\rangle_{x,x_0} = \int f(r)\,\bar P(r,t)\,dr$, with $\bar P(r,t)$ the ensemble-average propagator of Chapter 1 (Eq. 1.3) |
+    | Displacement cumulants | $\langle r^2\rangle_{x,x_0} = \int r^2\bar P(r,t)\,dr = 2D(t)\,t$, $\ K(t) = \langle r^4\rangle_{x,x_0}/\langle r^2\rangle_{x,x_0}^2 - 3$, with $\langle r^4\rangle_{x,x_0} = \int r^4\bar P(r,t)\,dr$ (Eq. 1.23, 1.25) |
     | Slab, limits | $D(t)\to D$ and $K\to0$ for $t\to0$; $\ \langle r^2\rangle_{x,x_0}\to L^2/6$ and $K\to-3/5$ for $t\to\infty$ |
     | Slab modes | $u_0 = 1/\sqrt L$, $\ u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$, $\ \tau_1 = L^2/(\pi^2D)$ |
-    | Path picture | $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ |
-    | Exact PGSE (MCF) | $E = [e^{-(D\Lambda - i\gamma G\mathbf B)\delta}\,e^{-D\Lambda(\Delta-\delta)}\,e^{-(D\Lambda + i\gamma G\mathbf B)\delta}]_{00}$ |
-    | Gaussian phase (GPA) | $\ln E \approx -\frac12\langle\varphi^2\rangle_{\text{paths}}$, $\ \langle\varphi^2\rangle_{\text{paths}} = \gamma^2\iint g(t_1)g(t_2)\,\langle x(t_1)x(t_2)\rangle_{\text{paths}}\,dt_1dt_2$, with $\langle x(t_1)x(t_2)\rangle_{\text{paths}} = \frac1V\iint x_0\,x\,P(x\mid x_0,\lvert t_2-t_1\rvert)\,dx\,dx_0 = \sum_n B_{0n}^2\,e^{-D\lambda_n\lvert t_1-t_2\rvert}$ |
+    | Path picture | $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ (Eq. 1.36) |
+    | Exact PGSE (MCF) | $E = [e^{-(D\Lambda - i\gamma G\mathbf B)\delta}\,e^{-D\Lambda(\Delta-\delta)}\,e^{-(D\Lambda + i\gamma G\mathbf B)\delta}]_{00}$ (Eq. 2.5) |
+    | Gaussian phase (GPA) | $\ln E \approx -\frac12\langle\varphi^2\rangle_{\text{paths}}$, $\ \langle\varphi^2\rangle_{\text{paths}} = \gamma^2\iint g(t_1)g(t_2)\,\langle x(t_1)x(t_2)\rangle_{\text{paths}}\,dt_1dt_2$, with $\langle x(t_1)x(t_2)\rangle_{\text{paths}} = \frac1V\iint x_0\,x\,P(x\mid x_0,\lvert t_2-t_1\rvert)\,dx\,dx_0 = \sum_n B_{0n}^2\,e^{-D\lambda_n\lvert t_1-t_2\rvert}$ (Eq. 2.7, 2.8) |
     | Verified in Ch 2 | GPA 5% off at $G \approx 205$ mT/m for $\delta = 10$, $\Delta = 20$ ms; complex zero of $E(G)$ near $463 + 20i$ mT/m |
 
     **Refresh first**
@@ -378,9 +378,9 @@ def _(mo):
 
     Suppose both gradient pulses are so short that spins do not move while they are on. The first pulse gives each spin the phase $\gamma g\delta\,x(0)$. After the refocusing pulse, the second removes $\gamma g\delta\,x(\Delta)$. So $\varphi = -qr$, with $q = \gamma g\delta$ and the displacement $r = x(\Delta) - x(0)$, and
 
-    $$E(q,\Delta) = \big\langle e^{iqr}\big\rangle_{x,x_0} = \int \bar P(r,\Delta)\,e^{iqr}\,dr ,$$
+    $$E(q,\Delta) = \big\langle e^{iqr}\big\rangle_{x,x_0} = \int \bar P(r,\Delta)\,e^{iqr}\,dr ,\tag{3.1}$$
 
-    the characteristic function of the displacement: the Fourier transform of the ensemble-average propagator $\bar P$ of Chapter 1 ([Stejskal & Tanner 1965](https://doi.org/10.1063/1.1695690); [Tanner & Stejskal 1968](https://doi.org/10.1063/1.1670306)). In powers of $q$, the cumulants of $\ln E$ are exactly the displacement cumulants, $\langle r^2\rangle_{x,x_0}$, $K(t)$, …. With finite pulses this identity breaks, because the phase then depends on the whole path, not only on its two end points (Chapter 2, Exercise 6).
+    the characteristic function of the displacement: the Fourier transform of the ensemble-average propagator $\bar P$ of Chapter 1 (Eqs. 1.3 and 1.24) ([Stejskal & Tanner 1965](https://doi.org/10.1063/1.1695690); [Tanner & Stejskal 1968](https://doi.org/10.1063/1.1670306)). In powers of $q$, the cumulants of $\ln E$ are exactly the displacement cumulants, $\langle r^2\rangle_{x,x_0}$, $K(t)$, …. With finite pulses this identity breaks, because the phase then depends on the whole path, not only on its two end points (Chapter 2, Exercise 6).
 
     → **When is a pulse narrow?** A spin must not move far during a pulse compared with the two lengths the signal resolves: $\sqrt{D\delta} \ll L$ and $\sqrt{D\delta} \ll 1/q$. In addition $\delta \ll \Delta$.
 
@@ -388,11 +388,11 @@ def _(mo):
 
     Put the eigenmode propagator of Chapter 1 into the Fourier integral. Every mode contributes its own decay $e^{-D\lambda_nt}$, weighted by how strongly it overlaps with the phase pattern $e^{iqx}$:
 
-    $$E(q,t) = \sum_n \frac{\lvert\tilde u_n(q)\rvert^2}{L}\,e^{-D\lambda_nt},\qquad \tilde u_n(q) = \int_0^L u_n(x)\,e^{iqx}\,dx .$$
+    $$E(q,t) = \sum_n \frac{\lvert\tilde u_n(q)\rvert^2}{L}\,e^{-D\lambda_nt},\qquad \tilde u_n(q) = \int_0^L u_n(x)\,e^{iqx}\,dx .\tag{3.2}$$
 
     For a slab this gives the closed form of [Tanner & Stejskal (1968)](https://doi.org/10.1063/1.1670306):
 
-    $$E(q,t) = \frac{2\,(1-\cos qL)}{(qL)^2} + 4\,(qL)^2\sum_{n\ge1} e^{-n^2\pi^2Dt/L^2}\;\frac{1-(-1)^n\cos qL}{\big[(qL)^2-(n\pi)^2\big]^2}.$$
+    $$E(q,t) = \frac{2\,(1-\cos qL)}{(qL)^2} + 4\,(qL)^2\sum_{n\ge1} e^{-n^2\pi^2Dt/L^2}\;\frac{1-(-1)^n\cos qL}{\big[(qL)^2-(n\pi)^2\big]^2}.\tag{3.3}$$
 
     It depends on $qL$ and $Dt/L^2$ only: these are the two coordinates of the narrow-pulse face. The first term is the $t\to\infty$ limit. The sum, which dies out on the pore time $\tau_1 = L^2/(\pi^2D)$, carries all the dynamics. Chapter 2's MCF reproduces it as $\delta\to0$; the check below uses $\delta = 0.05$ ms.
     """)
@@ -406,7 +406,7 @@ def _(maths):
 
     ② **Average over starting points.** Spins start uniformly, with density $1/L$:
 
-    $$E = \frac1L\int_0^L\!\!\int_0^L P(x\mid x_0,t)\,e^{iq(x-x_0)}\,dx\,dx_0 = \frac1L\sum_n e^{-D\lambda_nt}\Big(\int u_n(x)e^{iqx}dx\Big)\Big(\int u_n(x_0)e^{-iqx_0}dx_0\Big) .$$
+    $$E = \frac1L\int_0^L\!\!\int_0^L P(x\mid x_0,t)\,e^{iq(x-x_0)}\,dx\,dx_0 = \frac1L\sum_n e^{-D\lambda_nt}\Big(\int u_n(x)e^{iqx}dx\Big)\Big(\int u_n(x_0)e^{-iqx_0}dx_0\Big) .\tag{3.4}$$
 
     ⇒ The modes are real, so the second integral is the complex conjugate of the first: $E = \sum_n e^{-D\lambda_nt}\lvert\tilde u_n(q)\rvert^2/L$.
 
@@ -414,7 +414,7 @@ def _(maths):
 
     ④ **Modes $n\ge1$.** Write $\cos k_nx = \frac12(e^{ik_nx}+e^{-ik_nx})$ with $k_n = n\pi/L$, and integrate:
 
-    $$\tilde u_n = \sqrt{\tfrac2L}\;\frac{iq\,\big[1-(-1)^ne^{iqL}\big]}{k_n^2-q^2} ,\qquad \frac{\lvert\tilde u_n\rvert^2}{L} = \frac{2q^2\,\big[2-2(-1)^n\cos qL\big]}{L^2\,(k_n^2-q^2)^2} = \frac{4(qL)^2\,\big[1-(-1)^n\cos qL\big]}{\big[(qL)^2-(n\pi)^2\big]^2}.$$
+    $$\tilde u_n = \sqrt{\tfrac2L}\;\frac{iq\,\big[1-(-1)^ne^{iqL}\big]}{k_n^2-q^2} ,\qquad \frac{\lvert\tilde u_n\rvert^2}{L} = \frac{2q^2\,\big[2-2(-1)^n\cos qL\big]}{L^2\,(k_n^2-q^2)^2} = \frac{4(qL)^2\,\big[1-(-1)^n\cos qL\big]}{\big[(qL)^2-(n\pi)^2\big]^2}.\tag{3.5}$$
 
     → At $q = 0$ only $n = 0$ survives, with weight 1, so $E = 1$. ✓
 
@@ -638,19 +638,19 @@ def _(mo):
 
     **Free diffusion.** Far from any wall $\bar P$ is a Gaussian of variance $2Dt$, so $E = e^{-q^2Dt}$. For narrow pulses $b = q^2\Delta$; for finite pulses $b = q^2(\Delta-\delta/3)$ ([Stejskal & Tanner 1965](https://doi.org/10.1063/1.1695690)). In an anisotropic medium the Gaussian has a covariance $2\mathbf Dt$ and
 
-    $$E = e^{-\mathbf b:\mathbf D} = \exp\Big(-\sum_{ij}b_{ij}D_{ij}\Big),\qquad b_{ij} = q_iq_j\,t ,$$
+    $$E = e^{-\mathbf b:\mathbf D} = \exp\Big(-\sum_{ij}b_{ij}D_{ij}\Big),\qquad b_{ij} = q_iq_j\,t ,\tag{3.6}$$
 
     the **$b$-matrix** of DTI ([Basser, Mattiello & LeBihan 1994](https://doi.org/10.1006/jmrb.1994.1037)).
 
     **Walls, to first order.** At short times only spins within about $\ell_D$ of a wall notice it, and they move less. Their fraction is proportional to the surface-to-volume ratio $S/V$, which gives the result of [Mitra, Sen, Schwartz & Le Doussal (1992)](https://doi.org/10.1103/PhysRevLett.68.3555) and [Mitra, Sen & Schwartz (1993)](https://doi.org/10.1103/PhysRevB.47.8565):
 
-    $$\frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t),$$
+    $$\frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t),\tag{3.7}$$
 
-    in $d$ dimensions, for any pore shape (derived in Chapter 1, Exercise 9). Slab: $S/V = 2/L$, $d = 1$. Cylinder (in the cross-section): $S/V = 2/R$, $d = 2$. Sphere: $S/V = 3/R$, $d = 3$. The first measurements of $S/V$ this way were in porous media ([Latour et al. 1993](https://doi.org/10.1006/jmra.1993.1056)).
+    in $d$ dimensions, for any pore shape (Eq. 1.27, derived in Chapter 1, Exercise 9). Slab: $S/V = 2/L$, $d = 1$. Cylinder (in the cross-section): $S/V = 2/R$, $d = 2$. Sphere: $S/V = 3/R$, $d = 3$. The first measurements of $S/V$ this way were in porous media ([Latour et al. 1993](https://doi.org/10.1006/jmra.1993.1056)).
 
     **The kurtosis appears at the same order.** A slab at short times is a mixture: a bulk that diffuses freely, and a thin layer at each wall whose displacements are narrower. A mixture of Gaussian-like distributions of different widths has **positive** excess kurtosis. Chapter 1 (Exercise 9) derives, for a slab,
 
-    $$K(t) \approx \frac{16}{5\sqrt\pi}\,\frac{\sqrt{Dt}}{L} = 1.805\,\frac{\sqrt{Dt}}{L}.$$
+    $$K(t) \approx \frac{16}{5\sqrt\pi}\,\frac{\sqrt{Dt}}{L} = 1.805\,\frac{\sqrt{Dt}}{L}.\tag{3.8}$$
 
     **Edge enhancement.** The same physics, seen locally: the right-hand panel shows the signal of each starting position $x_0$ across the slab. Spins near a wall are attenuated less, so in a high-resolution image the edges of a pore light up (Hyslop & Lauterbur 1991; Pütz, Barsky & Schulten 1992; [de Swiet 1995](https://doi.org/10.1006/jmrb.1995.1141)).
     """)
@@ -742,7 +742,7 @@ def _(mo):
 
     **A closed pore.** Once $\ell_D \gg L$, a spin has forgotten where it started. Its end point is uniform in the pore and independent of its start, so the displacement $r = x - x_0$ is the difference of two independent uniform positions. For a slab, $\bar P(r)$ is a **triangle** of half-width $L$:
 
-    $$\bar P(r) = \frac{L-\lvert r\rvert}{L^2},\qquad \langle r^2\rangle_{x,x_0} = \frac{L^2}{6},\qquad D(t) = \frac{\langle r^2\rangle_{x,x_0}}{2t} = \frac{L^2}{12\,t},\qquad K = -\frac35 .$$
+    $$\bar P(r) = \frac{L-\lvert r\rvert}{L^2},\qquad \langle r^2\rangle_{x,x_0} = \frac{L^2}{6},\qquad D(t) = \frac{\langle r^2\rangle_{x,x_0}}{2t} = \frac{L^2}{12\,t},\qquad K = -\frac35 .\tag{3.9}$$
 
     Its Fourier transform is the form factor of ③, $E = \operatorname{sinc}^2(qL/2)$. In a closed pore $D(t)$ falls to zero as $1/t$, and $K$ stays negative: the displacement is bounded, so the distribution has lighter tails than a Gaussian.
 
@@ -750,7 +750,7 @@ def _(mo):
 
     **A connected medium.** If spins can leave the pore, through permeable membranes or through gaps between obstacles, $D(t)$ does not go to zero but to a finite $D_\infty < D$. The ratio $D/D_\infty$ is the **tortuosity**. For a stack of membranes with spacing $L$ and permeability $\kappa$ (the interface condition of Chapter 1), the resistances to flux add in series, as for heat conduction through layers:
 
-    $$\frac1{D_\infty} = \frac1D + \frac1{\kappa L} .$$
+    $$\frac1{D_\infty} = \frac1D + \frac1{\kappa L} .\tag{3.10}$$
 
     **How $D(t)$ approaches $D_\infty$** carries the structure. [Novikov et al. (2014)](https://doi.org/10.1073/pnas.1316944111) showed that the tail is a power law set by the type of disorder:
 
@@ -879,7 +879,7 @@ def _(exercise):
 
     **(b)** Show from the Tanner–Stejskal sum that at the first zero, $qL = 2\pi$,
 
-    $$E(2\pi, t) = \frac{32}{9\pi^2}e^{-\pi^2Dt/L^2} + \frac12 e^{-4\pi^2Dt/L^2} + \dots$$
+    $$E(2\pi, t) = \frac{32}{9\pi^2}e^{-\pi^2Dt/L^2} + \frac12 e^{-4\pi^2Dt/L^2} + \dots\tag{3.11}$$
 
     How long must $\Delta$ be, for the running example, before the dip reaches $10^{-2}$? Check with the slider.
 
@@ -922,13 +922,13 @@ def _(mo):
 
     The cumulant series is an expansion in the phase spread, $q$ times the typical displacement. The typical displacement is the root-mean-square $r_{\text{rms}} = \sqrt{\langle r^2\rangle_{x,x_0}} = \sqrt{2D(t)\,t}$, which runs from $\sqrt{2Dt}$ at short times to $L/\sqrt6$ at long times. So the region where the Gaussian (second cumulant) works is
 
-    $$q\,r_{\text{rms}}\lesssim 1 \qquad\Longleftrightarrow\qquad q\min(\ell_D, L)\lesssim 1\ \text{ (up to constants)} \qquad\Longleftrightarrow\qquad b\,D(t)\lesssim\tfrac12 ,$$
+    $$q\,r_{\text{rms}}\lesssim 1 \qquad\Longleftrightarrow\qquad q\min(\ell_D, L)\lesssim 1\ \text{ (up to constants)} \qquad\Longleftrightarrow\qquad b\,D(t)\lesssim\tfrac12 ,\tag{3.12}$$
 
     since $q^2r_{\text{rms}}^2 = 2q^2D(t)\,t = 2bD(t)$ for narrow pulses.
 
     **How large is "$\lesssim 1$"?** The first correction is the fourth cumulant. With $\kappa_4 = K\,r_{\text{rms}}^4$,
 
-    $$\ln E = -\frac{(qr_{\text{rms}})^2}{2} + \frac{K\,(qr_{\text{rms}})^4}{24} - \dots$$
+    $$\ln E = -\frac{(qr_{\text{rms}})^2}{2} + \frac{K\,(qr_{\text{rms}})^4}{24} - \dots\tag{3.13}$$
 
     The Gaussian is 5% off when the second term reaches 0.05: $(qr_{\text{rms}})^* \approx (1.2/\lvert K\rvert)^{1/4}$. A scan of the exact slab signal gives:
 
@@ -1214,13 +1214,13 @@ def _(mo):
 
     **A rule of thumb to test.** A natural guess for the interior is
 
-    $$H = \gamma gL\cdot\min\big(\delta,\ L^2/D\big)\ \lesssim\ 1 .$$
+    $$H = \gamma gL\cdot\min\big(\delta,\ L^2/D\big)\ \lesssim\ 1 .\tag{3.14}$$
 
     It reads: the phase difference across the pore that builds up during one lobe, where the lobe counts only up to the pore time (after that the spins average over the pore). In dimensionless form $H = \Gamma\min(\tilde\delta, 1)$. For long pulses it gives $\Gamma = (L/\ell_g)^3\lesssim1$, the motional-narrowing edge. For narrow pulses it gives $qL\lesssim1$.
 
     **A refinement.** At short $\Delta$ the walls are hardly felt, and free diffusion is Gaussian at any gradient. So the length in the rule should be the one the spins actually explore, $\ell = \min(\sqrt{D\Delta}, L)$:
 
-    $$H_2 = \gamma g\,\ell\cdot\min\big(\delta,\ \ell^2/D\big)\ \lesssim\ 1,\qquad \ell = \min(\sqrt{D\Delta}, L).$$
+    $$H_2 = \gamma g\,\ell\cdot\min\big(\delta,\ \ell^2/D\big)\ \lesssim\ 1,\qquad \ell = \min(\sqrt{D\Delta}, L).\tag{3.15}$$
 
     On the narrow-pulse face $H_2 = q\ell$, the cumulant boundary of 3a. On the long-pulse face $H_2 = (\ell/\ell_g)^3$, which gives both the free–localisation line ($\ell_D = \ell_g$) and the motional narrowing–localisation line ($L = \ell_g$) of 3b.
 
@@ -1372,11 +1372,11 @@ def _(mo):
 
     If the wall relaxes magnetization with relaxivity $\rho$ (µm/ms), the reflecting condition of Chapter 1 becomes the Robin condition
 
-    $$D\,\frac{\partial m}{\partial n} + \rho\,m = 0\quad\text{on the wall}.$$
+    $$D\,\frac{\partial m}{\partial n} + \rho\,m = 0\quad\text{on the wall}.\tag{3.16}$$
 
     The eigenmodes change, and with them the relaxation of the whole pore ([Brownstein & Tarr 1979](https://doi.org/10.1103/PhysRevA.19.2446)). For a slab, the slowest symmetric mode is $\cos\big(k(x - L/2)\big)$ with
 
-    $$\frac{kL}2\,\tan\frac{kL}2 = \frac{\rho L}{2D},\qquad \frac1{T_{2,\text{surf}}} = Dk^2 .$$
+    $$\frac{kL}2\,\tan\frac{kL}2 = \frac{\rho L}{2D},\qquad \frac1{T_{2,\text{surf}}} = Dk^2 .\tag{3.17}$$
 
     The new axis is $\rho L/D$, which compares how fast the wall removes spins with how fast diffusion brings them there:
 
@@ -1453,9 +1453,9 @@ def _(mo):
 
     Now let two compartments exchange spins across a membrane. If the membrane is the bottleneck, each compartment is well mixed and can be described by one number, its magnetization. With narrow pulses, and a Gaussian signal inside each compartment, the two magnetizations obey a linear ODE system ([Kärger 1985](<https://doi.org/10.1016/0001-8686(85)80018-X>)):
 
-    $$\frac{d\mathbf m}{dt} = -\big(q^2\mathbf D + \mathbf K\big)\,\mathbf m,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},$$
+    $$\frac{d\mathbf m}{dt} = -\big(q^2\mathbf D + \mathbf K\big)\,\mathbf m,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},\tag{3.18}$$
 
-    with $\mathbf m(0) = (p_1, p_2)$ and detailed balance $k_1p_1 = k_2p_2$. The signal is $E = (1,1)\,e^{-(b\mathbf D + \mathbf K\Delta)}\,\mathbf p$, with $b = q^2\Delta$. It is a linear system $\dot{\mathbf x} = A\mathbf x$, solved by $e^{tA}$ and its eigenvalues. Chapter 1 (Exercise 11) derives it as the characteristic function of the displacement, and shows that exchange leaves the mean-squared displacement unchanged and shows up only in the kurtosis.
+    with $\mathbf m(0) = (p_1, p_2)$ and detailed balance $k_1p_1 = k_2p_2$. The signal is $E = (1,1)\,e^{-(b\mathbf D + \mathbf K\Delta)}\,\mathbf p$, with $b = q^2\Delta$. It is a linear system $\dot{\mathbf x} = A\mathbf x$, solved by $e^{tA}$ and its eigenvalues. Chapter 1 (Eq. 1.30, Exercise 11) derives it as the characteristic function of the displacement, and shows that exchange leaves the mean-squared displacement unchanged and shows up only in the kurtosis.
 
     The new axis is $\Delta/\tau_{\text{ex}}$, with $1/\tau_{\text{ex}} = k_1 + k_2$. From Chapter 1, a barrier-limited membrane with permeability $\kappa$ gives $k_1 = \kappa\,(S/V)_1$.
 

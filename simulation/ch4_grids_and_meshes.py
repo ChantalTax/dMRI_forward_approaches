@@ -391,15 +391,15 @@ def _(mo):
 
     | Idea | Formula |
     | --- | --- |
-    | Bloch–Torrey | $\partial M/\partial t = \nabla\cdot(D\nabla M) - i\gamma\,g(t)\,x\,M$, $\ M(\mathbf x, 0) = 1$, $\ E = \frac1V\int M(\mathbf x, T)\,d\mathbf x$ |
+    | Bloch–Torrey | $\partial M/\partial t = \nabla\cdot(D\nabla M) - i\gamma\,g(t)\,x\,M$, $\ M(\mathbf x, 0) = 1$, $\ E = \frac1V\int M(\mathbf x, T)\,d\mathbf x$ (Eq. 1.32) |
     | Wall and interface conditions | impermeable: $D\,\partial M/\partial n = 0$; membrane: continuous flux $= \kappa\times$ jump in $M$; relaxing wall: $D\,\partial M/\partial n + \rho M = 0$ |
-    | The full problem (Ch 1) | compartments $\Omega_n$ with $D_n$, $T_{2,n}$ and spin density $\rho_n$; reflecting outer boundary; on a membrane $\Gamma_{nm}$ continuous flux $= \kappa_{nm}(c_{nm}M_m - c_{mn}M_n)$, $\ c_{nm} = 2\rho_n/(\rho_n + \rho_m)$; the gradient $f(t)\,\mathbf g$ |
-    | Weak form (Ch 1) | $\int w\,\partial_tM + \int D\nabla w\cdot\nabla M + i\gamma g\int w\,x\,M = \oint wD\,\partial_nM$ for every $w$; walls natural; modes as test functions give Chapter 2 |
+    | The full problem (Ch 1) | compartments $\Omega_n$ with $D_n$, $T_{2,n}$ and spin density $\rho_n$; reflecting outer boundary; on a membrane $\Gamma_{nm}$ continuous flux $= \kappa_{nm}(c_{nm}M_m - c_{mn}M_n)$, $\ c_{nm} = 2\rho_n/(\rho_n + \rho_m)$; the gradient $f(t)\,\mathbf g$ (Eq. 1.33) |
+    | Weak form (Ch 1) | $\int w\,\partial_tM + \int D\nabla w\cdot\nabla M + i\gamma g\int w\,x\,M = \oint wD\,\partial_nM$ for every $w$; walls natural; modes as test functions give Chapter 2 (Eq. 1.34) |
     | Averages (Ch 1) | the subscript says over what: $\langle f\rangle_{x,x_0}$ over start (uniform) and end, $\langle f\rangle_{\text{paths}}$ over whole random paths |
-    | Matrix method (Ch 2) | $d\mathbf c/dt = -(D\Lambda + i\gamma g(t)\mathbf B)\,\mathbf c$ in the eigenmodes: $\Lambda$ diagonal, $\mathbf B$ dense |
-    | Length scales | $\ell_D = \sqrt{Dt}$, $\ \ell_g = (D/\gamma g)^{1/3}$, phase wavelength $2\pi/q$ |
-    | Tortuosity (Ch 3) | membranes with spacing $L$: $1/D_\infty = 1/D + 1/(\kappa L)$ |
-    | Exchange mode (Ch 1) | slab $[-a, a]$, membrane at 0: slowest odd mode from $k\tan(ka) = 2\kappa/D$, rate $Dk^2\approx4\kappa/L$ |
+    | Matrix method (Ch 2) | $d\mathbf c/dt = -(D\Lambda + i\gamma g(t)\mathbf B)\,\mathbf c$ in the eigenmodes: $\Lambda$ diagonal, $\mathbf B$ dense (Eq. 2.2) |
+    | Length scales | $\ell_D = \sqrt{Dt}$, $\ \ell_g = (D/\gamma g)^{1/3}$, phase wavelength $2\pi/q$ (Eq. 1.39) |
+    | Tortuosity (Ch 3) | membranes with spacing $L$: $1/D_\infty = 1/D + 1/(\kappa L)$ (Eq. 3.10) |
+    | Exchange mode (Ch 1) | slab $[-a, a]$, membrane at 0: slowest odd mode from $k\tan(ka) = 2\kappa/D$, rate $Dk^2\approx4\kappa/L$ (Eq. 1.29) |
 
     **Refresh first**
 
@@ -420,7 +420,7 @@ def _(mo):
 
     Cut space into $n$ pieces and keep time continuous. Each piece carries one unknown, so the magnetization $M(x,t)$ becomes a vector $\mathbf M(t)$ and the Bloch–Torrey PDE becomes a system of $n$ linear ODEs:
 
-    $$\boldsymbol{\mathcal M}\,\frac{d\mathbf M}{dt} = -\big(D\,\mathbf K + i\gamma\,g(t)\,\mathbf X\big)\,\mathbf M .$$
+    $$\boldsymbol{\mathcal M}\,\frac{d\mathbf M}{dt} = -\big(D\,\mathbf K + i\gamma\,g(t)\,\mathbf X\big)\,\mathbf M .\tag{4.1}$$
 
     This is the **method of lines**: every point of space follows its own line in time, coupled to its neighbours. You met this form in Chapter 2, where the pieces were the eigenmodes. What changes from method to method is only the choice of pieces:
 
@@ -536,7 +536,7 @@ def _(mo):
 
     ⇒ **Balance of one cell.** What enters through one face and leaves through the other changes the content of the cell:
 
-    $$h\,\frac{dM_i}{dt} = J_{i-1/2} - J_{i+1/2} = \frac Dh\big(M_{i-1} - 2M_i + M_{i+1}\big).$$
+    $$h\,\frac{dM_i}{dt} = J_{i-1/2} - J_{i+1/2} = \frac Dh\big(M_{i-1} - 2M_i + M_{i+1}\big).\tag{4.2}$$
 
     ⇒ Divide by $h$: the familiar three-point Laplacian, $D(M_{i-1} - 2M_i + M_{i+1})/h^2$. Taylor-expanding $M_{i\pm1}$ shows that it differs from $D\,M''(x_i)$ by $\frac{Dh^2}{12}M''''$: second order in $h$ (Exercise 2).
 
@@ -560,7 +560,7 @@ def _(mo):
 
     The gradient term is local: each cell dephases at its own rate. It adds $i\gamma g(t)x_i$ to $A_{ii}$, a diagonal matrix. Relaxation is just as local: a cell in compartment $n$ gets an extra $1/T_{2,n}$ on the diagonal. Without relaxation, assembled:
 
-    $$\frac{d\mathbf M}{dt} = -\big(\mathbf A + i\gamma g(t)\,\mathrm{diag}(x_i)\big)\,\mathbf M,\qquad E = \frac1n\sum_iM_i\ \text{ at the echo}.$$
+    $$\frac{d\mathbf M}{dt} = -\big(\mathbf A + i\gamma g(t)\,\mathrm{diag}(x_i)\big)\,\mathbf M,\qquad E = \frac1n\sum_iM_i\ \text{ at the echo}.\tag{4.3}$$
 
     **Recipe**
 
@@ -634,7 +634,7 @@ def _(mo):
 
     **Why explicit Euler has a limit.** Look at one Fourier pattern on the grid, $M_j = e^{ikjh}$. The three-point Laplacian maps it onto itself, multiplied by $-\mu$ with $\mu = \frac{4D}{h^2}\sin^2\frac{kh}2$. One explicit step therefore multiplies it by the **amplification factor**
 
-    $$G_{\text{EE}} = 1 - \delta t\,\mu = 1 - 4r\sin^2\tfrac{kh}2,\qquad r = \frac{D\,\delta t}{h^2}.$$
+    $$G_{\text{EE}} = 1 - \delta t\,\mu = 1 - 4r\sin^2\tfrac{kh}2,\qquad r = \frac{D\,\delta t}{h^2}.\tag{4.4}$$
 
     The fastest pattern on the grid, $kh = \pi$ (neighbouring cells alternate), has $G = 1 - 4r$. For $r > 1/2$ that is below $-1$: this pattern flips sign and grows every step, and the solution blows up. Hence $\delta t\le h^2/(2D)$ in 1D, and $h^2/(2dD)$ in $d$ dimensions. This is the Courant–Friedrichs–Lewy type of limit ([Courant, Friedrichs & Lewy 1928](https://doi.org/10.1007/BF01448839)).
 
@@ -779,7 +779,7 @@ def _(mo):
 
     Write one explicit Euler step of the flux balance cell by cell, leaving the gradient out for a moment:
 
-    $$M_j^{+} = \big(1 - s_{j\to j-1} - s_{j\to j+1}\big)\,M_j + s_{j-1\to j}\,M_{j-1} + s_{j+1\to j}\,M_{j+1},\qquad s_{j\to k} = \frac{c_{jk}\,\delta t}{h} .$$
+    $$M_j^{+} = \big(1 - s_{j\to j-1} - s_{j\to j+1}\big)\,M_j + s_{j-1\to j}\,M_{j-1} + s_{j+1\to j}\,M_{j+1},\qquad s_{j\to k} = \frac{c_{jk}\,\delta t}{h} .\tag{4.5}$$
 
     ⇒ Read it as bookkeeping. In one step a fraction $s_{j\to k}$ of the content of cell $j$ moves to cell $k$, and the rest stays. That is why $s$ is called a **jump probability**. In the bulk $s = D\,\delta t/h^2 = r$.
 
@@ -793,7 +793,7 @@ def _(mo):
 
     **Relaxation and gradient as one factor.** Over one step, relaxation and the gradient act on every cell separately, so they can be applied exactly:
 
-    $$\Phi_j = \exp\!\Big(-i\gamma f(t)\,(\mathbf g\cdot\mathbf x_j)\,\delta t - \frac{\delta t}{T_{2,j}}\Big),\qquad \mathbf M^{n+1} = \boldsymbol\Phi\odot(\mathbf I + \mathbf S)\,\mathbf M^n,$$
+    $$\Phi_j = \exp\!\Big(-i\gamma f(t)\,(\mathbf g\cdot\mathbf x_j)\,\delta t - \frac{\delta t}{T_{2,j}}\Big),\qquad \mathbf M^{n+1} = \boldsymbol\Phi\odot(\mathbf I + \mathbf S)\,\mathbf M^n,\tag{4.6}$$
 
     where $\odot$ multiplies entry by entry. This is the **matrix-based finite-difference (MFD)** update of [Xu, Does & Gore (2007)](https://doi.org/10.1088/0031-9155/52/7/N01): diffusion explicitly, everything local exactly. It removes the phase-term trap of ④.
 
@@ -899,7 +899,7 @@ def _(mo):
 
     ⇒ Insert this into the Bloch–Torrey equation. The time derivative of the phase factor produces $-i\gamma gx\,m$, which cancels the gradient term exactly, and the Laplacian picks up the factor: $\partial_x(m\,e^{-iqx}) = e^{-iqx}(\partial_x - iq)\,m$. So
 
-    $$\frac{\partial m}{\partial t} = D\,(\partial_x - iq(t))^2\,m .$$
+    $$\frac{\partial m}{\partial t} = D\,(\partial_x - iq(t))^2\,m .\tag{4.7}$$
 
     ⇒ This equation has no $x$ in it, only derivatives. For a periodic medium and a uniform start ($m = 1$), $m$ stays **periodic**. One cell with ordinary periodic boundaries is now enough.
 
@@ -990,13 +990,13 @@ def _(mo):
 
     ## ① Start from the weak form
 
-    Chapter 1 wrote the Bloch–Torrey equation in weak form: for every test function $w$,
+    Chapter 1 wrote the Bloch–Torrey equation in weak form, Eq. (1.34): for every test function $w$,
 
-    $$\int_\Omega w\,\partial_tM + \int_\Omega D\,\nabla w\cdot\nabla M + i\gamma g\int_\Omega w\,x\,M = \oint_{\partial\Omega}w\,D\,\partial_nM\,dS .$$
+    $$\int_\Omega w\,\partial_tM + \int_\Omega D\,\nabla w\cdot\nabla M + i\gamma g\int_\Omega w\,x\,M = \oint_{\partial\Omega}w\,D\,\partial_nM\,dS .\tag{4.8}$$
 
     Two consequences carry the whole method. It needs only first derivatives of $M$, so $M$ may be built from pieces with kinks. And the walls sit in the boundary term: impermeable walls make it zero (**nothing to code**), a membrane adds a term that couples its two sides, and a relaxing wall adds $-\rho\oint wM\,dS$. Finite differences need a rule at every wall face (4a ②); finite elements get reflecting walls for free.
 
-    Chapter 1 also showed that the choice of test functions decides the method: eigenmodes give the matrix method of Chapter 2. Finite elements choose functions that are easy to build on any shape.
+    Chapter 1 also showed that the choice of test functions decides the method: eigenmodes give the matrix method of Chapter 2, Eq. (2.2). Finite elements choose functions that are easy to build on any shape.
 
     ## ② Galerkin: hat functions as unknowns and as weights
 
@@ -1012,11 +1012,11 @@ def _(mo):
 
     ⇒ Insert $M = \sum_jM_jN_j$ and $w = N_i$ into the weak form. Every integral becomes a sum over elements of small matrices:
 
-    $$\boldsymbol{\mathcal M}\frac{d\mathbf M}{dt} = -\big(\mathbf K + i\gamma g(t)\,\mathbf J\big)\mathbf M,\qquad \mathcal M_{ij} = \int N_iN_j,\quad K_{ij} = \int D\,\nabla N_i\cdot\nabla N_j,\quad J_{ij} = \int N_i\,x\,N_j .$$
+    $$\boldsymbol{\mathcal M}\frac{d\mathbf M}{dt} = -\big(\mathbf K + i\gamma g(t)\,\mathbf J\big)\mathbf M,\qquad \mathcal M_{ij} = \int N_iN_j,\quad K_{ij} = \int D\,\nabla N_i\cdot\nabla N_j,\quad J_{ij} = \int N_i\,x\,N_j .\tag{4.9}$$
 
     For a 1D element $[x_a, x_b]$ of length $h$, all three integrals are exact:
 
-    $$\boldsymbol{\mathcal M}^e = \frac h6\begin{pmatrix}2&1\\1&2\end{pmatrix},\qquad \mathbf K^e = \frac Dh\begin{pmatrix}1&-1\\-1&1\end{pmatrix},\qquad \mathbf J^e = \frac h{12}\begin{pmatrix}3x_a + x_b & x_a + x_b\\ x_a + x_b & x_a + 3x_b\end{pmatrix}.$$
+    $$\boldsymbol{\mathcal M}^e = \frac h6\begin{pmatrix}2&1\\1&2\end{pmatrix},\qquad \mathbf K^e = \frac Dh\begin{pmatrix}1&-1\\-1&1\end{pmatrix},\qquad \mathbf J^e = \frac h{12}\begin{pmatrix}3x_a + x_b & x_a + x_b\\ x_a + x_b & x_a + 3x_b\end{pmatrix}.\tag{4.10}$$
 
     ⇒ **Assembly.** Each element adds its $2\times2$ matrix into the rows and columns of its two nodes. Neighbouring elements share a node, so their contributions overlap there. The result is a sparse matrix that couples each node only to its neighbours.
 
@@ -1024,9 +1024,9 @@ def _(mo):
 
     ## ④ The full system: compartments, relaxation and membranes
 
-    With several compartments, each gets its own set of hat functions, living only on the elements of that compartment. A node on an interface $\Gamma_{nm}$ is therefore **doubled**: one copy belongs to $\Omega_n$, the other to $\Omega_m$, so that $M$ can jump across the membrane (⑥ shows it in 1D). Put all nodal values in one vector $\boldsymbol\xi$ and write $\varphi_k$ for the hat function of node $k$. The weak form of the full problem of Chapter 1 then gives
+    With several compartments, each gets its own set of hat functions, living only on the elements of that compartment. A node on an interface $\Gamma_{nm}$ is therefore **doubled**: one copy belongs to $\Omega_n$, the other to $\Omega_m$, so that $M$ can jump across the membrane (⑥ shows it in 1D). Put all nodal values in one vector $\boldsymbol\xi$ and write $\varphi_k$ for the hat function of node $k$. The weak form of the full problem of Chapter 1, Eqs. (1.33)–(1.34), then gives
 
-    $$\boldsymbol{\mathcal M}\,\frac{d\boldsymbol\xi}{dt} = -\big(\mathbf S + \mathbf R + \mathbf Q + i\gamma f(t)\,\mathbf J(\mathbf g)\big)\,\boldsymbol\xi,\qquad \xi_k(0) = \rho_n\ \text{ for every node } k \text{ of } \Omega_n .$$
+    $$\boldsymbol{\mathcal M}\,\frac{d\boldsymbol\xi}{dt} = -\big(\mathbf S + \mathbf R + \mathbf Q + i\gamma f(t)\,\mathbf J(\mathbf g)\big)\,\boldsymbol\xi,\qquad \xi_k(0) = \rho_n\ \text{ for every node } k \text{ of } \Omega_n .\tag{4.11}$$
 
     | Matrix | Entries | Comes from |
     | --- | --- | --- |
@@ -1129,7 +1129,7 @@ def _(mo):
 
     Setting $g = 0$ and looking for $\mathbf M(t) = \mathbf u\,e^{-\lambda t}$ turns the semi-discrete equation into a **generalised eigenproblem**,
 
-    $$\mathbf K\mathbf u = \lambda\,\boldsymbol{\mathcal M}\,\mathbf u ,$$
+    $$\mathbf K\mathbf u = \lambda\,\boldsymbol{\mathcal M}\,\mathbf u ,\tag{4.12}$$
 
     whose solutions are the eigenmodes of the meshed shape. With eigenvectors normalised so that $\mathbf U^{\mathsf T}\boldsymbol{\mathcal M}\mathbf U = \mathbf I$, the gradient matrix of Chapter 2 is simply $\mathbf B = \mathbf U^{\mathsf T}\mathbf J\mathbf U$, and the whole of Chapter 2 runs unchanged. This is the matrix formalism of SpinDoctor ([Li, Tran & Nguyen 2020](https://doi.org/10.1002/nbm.4353)), extended to permeable membranes by [Agdestein, Tran & Li (2022)](https://doi.org/10.1002/nbm.4646). ReMiDi ([Khole et al. 2025](https://arxiv.org/abs/2502.01988)) makes it differentiable, so that the shape itself can be fitted to a signal.
 
@@ -1353,7 +1353,7 @@ def _(mo):
 
     ## Convergence in 1D
 
-    Both methods solve the running example on the slab, with Crank–Nicolson and $\delta t = 0.02$ ms. The reference is the exact MCF signal of Chapter 2.
+    Both methods solve the running example on the slab, with Crank–Nicolson and $\delta t = 0.02$ ms. The reference is the exact MCF signal of Chapter 2, Eq. (2.5).
     """)
     return
 
@@ -1400,7 +1400,7 @@ def _(mo):
     ② **Time, explicit.** $\delta t\le h^2/(2dD)$ for stability, and small enough to follow the waveform.
     ③ **Time, implicit.** $\delta t$ set by accuracy alone: Crank–Nicolson needs a few steps per change of the gradient, more for oscillating waveforms.
     ④ **Check.** Halve $h$, then $\delta t$, until $E$ changes by less than you can measure.
-    ⑤ **Validate.** Before simulating tissue, reproduce a slab, a cylinder or a sphere: the exact MCF of Chapter 2, and the closed forms of Chapter 3 (form factor, motional narrowing, localisation). If two methods disagree on a slab, one of them has a bug.
+    ⑤ **Validate.** Before simulating tissue, reproduce a slab, a cylinder or a sphere: the exact MCF of Chapter 2 (Eq. 2.5), and the closed forms of Chapter 3 (form factor, motional narrowing, localisation). If two methods disagree on a slab, one of them has a bug.
     """)
     return
 
