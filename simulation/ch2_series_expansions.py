@@ -232,7 +232,7 @@ def _(mo):
     - **The gradient couples the modes.** The field $x$ is not a mode, so multiplying a mode by $x$ spreads it over the others; $\mathbf B$ says how much goes where. All the geometry is in $\Lambda$ and $\mathbf B$.
     - **Start and finish.** Spins start uniform, $m(x,0) = u_0$, so $\mathbf c(0) = \mathbf e_0 = (1,0,0,\dots)$. Only the uniform mode has a nonzero integral, so the signal is just the first component at the echo: $E = c_0(T)$.
 
-    $\mathbf B$ is the **position matrix** of Chapter 1 (Exercise 7): real, symmetric, nonzero only between modes of opposite parity, with couplings that fall off as $1/n^2$, and $B_{0n}^2$ equal to the MSD weights. Together, $\Lambda$ and $\mathbf B$ are everything the geometry contributes.
+    $\mathbf B$ is the **position matrix** of Chapter 1 (Exercise 5): real, symmetric, nonzero only between modes of opposite parity, with couplings that fall off as $1/n^2$, and $B_{0n}^2$ equal to the MSD weights. Together, $\Lambda$ and $\mathbf B$ are everything the geometry contributes.
 
     The whole simulation problem is now: propagate $\mathbf c$ from $\mathbf e_0$ to the echo, and read off $c_0$. The methods below differ only in **how they step through time**.
     """)
@@ -489,7 +489,7 @@ def _(mo):
     Mirroring is what makes the wall behaviour matter. A function with a nonzero slope at a wall gets a kink when mirrored, even if it is perfectly smooth inside. The left panel shows the cosine coefficients of four functions:
 
     - a **step** (a jump): coefficients fall as $1/n$;
-    - the gradient field **$x$** itself: slope 1 at the walls, so the mirror has kinks, and the coefficients fall as $1/n^2$. These are the couplings $B_{0n}$ of Chapter 1, Exercise 7;
+    - the gradient field **$x$** itself: slope 1 at the walls, so the mirror has kinks, and the coefficients fall as $1/n^2$. These are the couplings $B_{0n}$ of Chapter 1, Exercise 5;
     - a **smooth step with zero slope at the walls**: the first jump is in the third derivative of the mirror, so $1/n^4$;
     - the **propagator** at $t > 0$: diffusion has smoothed it completely, and the coefficients $e^{-D\lambda_n t}u_n(x_0)$ fall faster than any power.
 
@@ -552,7 +552,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
-    **(a)** In Chapter 1, Exercise 7 you found that $B_{0n} \propto 1/n^2$. Explain the $1/n^2$ with the mirrored function. Would measuring $x$ from a wall instead of the centre change anything?
+    **(a)** In Chapter 1, Exercise 5 you found that $B_{0n} \propto 1/n^2$. Explain the $1/n^2$ with the mirrored function. Would measuring $x$ from a wall instead of the centre change anything?
 
     **(b)** Use rule 2 for $L = 8$ µm, $D = 2$ µm²/ms and $G = 300$ mT/m: from which $N$ on is the last mode damped more strongly than it is dephased? Compare with the right-hand panel.
 
