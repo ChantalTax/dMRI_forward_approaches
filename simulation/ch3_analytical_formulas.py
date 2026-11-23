@@ -245,13 +245,13 @@ def _(mo):
 
     | Idea | Formula |
     | --- | --- |
-    | Length scales | pore size $L$; diffusion length $\ell_D = \sqrt{Dt}$; gradient length $\ell_g = (D/\gamma g)^{1/3}$; phase wavelength $1/q$ (Eq. 1.39) |
+    | Length scales | pore size $L$; diffusion length $\ell_D = \sqrt{Dt}$; gradient length $\ell_g = (D/\gamma g)^{1/3}$; phase wavelength $1/q$ (Eq. 1.40) |
     | Averages (Ch 1) | the subscript says over what: $\langle f\rangle_{x,x_0}$ over start (uniform in the pore, volume $V$) and end; $\langle f\rangle_{\text{paths}}$ over whole random paths, the mean over $N\to\infty$ walkers; $\langle f\rangle_x$ over the pore; $\langle f\rangle_W$ over a random step $W$ |
     | … of the displacement | $r = x(t) - x_0$: $\ \langle f(r)\rangle_{x,x_0} = \int f(r)\,\bar P(r,t)\,dr$, with $\bar P(r,t)$ the ensemble-average propagator of Chapter 1 (Eq. 1.3) |
-    | Displacement cumulants | $\langle r^2\rangle_{x,x_0} = \int r^2\bar P(r,t)\,dr = 2D(t)\,t$, $\ K(t) = \langle r^4\rangle_{x,x_0}/\langle r^2\rangle_{x,x_0}^2 - 3$, with $\langle r^4\rangle_{x,x_0} = \int r^4\bar P(r,t)\,dr$ (Eq. 1.23, 1.25) |
+    | Displacement cumulants | $\langle r^2\rangle_{x,x_0} = \int r^2\bar P(r,t)\,dr = 2D(t)\,t$, $\ K(t) = \langle r^4\rangle_{x,x_0}/\langle r^2\rangle_{x,x_0}^2 - 3$, with $\langle r^4\rangle_{x,x_0} = \int r^4\bar P(r,t)\,dr$ (Eq. 1.24, 1.26) |
     | Slab, limits | $D(t)\to D$ and $K\to0$ for $t\to0$; $\ \langle r^2\rangle_{x,x_0}\to L^2/6$ and $K\to-3/5$ for $t\to\infty$ |
     | Slab modes | $u_0 = 1/\sqrt L$, $\ u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$, $\ \tau_1 = L^2/(\pi^2D)$ |
-    | Path picture | $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ (Eq. 1.36) |
+    | Path picture | $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ (Eq. 1.37) |
     | Exact PGSE (MCF) | $E = [e^{-(D\Lambda - i\gamma G\mathbf B)\delta}\,e^{-D\Lambda(\Delta-\delta)}\,e^{-(D\Lambda + i\gamma G\mathbf B)\delta}]_{00}$ (Eq. 2.5) |
     | Gaussian phase (GPA) | $\ln E \approx -\frac12\langle\varphi^2\rangle_{\text{paths}}$, $\ \langle\varphi^2\rangle_{\text{paths}} = \gamma^2\iint g(t_1)g(t_2)\,\langle x(t_1)x(t_2)\rangle_{\text{paths}}\,dt_1dt_2$, with $\langle x(t_1)x(t_2)\rangle_{\text{paths}} = \frac1V\iint x_0\,x\,P(x\mid x_0,\lvert t_2-t_1\rvert)\,dx\,dx_0 = \sum_n B_{0n}^2\,e^{-D\lambda_n\lvert t_1-t_2\rvert}$ (Eq. 2.7, 2.8) |
     | Verified in Ch 2 | GPA 5% off at $G \approx 205$ mT/m for $\delta = 10$, $\Delta = 20$ ms; complex zero of $E(G)$ near $463 + 20i$ mT/m |
@@ -380,7 +380,7 @@ def _(mo):
 
     $$E(q,\Delta) = \big\langle e^{iqr}\big\rangle_{x,x_0} = \int \bar P(r,\Delta)\,e^{iqr}\,dr ,\tag{3.1}$$
 
-    the characteristic function of the displacement: the Fourier transform of the ensemble-average propagator $\bar P$ of Chapter 1 (Eqs. 1.3 and 1.24) ([Stejskal & Tanner 1965](https://doi.org/10.1063/1.1695690); [Tanner & Stejskal 1968](https://doi.org/10.1063/1.1670306)). In powers of $q$, the cumulants of $\ln E$ are exactly the displacement cumulants, $\langle r^2\rangle_{x,x_0}$, $K(t)$, …. With finite pulses this identity breaks, because the phase then depends on the whole path, not only on its two end points (Chapter 2, Exercise 6).
+    the characteristic function of the displacement: the Fourier transform of the ensemble-average propagator $\bar P$ of Chapter 1 (Eqs. 1.3 and 1.25) ([Stejskal & Tanner 1965](https://doi.org/10.1063/1.1695690); [Tanner & Stejskal 1968](https://doi.org/10.1063/1.1670306)). In powers of $q$, the cumulants of $\ln E$ are exactly the displacement cumulants, $\langle r^2\rangle_{x,x_0}$, $K(t)$, …. With finite pulses this identity breaks, because the phase then depends on the whole path, not only on its two end points (Chapter 2, Exercise 6).
 
     → **When is a pulse narrow?** A spin must not move far during a pulse compared with the two lengths the signal resolves: $\sqrt{D\delta} \ll L$ and $\sqrt{D\delta} \ll 1/q$. In addition $\delta \ll \Delta$.
 
@@ -646,7 +646,7 @@ def _(mo):
 
     $$\frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t),\tag{3.7}$$
 
-    in $d$ dimensions, for any pore shape (Eq. 1.27, derived in Chapter 1, Exercise 9). Slab: $S/V = 2/L$, $d = 1$. Cylinder (in the cross-section): $S/V = 2/R$, $d = 2$. Sphere: $S/V = 3/R$, $d = 3$. The first measurements of $S/V$ this way were in porous media ([Latour et al. 1993](https://doi.org/10.1006/jmra.1993.1056)).
+    in $d$ dimensions, for any pore shape (Eq. 1.28, derived in Chapter 1, Exercise 9). Slab: $S/V = 2/L$, $d = 1$. Cylinder (in the cross-section): $S/V = 2/R$, $d = 2$. Sphere: $S/V = 3/R$, $d = 3$. The first measurements of $S/V$ this way were in porous media ([Latour et al. 1993](https://doi.org/10.1006/jmra.1993.1056)).
 
     **The kurtosis appears at the same order.** A slab at short times is a mixture: a bulk that diffuses freely, and a thin layer at each wall whose displacements are narrower. A mixture of Gaussian-like distributions of different widths has **positive** excess kurtosis. Chapter 1 (Exercise 9) derives, for a slab,
 
@@ -1455,7 +1455,7 @@ def _(mo):
 
     $$\frac{d\mathbf m}{dt} = -\big(q^2\mathbf D + \mathbf K\big)\,\mathbf m,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},\tag{3.18}$$
 
-    with $\mathbf m(0) = (p_1, p_2)$ and detailed balance $k_1p_1 = k_2p_2$. The signal is $E = (1,1)\,e^{-(b\mathbf D + \mathbf K\Delta)}\,\mathbf p$, with $b = q^2\Delta$. It is a linear system $\dot{\mathbf x} = A\mathbf x$, solved by $e^{tA}$ and its eigenvalues. Chapter 1 (Eq. 1.30, Exercise 11) derives it as the characteristic function of the displacement, and shows that exchange leaves the mean-squared displacement unchanged and shows up only in the kurtosis.
+    with $\mathbf m(0) = (p_1, p_2)$ and detailed balance $k_1p_1 = k_2p_2$. The signal is $E = (1,1)\,e^{-(b\mathbf D + \mathbf K\Delta)}\,\mathbf p$, with $b = q^2\Delta$. It is a linear system $\dot{\mathbf x} = A\mathbf x$, solved by $e^{tA}$ and its eigenvalues. Chapter 1 (Eq. 1.31, Exercise 11) derives it as the characteristic function of the displacement, and shows that exchange leaves the mean-squared displacement unchanged and shows up only in the kurtosis.
 
     The new axis is $\Delta/\tau_{\text{ex}}$, with $1/\tau_{\text{ex}} = k_1 + k_2$. From Chapter 1, a barrier-limited membrane with permeability $\kappa$ gives $k_1 = \kappa\,(S/V)_1$.
 

@@ -185,14 +185,14 @@ def _(mo):
 
     | Idea | Formula |
     | --- | --- |
-    | Eigenmodes of a pore | $-\nabla^2u_n = \lambda_nu_n$, $\ \partial u_n/\partial n = 0$ on the walls, $\ \int u_nu_m = \delta_{nm}$ (Eq. 1.8) |
+    | Eigenmodes of a pore | $-\nabla^2u_n = \lambda_nu_n$, $\ \partial u_n/\partial n = 0$ on the walls, $\ \int u_nu_m = \delta_{nm}$ (Eq. 1.9) |
     | Slab | $u_0 = 1/\sqrt L$, $\ u_n = \sqrt{2/L}\cos(n\pi x/L)$, $\ \lambda_n = (n\pi/L)^2$ |
-    | Propagator | $P(x\mid x_0,t) = \sum_n u_n(x)u_n(x_0)e^{-D\lambda_nt}$ (Eq. 1.14) |
+    | Propagator | $P(x\mid x_0,t) = \sum_n u_n(x)u_n(x_0)e^{-D\lambda_nt}$ (Eq. 1.15) |
     | Averages (Ch 1) | the subscript says over what: $\langle f\rangle_{x,x_0} = \frac1L\iint f(x, x_0)\,P(x\mid x_0,t)\,dx\,dx_0$ over start (uniform) and end; $\langle f\rangle_{\text{paths}}$ over whole random paths with a uniform start, the mean over $N\to\infty$ walkers; $\langle f\rangle_x = \frac1L\int f\,dx$ over the pore |
-    | MSD weights in a slab | $\langle(x-x_0)^2\rangle_{x,x_0} = \frac1L\iint(x-x_0)^2P(x\mid x_0,t)\,dx\,dx_0 = \frac{L^2}{6} - 2\sum_{n\ \text{odd}} \frac{8L^2}{(n\pi)^4}e^{-D\lambda_nt}$ (Eq. 1.16) |
-    | Bloch–Torrey | $\partial m/\partial t = D\nabla^2m - i\gamma\,g(t)\,x\,m$, $\ E = \int m\,dx\big/\int m(x,0)\,dx$ (Eq. 1.32) |
-    | Path picture | $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ (Eq. 1.36) |
-    | Gradient length | $\ell_g = (D/\gamma g)^{1/3}$ (Eq. 1.39) |
+    | MSD weights in a slab | $\langle(x-x_0)^2\rangle_{x,x_0} = \frac1L\iint(x-x_0)^2P(x\mid x_0,t)\,dx\,dx_0 = \frac{L^2}{6} - 2\sum_{n\ \text{odd}} \frac{8L^2}{(n\pi)^4}e^{-D\lambda_nt}$ (Eq. 1.17) |
+    | Bloch–Torrey | $\partial m/\partial t = D\nabla^2m - i\gamma\,g(t)\,x\,m$, $\ E = \int m\,dx\big/\int m(x,0)\,dx$ (Eq. 1.33) |
+    | Path picture | $E = \langle e^{-i\varphi}\rangle_{\text{paths}} = \lim_{N\to\infty}\frac1N\sum_{j=1}^N e^{-i\varphi_j}$, $\ \varphi_j = \gamma\int_0^T g(t)\,x_j(t)\,dt$ for spin $j$ with path $x_j(t)$ (Eq. 1.37) |
+    | Gradient length | $\ell_g = (D/\gamma g)^{1/3}$ (Eq. 1.40) |
 
     ## Two kinds of series
 
@@ -232,7 +232,7 @@ def _(mo):
     - **The gradient couples the modes.** The field $x$ is not a mode, so multiplying a mode by $x$ spreads it over the others; $\mathbf B$ says how much goes where. All the geometry is in $\Lambda$ and $\mathbf B$.
     - **Start and finish.** Spins start uniform, $m(x,0) = u_0$, so $\mathbf c(0) = \mathbf e_0 = (1,0,0,\dots)$. Only the uniform mode has a nonzero integral, so the signal is just the first component at the echo: $E = c_0(T)$.
 
-    $\mathbf B$ is the **position matrix** of Chapter 1 (Eq. 1.17, Exercise 5): real, symmetric, nonzero only between modes of opposite parity, with couplings that fall off as $1/n^2$, and $B_{0n}^2$ equal to the MSD weights. Together, $\Lambda$ and $\mathbf B$ are everything the geometry contributes.
+    $\mathbf B$ is the **position matrix** of Chapter 1 (Eq. 1.18, Exercise 5): real, symmetric, nonzero only between modes of opposite parity, with couplings that fall off as $1/n^2$, and $B_{0n}^2$ equal to the MSD weights. Together, $\Lambda$ and $\mathbf B$ are everything the geometry contributes.
 
     The whole simulation problem is now: propagate $\mathbf c$ from $\mathbf e_0$ to the echo, and read off $c_0$. The methods below differ only in **how they step through time**.
     """)
