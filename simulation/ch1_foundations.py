@@ -212,7 +212,7 @@ def _(mo):
     | $\xi$ | Fourier variable of a characteristic function $\langle e^{i\xi r}\rangle$ (1a); in 1b it becomes $q$ | 1/µm |
     | $S$, $S_0$, $E = S/S_0$ | signal with and without diffusion weighting; normalised signal | |
     | $\lambda_n$, $u_n(\mathbf x)$, $\tau_n$ | eigenvalue, eigenmode, decay time $1/(D\lambda_n)$ | 1/µm², –, ms |
-    | $P(\mathbf x\mid\mathbf x_0,t)$ | propagator of one molecule: probability density to be at $\mathbf x$ at $t$ after starting at $\mathbf x_0$ | 1/µm³ |
+    | $P(\mathbf x\mid\mathbf x_0,t)$ | propagator for a known start: probability density to be at $\mathbf x$ at $t$ after starting at $\mathbf x_0$ (one molecule, or many released together at $\mathbf x_0$) | 1/µm³ |
     | $\bar P(\mathbf r,t)$ | ensemble-average propagator: probability density of the displacement $\mathbf r$, over all molecules starting uniformly | 1/µm³ |
     | $G(r,t)$ | propagator without walls (free diffusion); it depends only on the displacement, $P(\mathbf x\mid\mathbf x_0,t) = \bar P(\mathbf r,t) = G(r,t)$ | 1/µm³ (1/µm in 1D) |
 
@@ -239,7 +239,7 @@ def _(mo):
 
     | Notation | Average over | Definition |
     | --- | --- | --- |
-    | $\langle f\rangle_{x\mid x_0}$ | the end point $x$ of a molecule that started at a fixed $x_0$ | $\int f(x)\,P(x\mid x_0,t)\,dx$ |
+    | $\langle f\rangle_{x\mid x_0}$ | the end point $x$, for molecules that all started at the same known $x_0$ | $\int f(x)\,P(x\mid x_0,t)\,dx$ |
     | $\langle f\rangle_{x}$, $\langle f\rangle_{x_0}$ | one position, spread uniformly over the pore (volume $V$) | $\frac1V\int f(x)\,dx$ |
     | $\langle f\rangle_{x,x_0}$ | start **and** end: every molecule, starting uniformly | $\frac1V\iint f(x, x_0)\,P(x\mid x_0,t)\,dx\,dx_0$ |
     | $\langle f\rangle_{\text{paths}}$ | whole random paths $x(t')$, $0\le t'\le t$, starting uniformly | $\lim_{N\to\infty}\frac1N\sum_{j=1}^N f_j$ over $N$ walkers |
@@ -303,13 +303,13 @@ def _(mo):
 
     $$\boxed{\ \frac{\partial C}{\partial t} = D\,\nabla^2 C\ }.\tag{1.1}$$
 
-    **Two propagators: one molecule, and all molecules.** The **propagator** $P(\mathbf x\mid\mathbf x_0,t)$ describes one molecule: the probability density of finding it at $\mathbf x$ at time $t$, given that it started at $\mathbf x_0$. It is one particular solution of the diffusion equation. Put a single molecule at $\mathbf x_0$, so $C(\mathbf x, 0) = \delta(\mathbf x - \mathbf x_0)$, and solve with the wall conditions of the domain:
+    **Two propagators: a known start, and a uniform start.** The **propagator** $P(\mathbf x\mid\mathbf x_0,t)$ is the probability density of finding a molecule at $\mathbf x$ at time $t$, given that it started at $\mathbf x_0$. Molecules do not interact, so it is just as well the share of many molecules, all released together at $\mathbf x_0$, that are at $\mathbf x$ at time $t$. One molecule or many makes no difference; what matters is that they all start at the same known point. It is one particular solution of the diffusion equation. Put a single molecule at $\mathbf x_0$, so $C(\mathbf x, 0) = \delta(\mathbf x - \mathbf x_0)$, and solve with the wall conditions of the domain:
 
     $$\boxed{\ P(\mathbf x\mid\mathbf x_0,t) = C(\mathbf x,t)\quad\text{for}\quad C(\mathbf x,0) = \delta(\mathbf x - \mathbf x_0)\ }\tag{1.2}$$
 
     → Every other start is a sum of point sources, so one propagator solves the equation for every initial condition: $C(\mathbf x,t) = \int P(\mathbf x\mid\mathbf x_0,t)\,C(\mathbf x_0,0)\,d\mathbf x_0$.
 
-    Often we follow all molecules at once, starting spread uniformly over the domain (volume $V$), and ask only how far each one moved: the **displacement** $\mathbf r = \mathbf x - \mathbf x_0$. Its probability density is the **ensemble-average propagator**, the propagator for a move by $\mathbf r$, averaged over all starting points:
+    In tissue the molecules do not start at one point: they start spread uniformly over the domain (volume $V$). Then we ask only how far each one moved: the **displacement** $\mathbf r = \mathbf x - \mathbf x_0$. Its probability density is the **ensemble-average propagator**, the propagator for a move by $\mathbf r$, averaged over all starting points:
 
     $$\boxed{\ \bar P(\mathbf r,t) = \frac1V\int_V P(\mathbf x_0 + \mathbf r\mid\mathbf x_0,t)\,d\mathbf x_0 = \frac1V\iint\delta\big(\mathbf r - (\mathbf x - \mathbf x_0)\big)\,P(\mathbf x\mid\mathbf x_0,t)\,d\mathbf x\,d\mathbf x_0\ }\tag{1.3}$$
 
@@ -317,7 +317,7 @@ def _(mo):
 
     | | $P(\mathbf x\mid\mathbf x_0,t)$ | $\bar P(\mathbf r,t)$ |
     | --- | --- | --- |
-    | describes | one molecule, from a known start $\mathbf x_0$ | all molecules, starting uniformly |
+    | describes | molecules from a known start $\mathbf x_0$ (one, or many released together) | molecules starting uniformly over the domain |
     | variable | where the molecule ends up, $\mathbf x$ | how far each molecule moved, $\mathbf r = \mathbf x - \mathbf x_0$ |
     | averages taken with it | $\langle\cdot\rangle_{\mathbf x\mid\mathbf x_0}$ | $\langle\cdot\rangle_{\mathbf x,\mathbf x_0}$ |
     | without walls | $G(r,t)$, the same for every start | $G(r,t)$ as well |
@@ -1321,7 +1321,7 @@ def _(mo):
     mo.md(r"""
     ## Beyond the mean-squared displacement: cumulants of the displacement
 
-    The MSD is one number per time. The ensemble-average propagator $\bar P(r,t)$ of Eq. (1.3) holds the whole **distribution of displacements** $r = x - x_0$ over all molecules.
+    The MSD is one number per time. The ensemble-average propagator $\bar P(r,t)$ of Eq. (1.3) holds the whole **distribution of displacements** $r = x - x_0$ over all molecules, starting uniformly.
 
     A compact way to describe a distribution is by its **cumulants** $\kappa_n$: the mean ($\kappa_1$, zero here by symmetry), the variance ($\kappa_2 = \langle r^2\rangle_{x,x_0}$), and then the shape ($\kappa_4 = \langle r^4\rangle_{x,x_0} - 3\langle r^2\rangle_{x,x_0}^2$ for a symmetric distribution). In 1D define
 
@@ -1339,11 +1339,11 @@ def _(mo):
 
     ⇒ Expand $e^{i\xi r} = 1 + i\xi r - \frac{\xi^2r^2}{2} - \dots$ and average term by term: $\phi(\xi) = \sum_n\frac{(i\xi)^n}{n!}\langle r^n\rangle$. Every moment sits in one function.
 
-    ⇒ Its logarithm holds the cumulants. For the displacements of all molecules, $p = \bar P(r,t)$ and the average is over start and end:
+    ⇒ Its logarithm holds the cumulants. For molecules starting uniformly, $p = \bar P(r,t)$ and the average is over start and end:
 
     $$\boxed{\ \ln\big\langle e^{i\xi r}\big\rangle_{x,x_0} = \sum_{n\ge1}\frac{(i\xi)^n}{n!}\,\kappa_n = -\frac{\xi^2}{2}\langle r^2\rangle_{x,x_0} + \frac{\xi^4}{24}\,\kappa_4 - \dots\ }\tag{1.25}$$
 
-    (For one molecule from a known start, $p = P(x_0 + r\mid x_0, t)$ and the average is $\langle\cdot\rangle_{x\mid x_0}$.) A Gaussian stops at $\xi^2$, so all its cumulants beyond the variance vanish (Exercise 8a).
+    (For molecules from a known start $x_0$, $p = P(x_0 + r\mid x_0, t)$ and the average is $\langle\cdot\rangle_{x\mid x_0}$.) A Gaussian stops at $\xi^2$, so all its cumulants beyond the variance vanish (Exercise 8a).
 
     Keep this line in mind: 1b shows that a measurement can give you exactly this characteristic function.
     """)
