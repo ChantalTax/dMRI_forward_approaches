@@ -760,25 +760,51 @@ def _(mo):
     mo.md(r"""
     ### See it: modes and the propagator in a slab
 
-    First the picture, then the derivation: Exercise 2 below derives the modes of a slab that are shown here. Top: how much each mode has faded, $e^{-D\lambda_nt}$, against time; the dots mark the time chosen with the slider. Bottom left: the $N$ terms of the mode sum, $u_n(x_0)\,e^{-D\lambda_nt}\,u_n(x)$: each mode, weighted by where the molecule started and by how much it has faded. Bottom right: their sum, the propagator of a molecule released at $x_0$. Make $t$ short and $N$ small, and watch the sum fail; move $t$ to the right, and watch the dots of the higher modes drop to zero one by one.
+    First the picture, then the derivation: Exercise 2 below derives the modes of a slab that are shown here. Top: how much each mode has faded, $e^{-D\lambda_nt}$, against time; the dots mark the time $t$, set with the slider or typed in milliseconds in the box next to it. Bottom left: the $N$ terms of the mode sum, $u_n(x_0)\,e^{-D\lambda_nt}\,u_n(x)$: each mode, weighted by where the molecule started and by how much it has faded. Bottom right: their sum, the propagator of a molecule released at $x_0$. Make $t$ short and $N$ small, and watch the sum fail; move $t$ to the right, and watch the dots of the higher modes drop to zero one by one.
     """)
     return
 
 
 @app.cell(hide_code=True)
 def _(mo):
+    get_t1, set_t1 = mo.state(0.1)
+    return get_t1, set_t1
+
+
+@app.cell(hide_code=True)
+def _(get_t1, mo, np, set_t1):
+    t1_slider = mo.ui.slider(-2, 2, step=0.05, label="log₁₀ t (t in ms)", show_value=True,
+                              value=float(np.clip(round(np.log10(get_t1()) / 0.05) * 0.05, -2, 2)),
+                              on_change=lambda v: set_t1(float(f"{10**v:.3g}")))
+    return (t1_slider,)
+
+
+@app.cell(hide_code=True)
+def _(get_t1, mo, set_t1):
+    t1_box = mo.ui.number(start=0.01, stop=100, step=0.001, value=get_t1(), label="or type t (ms)",
+                           on_change=set_t1)
+    return (t1_box,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
     L1 = mo.ui.slider(4, 20, step=1, value=10, label="Slab width L (µm)", show_value=True)
     D1 = mo.ui.slider(0.5, 3.0, step=0.1, value=2.0, label="D (µm²/ms)", show_value=True)
-    logt1 = mo.ui.slider(-2, 2, step=0.05, value=-1.0, label="log₁₀ t (t in ms)", show_value=True)
     N1 = mo.ui.slider(1, 80, step=1, value=6, label="Number of modes N", show_value=True)
     x01 = mo.ui.slider(0.0, 1.0, step=0.01, value=0.3, label="Start x₀ / L", show_value=True)
+    return D1, L1, N1, x01
+
+
+@app.cell(hide_code=True)
+def _(D1, L1, N1, mo, t1_box, t1_slider, x01):
     mo.vstack(
         [
             mo.hstack([L1, D1], justify="start", gap=2),
-            mo.hstack([logt1, N1, x01], justify="start", gap=2, wrap=True),
+            mo.hstack([t1_slider, t1_box], justify="start", gap=2),
+            mo.hstack([N1, x01], justify="start", gap=2, wrap=True),
         ]
     )
-    return D1, L1, N1, logt1, x01
+    return
 
 
 @app.cell(hide_code=True)
@@ -789,7 +815,7 @@ def _(
     D1,
     L1,
     N1,
-    logt1,
+    get_t1,
     mo,
     np,
     plt,
@@ -798,7 +824,7 @@ def _(
     x01,
 ):
     _L, _D, _N = L1.value, D1.value, N1.value
-    _t = 10 ** logt1.value
+    _t = get_t1()
     _x0 = x01.value * _L
     _x = np.linspace(0, _L, 600)
 
@@ -919,11 +945,11 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
-    **(a)** Predict first: for $L = 10$ µm and $D = 2$ µm²/ms, about how many modes do you need for a smooth propagator at $t = 0.1$ ms? And at $t = 10$ ms? Check with the sliders.
+    **(a)** The mode sum, Eq. (1.17), is cut off after $N$ terms. With too few, the curve shows ripples that come from the cut-off, not from diffusion. *Enough modes* means that adding more no longer changes the curve visibly. Predict first: for $L = 10$ µm and $D = 2$ µm²/ms, about how many modes are enough at $t = 0.1$ ms? And at $t = 10$ ms? Check by typing these times in the box and moving the $N$ slider.
 
     **(b)** At short times the walls have not been felt yet. Which curve should the propagator then match?
 
-    **(c)** What does this tell you about when eigenmode methods are cheap, and when they are expensive?
+    **(c)** The **computational cost** of an eigenmode method is the work of computing the modes you keep and summing them: it grows with $N$. What does (a) tell you about when eigenmode methods are cheap to compute, and when they are expensive?
     """, "3 · How many modes?")
     return
 
@@ -931,13 +957,14 @@ def _(exercise):
 @app.cell(hide_code=True)
 def _(answer):
     answer(r"""
-    **(a)** ⇒ Mode $n$ still matters while $e^{-D\lambda_n t}$ is not negligible, say $D\lambda_n t \lesssim 5$ ($e^{-5} < 1\%$).
+    **(a)** ⇒ Mode $n$ still changes the curve while $e^{-D\lambda_n t}$ is not negligible, say $D\lambda_n t \lesssim 5$ ($e^{-5} < 1\%$). Modes beyond that have faded; leaving them out changes nothing visible.
     ⇒ With $\lambda_n = (n\pi/L)^2$: $n \lesssim \dfrac{L}{\pi}\sqrt{\dfrac{5}{Dt}}$.
     ⇒ $t = 0.1$ ms: $n \approx \frac{10}{\pi}\sqrt{25} \approx 16$. $\ t = 10$ ms: $n \approx \frac{10}{\pi}\sqrt{0.25} \approx 2$.
 
     **(b)** The free Gaussian of Exercise 1, centred at $x_0$, as long as $\sqrt{2Dt}$ is small compared with the distance from $x_0$ to the nearest wall. Move $x_0$ close to a wall and you see the reflected part appear first there.
 
-    **(c)** At long times only a handful of modes survive, so eigenmode methods are cheap exactly where diffusion has explored the whole pore. At short times you need many modes to build a narrow peak. There, a free Gaussian (or a random walk) is the natural description. You will see this trade-off again in Chapters 2 and 5.
+    **(c)** ⇒ From (a), $N\propto L/\sqrt{Dt}$: the number of modes, and with it the computing time, grows as the time gets shorter.
+    ⇒ At long times only a handful of modes survive, so eigenmode methods are cheap exactly where diffusion has explored the whole pore. At short times you need many modes to build a narrow peak. There, a free Gaussian (or a random walk) is the natural description. You will see this trade-off again in Chapters 2 and 5.
     """)
     return
 
@@ -1637,14 +1664,34 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mt_t = mo.ui.slider(-1.5, 1.0, step=0.05, value=-0.5, label="log₁₀ t (ms)", show_value=True)
-    mt_t
-    return (mt_t,)
+    get_mt, set_mt = mo.state(0.316)
+    return get_mt, set_mt
 
 
 @app.cell(hide_code=True)
-def _(C_ALT, C_FREE, C_MAIN, mo, mt_t, np, plt):
-    _D, _t = 2.0, 10**mt_t.value
+def _(get_mt, mo, np, set_mt):
+    mt_slider = mo.ui.slider(-1.5, 1.0, step=0.05, label="log₁₀ t (ms)", show_value=True,
+                              value=float(np.clip(round(np.log10(get_mt()) / 0.05) * 0.05, -1.5, 1.0)),
+                              on_change=lambda v: set_mt(float(f"{10**v:.3g}")))
+    return (mt_slider,)
+
+
+@app.cell(hide_code=True)
+def _(get_mt, mo, set_mt):
+    mt_box = mo.ui.number(start=0.0316, stop=10, step=0.001, value=get_mt(), label="or type t (ms)",
+                           on_change=set_mt)
+    return (mt_box,)
+
+
+@app.cell(hide_code=True)
+def _(mo, mt_box, mt_slider):
+    mo.hstack([mt_slider, mt_box], justify="start", gap=2)
+    return
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_FREE, C_MAIN, get_mt, mo, np, plt):
+    _D, _t = 2.0, get_mt()
     _ell = np.sqrt(_D * _t)
 
     # left: a pore with the surface pool of thickness ℓ_D
@@ -2079,17 +2126,58 @@ def _(C_ALT, C_FREE, C_MAIN, brentq, np, plt):
 
 @app.cell(hide_code=True)
 def _(mo):
-    kx_t = mo.ui.slider(-0.5, 3.0, step=0.05, value=1.0, label="log₁₀ t (ms)", show_value=True)
-    kx_tau = mo.ui.slider(0.0, 2.5, step=0.05, value=1.3, label="log₁₀ τ_ex (ms)", show_value=True)
-    kx_p = mo.ui.slider(0.1, 0.9, step=0.05, value=0.4, label="fraction p₁ in the fast compartment", show_value=True)
-    mo.vstack([kx_t, kx_tau, kx_p])
-    return kx_p, kx_t, kx_tau
+    get_kxt, set_kxt = mo.state(10.0)
+    return get_kxt, set_kxt
 
 
 @app.cell(hide_code=True)
-def _(C_ALT, C_FREE, C_MAIN, kx_p, kx_t, kx_tau, mo, np, plt):
+def _(get_kxt, mo, np, set_kxt):
+    kxt_slider = mo.ui.slider(-0.5, 3.0, step=0.05, label="log₁₀ t (ms)", show_value=True,
+                              value=float(np.clip(round(np.log10(get_kxt()) / 0.05) * 0.05, -0.5, 3.0)),
+                              on_change=lambda v: set_kxt(float(f"{10**v:.3g}")))
+    return (kxt_slider,)
+
+
+@app.cell(hide_code=True)
+def _(get_kxt, mo, set_kxt):
+    kxt_box = mo.ui.number(start=0.316, stop=1000, step=0.001, value=get_kxt(), label="or type t (ms)",
+                           on_change=set_kxt)
+    return (kxt_box,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    get_kxtau, set_kxtau = mo.state(20.0)
+    return get_kxtau, set_kxtau
+
+
+@app.cell(hide_code=True)
+def _(get_kxtau, mo, np, set_kxtau):
+    kxtau_slider = mo.ui.slider(0.0, 2.5, step=0.05, label="log₁₀ τ_ex (ms)", show_value=True,
+                              value=float(np.clip(round(np.log10(get_kxtau()) / 0.05) * 0.05, 0.0, 2.5)),
+                              on_change=lambda v: set_kxtau(float(f"{10**v:.3g}")))
+    return (kxtau_slider,)
+
+
+@app.cell(hide_code=True)
+def _(get_kxtau, mo, set_kxtau):
+    kxtau_box = mo.ui.number(start=1, stop=316.2, step=0.001, value=get_kxtau(), label="or type τ_ex (ms)",
+                           on_change=set_kxtau)
+    return (kxtau_box,)
+
+
+@app.cell(hide_code=True)
+def _(kxt_box, kxt_slider, kxtau_box, kxtau_slider, mo):
+    kx_p = mo.ui.slider(0.1, 0.9, step=0.05, value=0.4, label="fraction p₁ in the fast compartment", show_value=True)
+    mo.vstack([mo.hstack([kxt_slider, kxt_box], justify="start", gap=2),
+               mo.hstack([kxtau_slider, kxtau_box], justify="start", gap=2), kx_p])
+    return (kx_p,)
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_FREE, C_MAIN, get_kxt, get_kxtau, kx_p, mo, np, plt):
     _D1, _D2 = 2.0, 0.5
-    _t, _tau, _p1 = 10**kx_t.value, 10**kx_tau.value, kx_p.value
+    _t, _tau, _p1 = get_kxt(), get_kxtau(), kx_p.value
     _p = np.array([_p1, 1 - _p1])
     _k1, _k2 = _p[1] / _tau, _p[0] / _tau            # k1 + k2 = 1/τ_ex and k1 p1 = k2 p2
     _Db = _p1 * _D1 + (1 - _p1) * _D2
