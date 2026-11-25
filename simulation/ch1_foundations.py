@@ -980,9 +980,31 @@ def _(takeaway):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 1.1.6 Mean-squared displacement in a slab
+    ## 1.1.6 Mean-squared displacement and diffusivity
 
-    With the propagator in hand, every average over the molecules is an integral. The simplest one is the mean-squared displacement: how far, on average, the molecules have spread after a time $t$. Without walls it grows as $2Dt$ for ever (Exercise 1); between two walls it cannot.
+    With the propagator in hand, every average over the molecules is an integral. The simplest is the **mean-squared displacement** (MSD): the squared displacement $r = x(t) - x_0$, averaged over all molecules, $\langle r^2\rangle_{x,x_0} = \int r^2\,\bar P(r,t)\,dr$. It says how far, on average, the molecules have spread after a time $t$. Without walls it grows as $2Dt$ for ever (Exercise 1); between two walls it cannot.
+
+    A **diffusivity** turns the MSD back into µm²/ms. With walls the MSD is no longer a straight line in $t$, and there are two ways to read a diffusivity off it.
+
+    **Effective diffusivity** ([Callaghan 2011](https://doi.org/10.1093/acprof:oso/9780199556984.001.0001)): the squared difference in position divided by twice the difference in time over which it was gathered,
+
+    $$\boxed{\ D_{\text{eff}}(t) = \frac{\big\langle[x(t) - x(0)]^2\big\rangle_{x,x_0}}{2t}\ }.\tag{1.18}$$
+
+    → On a plot of MSD against $t$ it is half the slope of the straight line (the *chord*) from the origin to the curve at time $t$. It is the $D(t)$ used in the rest of the course; it is also called the apparent or cumulative diffusivity. In $d$ dimensions, divide by $2d$.
+
+    **Instantaneous diffusivity** ([Novikov et al. 2014](https://doi.org/10.1073/pnas.1316944111)): half the local slope (the *tangent*) of the MSD curve,
+
+    $$\boxed{\ D_{\text{inst}}(t) = \frac12\,\frac{d}{dt}\big\langle[x(t) - x(0)]^2\big\rangle_{x,x_0}\ }.\tag{1.19}$$
+
+    → It says how fast the cloud of molecules spreads *at* time $t$.
+
+    ⇒ Integrate Eq. (1.19) from 0 to $t$, use that the MSD is zero at $t = 0$, and divide by $2t$:
+
+    $$D_{\text{eff}}(t) = \frac1t\int_0^tD_{\text{inst}}(t')\,dt' .\tag{1.20}$$
+
+    → The effective diffusivity is the **running average** of the instantaneous one. It remembers the whole history since $t = 0$, so it changes more slowly. Without walls both equal $D$ at all times.
+
+    → $D_{\text{eff}}$ is what a measurement with diffusion time $t$ and short pulses gives (Section 1.2, Chapter 3). $D_{\text{inst}}$ shows more directly *when* the structure is felt ([Novikov et al. 2019](https://doi.org/10.1002/nbm.3998)).
     """)
     return
 
@@ -990,16 +1012,18 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(exercise):
     exercise(r"""
-    Molecules start **uniformly** in the slab. The mean-squared displacement averages over where each molecule starts *and* where it ends,
+    **(a)** Molecules start **uniformly** in the slab. The mean-squared displacement averages over where each molecule starts *and* where it ends,
 
-    $$\langle (x - x_0)^2\rangle_{x,x_0} = \frac1L\int_0^L\!\!\int_0^L (x - x_0)^2\,P(x\mid x_0,t)\,dx\,dx_0 .\tag{1.18}$$
+    $$\langle (x - x_0)^2\rangle_{x,x_0} = \frac1L\int_0^L\!\!\int_0^L (x - x_0)^2\,P(x\mid x_0,t)\,dx\,dx_0 .\tag{1.21}$$
 
     Using the propagator, show that
 
-    $$\langle (x - x_0)^2\rangle_{x,x_0}(t) = \frac{L^2}{6} - \frac{16L^2}{\pi^4}\sum_{n\ \text{odd}}\frac{e^{-D(n\pi/L)^2 t}}{n^4},\tag{1.19}$$
+    $$\langle (x - x_0)^2\rangle_{x,x_0}(t) = \frac{L^2}{6} - \frac{16L^2}{\pi^4}\sum_{n\ \text{odd}}\frac{e^{-D(n\pi/L)^2 t}}{n^4},\tag{1.22}$$
 
-    and that it tends to $L^2/6$ at long times. (In the random-walk notebook the walkers between two walls levelled off at $L^2/6$. Here is where that number comes from.)
-    """, "4 · Mean-squared displacement in a slab")
+    and that it tends to $L^2/6$ at long times. (In the random-walk notebook the walkers between two walls levelled off at $L^2/6$. Here is where that number comes from.) This is part **(a)**.
+
+    **(b)** From Eq. (1.22), find $D_{\text{inst}}(t)$ and $D_{\text{eff}}(t)$ for the slab. Check that both start at $D$. How does each fall at long times?
+    """, "4 · Mean-squared displacement and diffusivities in a slab")
     return
 
 
@@ -1009,6 +1033,7 @@ def _(hint):
     - Expand the square: $\langle(x-x_0)^2\rangle_{x,x_0} = \langle x^2\rangle_{x,x_0} + \langle x_0^2\rangle_{x,x_0} - 2\langle x\,x_0\rangle_{x,x_0}$.
     - Uniform start and reflecting walls mean the walkers stay uniform at all times, so $\langle x^2\rangle_{x,x_0} = \langle x_0^2\rangle_{x,x_0} = L^2/3$.
     - $\langle x\,x_0\rangle_{x,x_0} = \frac1L\iint x\,x_0\,P(x|x_0,t)\,dx\,dx_0$. Insert the mode sum: each mode contributes $\frac1L\big(\int_0^L x\,u_n\,dx\big)^2 e^{-D\lambda_n t}$.
+    - (b) Differentiate term by term for Eq. (1.19). At $t = 0$ you need $\sum_{n\ \text{odd}}n^{-2} = \pi^2/8$. At long times, which term of each expression is left?
     """)
     return
 
@@ -1016,7 +1041,7 @@ def _(hint):
 @app.cell(hide_code=True)
 def _(answer):
     answer(r"""
-    ⇒ $\langle x^2\rangle_{x,x_0} = \langle x_0^2\rangle_{x,x_0} = \frac1L\int_0^L x^2dx = \frac{L^2}{3}$.
+    **(a)** ⇒ $\langle x^2\rangle_{x,x_0} = \langle x_0^2\rangle_{x,x_0} = \frac1L\int_0^L x^2dx = \frac{L^2}{3}$.
 
     ⇒ $\langle x\,x_0\rangle_{x,x_0} = \frac1L\sum_n e^{-D\lambda_n t}\left(\int_0^L x\,u_n(x)\,dx\right)^2$.
 
@@ -1031,39 +1056,79 @@ def _(answer):
     → Check $t=0$: $\sum_{n\ \text{odd}} n^{-4} = \pi^4/96$, so the MSD is $L^2/6 - L^2/6 = 0$. ✓
     → $t\to\infty$: all exponentials vanish and the MSD is $L^2/6$: start and end positions have become independent, each uniform in the slab.
     → The weights $8L^2/(n\pi)^4$ fall as $n^{-4}$: the first mode carries 98.6% of the total. Remember this. Exercise 5 shows where they come from, and Chapter 2 meets the same weights again.
+
+    **(b)** ⇒ Instantaneous: $\dfrac{d}{dt}e^{-D(n\pi/L)^2t} = -D\dfrac{n^2\pi^2}{L^2}e^{-D(n\pi/L)^2t}$, so
+
+    $$D_{\text{inst}}(t) = \frac12\cdot\frac{16L^2}{\pi^4}\sum_{n\ \text{odd}}\frac{D\,n^2\pi^2}{L^2\,n^4}e^{-D(n\pi/L)^2t} = \frac{8D}{\pi^2}\sum_{n\ \text{odd}}\frac{e^{-D(n\pi/L)^2t}}{n^2}.$$
+
+    ⇒ $t = 0$: $\frac{8D}{\pi^2}\cdot\frac{\pi^2}{8} = D$. ✓ Long times: only $n = 1$ is left, $D_{\text{inst}}\approx\frac{8D}{\pi^2}e^{-t/\tau_1}$ with $\tau_1 = L^2/(\pi^2D)$: an **exponential** decay to zero.
+
+    ⇒ Effective: divide Eq. (1.22) by $2t$. For small $t$ it is $D$ (the MSD starts as $2Dt$). At long times the sum has faded and $D_{\text{eff}}\approx\dfrac{L^2}{12\,t}$: only a **power-law** decay, $\propto1/t$.
+
+    → The cloud stops spreading after a few $\tau_1$, and $D_{\text{inst}}$ shows that at once. $D_{\text{eff}}$ keeps averaging over the early free spreading, so it falls only as $1/t$ (Eq. 1.20).
     """)
     return
 
 
 @app.cell(hide_code=True)
-def _(C_ALT, C_FREE, C_MAIN, D1, L1, mo, np, plt):
-    _L, _D = L1.value, D1.value
-    _t = np.logspace(-2, 2.3, 400)
-    _n = np.arange(1, 400, 2)[:, None]
-    _msd = _L**2 / 6 - 16 * _L**2 / np.pi**4 * np.sum(np.exp(-_D * (_n * np.pi / _L) ** 2 * _t) / _n**4, axis=0)
+def _(mo):
+    msd_L = mo.ui.slider(4, 20, step=1, value=8, label="Slab width L (µm)", show_value=True)
+    msd_D = mo.ui.slider(0.5, 3.0, step=0.1, value=2.0, label="D (µm²/ms)", show_value=True)
+    msd_t = mo.ui.slider(0.05, 3.0, step=0.05, value=0.5, label="time t / τ₁", show_value=True)
+    mo.hstack([msd_L, msd_D, msd_t], justify="start", gap=2, wrap=True)
+    return msd_D, msd_L, msd_t
 
-    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(10, 3.6))
-    _a1.loglog(_t, 2 * _D * _t, color=C_FREE, ls="--", label="free: 2Dt")
-    _a1.loglog(_t, _msd, color=C_MAIN, lw=2, label="slab, from the modes")
-    _a1.axhline(_L**2 / 6, color=C_ALT, lw=1, ls=":", label="L²/6")
-    _a1.set(xlabel="t (ms)", ylabel="⟨(x − x₀)²⟩ (µm²)", title="Mean-squared displacement")
-    _a1.legend(frameon=False, fontsize=8)
 
-    _a2.semilogx(_t, _msd / (2 * _t), color=C_MAIN, lw=2, label="⟨(x − x₀)²⟩ / 2t")
-    _a2.axhline(_D, color=C_FREE, ls="--", label="free D")
-    _a2.axvline(_L**2 / (np.pi**2 * _D), color="k", lw=0.8, ls=":")
-    _a2.text(_L**2 / (np.pi**2 * _D), _D * 0.05, " τ₁", fontsize=9)
-    _a2.set(xlabel="t (ms)", ylabel="apparent D (µm²/ms)", ylim=(0, _D * 1.1), title="The apparent diffusivity falls once walls are felt")
-    _a2.legend(frameon=False, fontsize=8)
+@app.cell(hide_code=True)
+def _(C_ALT, C_FREE, C_MAIN, mo, msd_D, msd_L, msd_t, np, plt):
+    _L, _D = msd_L.value, msd_D.value
+    _tau1 = _L**2 / (np.pi**2 * _D)
+    _n = np.arange(1, 800, 2)[:, None]
+
+    def _msd(t):
+        return _L**2 / 6 - 16 * _L**2 / np.pi**4 * np.sum(np.exp(-_D * (_n * np.pi / _L) ** 2 * t) / _n**4, axis=0)
+
+    def _dinst(t):
+        return 8 * _D / np.pi**2 * np.sum(np.exp(-_D * (_n * np.pi / _L) ** 2 * t) / _n**2, axis=0)
+
+    _t0 = msd_t.value * _tau1
+    _m0, _di0 = _msd(np.array([_t0]))[0], _dinst(np.array([_t0]))[0]
+    _de0 = _m0 / (2 * _t0)
+
+    _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(10.5, 3.9))
+    # left: linear axes, chord and tangent at the chosen time
+    _tl = np.linspace(1e-4, 3.2 * _tau1, 400)
+    _a1.plot(_tl, 2 * _D * _tl, color=C_FREE, ls="--", lw=1, label="free: 2Dt")
+    _a1.plot(_tl, _msd(_tl), color=C_MAIN, lw=2.2, label="slab, Eq. (1.22)")
+    _a1.axhline(_L**2 / 6, color="0.5", lw=1, ls=":", label="L²/6")
+    _a1.plot([0, _t0], [0, _m0], color=C_ALT, lw=1.6, label=f"chord: slope 2D_eff")
+    _dt = 0.6 * _tau1
+    _a1.plot([_t0 - _dt, _t0 + _dt], [_m0 - 2 * _di0 * _dt, _m0 + 2 * _di0 * _dt], color="k", lw=1.2, label="tangent: slope 2D_inst")
+    _a1.plot(_t0, _m0, "o", color=C_ALT, mec="k", ms=7)
+    _a1.set(xlabel="t (ms)", ylabel="⟨(x − x₀)²⟩ (µm²)", xlim=(0, 3.2 * _tau1), ylim=(0, _L**2 / 6 * 1.35), title="MSD: chord and tangent at time t")
+    _a1.legend(frameon=False, fontsize=7.5, loc="lower right")
+
+    # right: both diffusivities against time
+    _tt = np.logspace(np.log10(0.01 * _tau1), np.log10(30 * _tau1), 400)
+    _a2.semilogx(_tt, _msd(_tt) / (2 * _tt) / _D, color=C_ALT, lw=2.2, label="D_eff / D  (chord), Eq. (1.18)")
+    _a2.semilogx(_tt, _dinst(_tt) / _D, color="k", lw=1.6, label="D_inst / D  (tangent), Eq. (1.19)")
+    _a2.semilogx(_tt, _L**2 / (12 * _tt) / _D, color=C_ALT, lw=0.8, ls=":", label="L²/(12t): long-time D_eff")
+    _a2.axvline(_tau1, color="0.5", lw=0.8, ls=":")
+    _a2.text(_tau1, 1.02, " τ₁", fontsize=9, color="0.4")
+    _a2.plot([_t0, _t0], [_de0 / _D, _di0 / _D], "o", color=C_ALT, mec="k", ms=6)
+    _a2.set(xlabel="t (ms)", ylabel="diffusivity / D", ylim=(0, 1.1), title="Effective and instantaneous diffusivity")
+    _a2.legend(frameon=False, fontsize=7.5, loc="lower left")
     _fig.tight_layout()
-    mo.vstack([_fig, mo.md(f"Uses L and D from the sliders above. τ₁ = L²/(π²D) = **{_L**2 / (np.pi**2 * _D):.2f} ms**.")])
+    mo.vstack([_fig, mo.md(
+        f"τ₁ = L²/(π²D) = **{_tau1:.2f} ms**; at t = **{_t0:.2f} ms**: D_eff = **{_de0:.2f}** µm²/ms, D_inst = **{_di0:.2f}** µm²/ms."
+    )])
     return
 
 
 @app.cell(hide_code=True)
 def _(takeaway):
     takeaway(r"""
-    In a slab the mean-squared displacement rises as $2Dt$ and levels off at $L^2/6$ → the mode weights fall as $n^{-4}$, so the first mode carries 98.6%: one time scale, $\tau_1 = L^2/(\pi^2D)$, describes the whole approach to restriction.
+    Two diffusivities come from the MSD: the effective one, MSD$/2t$ (chord), and the instantaneous one, half its slope (tangent); the first is the running average of the second → in a slab the MSD levels off at $L^2/6$, so $D_{\text{inst}}$ drops to zero exponentially, with one time scale $\tau_1 = L^2/(\pi^2D)$ (the first mode carries 98.6%), while $D_{\text{eff}}$ falls only as $L^2/(12t)$.
     """)
     return
 
@@ -1075,7 +1140,7 @@ def _(mo):
 
     The MSD needed the integrals $\int x\,u_n\,dx$. They are the first row of a matrix that every later chapter uses: the **position written in the mode basis**,
 
-    $$\boxed{\ B_{nm} = \int u_n(x)\;x\;u_m(x)\,dx\ },\tag{1.20}$$
+    $$\boxed{\ B_{nm} = \int u_n(x)\;x\;u_m(x)\,dx\ },\tag{1.23}$$
 
     with $x$ measured from the centre of the pore. Like the eigenvalues $\lambda_n$, it depends only on the geometry. Some of its properties hold for any pore, others only for special shapes:
 
@@ -1104,7 +1169,7 @@ def _(exercise):
 
     **(d)** Show that for $n, m \ge 1$
 
-    $$B_{nm} = \frac{L}{\pi^2}\left[\frac{(-1)^{n-m}-1}{(n-m)^2} + \frac{(-1)^{n+m}-1}{(n+m)^2}\right].\tag{1.21}$$
+    $$B_{nm} = \frac{L}{\pi^2}\left[\frac{(-1)^{n-m}-1}{(n-m)^2} + \frac{(-1)^{n+m}-1}{(n+m)^2}\right].\tag{1.24}$$
     """, "5 · The position in the mode basis")
     return
 
@@ -1171,7 +1236,7 @@ def _(C_ALT, C_MAIN, mo, np, plt):
 @app.cell(hide_code=True)
 def _(takeaway):
     takeaway(r"""
-    Multiplying by position couples the modes: the position matrix $\mathbf B$, Eq. (1.20), is nonzero only between modes of opposite parity → the eigenvalues $\lambda_n$ and $\mathbf B$ are all that the matrix methods of Chapter 2 need to know about a pore.
+    Multiplying by position couples the modes: the position matrix $\mathbf B$, Eq. (1.23), is nonzero only between modes of opposite parity → the eigenvalues $\lambda_n$ and $\mathbf B$ are all that the matrix methods of Chapter 2 need to know about a pore.
     """)
     return
 
@@ -1208,7 +1273,7 @@ def _(maths):
 
     **Cylinder.** Write $u = F(s)\,\Theta(\theta)\,Z(z)$ in $-\nabla^2u = \lambda u$, with the Laplacian in cylindrical coordinates (notation section). For the modes of the cross-section $Z$ is constant. $\Theta$ must come back to itself after one turn, so $\Theta = \cos m\theta$ or $\sin m\theta$ with $m = 0, 1, 2, \dots$ What is left for the radial part $F$:
 
-    $$s^2F'' + s\,F' + \big(\lambda s^2 - m^2\big)F = 0 .\tag{1.22}$$
+    $$s^2F'' + s\,F' + \big(\lambda s^2 - m^2\big)F = 0 .\tag{1.25}$$
 
     ⇒ With $y = \sqrt\lambda\,s$ this is **Bessel's equation**. Its solution that stays finite at the centre is $J_m(\sqrt\lambda\,s)$. (The second solution, $Y_m$, blows up at $s = 0$; it returns in an annulus, where the centre is not part of the domain.)
 
@@ -1218,7 +1283,7 @@ def _(maths):
 
     **Orthogonality.** Modes with different $m$ are orthogonal through the angle: $\int_0^{2\pi}\cos m\theta\cos m'\theta\,d\theta = 0$. Modes with the same $m$ and different roots are orthogonal through the radial coordinate, **with weight $s$**:
 
-    $$\int_0^R J_m\Big(\frac{\alpha_{mk}s}{R}\Big)\,J_m\Big(\frac{\alpha_{mk'}s}{R}\Big)\,s\,ds = 0\qquad (k\ne k').\tag{1.23}$$
+    $$\int_0^R J_m\Big(\frac{\alpha_{mk}s}{R}\Big)\,J_m\Big(\frac{\alpha_{mk'}s}{R}\Big)\,s\,ds = 0\qquad (k\ne k').\tag{1.26}$$
 
     → The weight is the $s\,ds$ of the area element, so this is ordinary orthogonality, $\int u\,u'\,dA = 0$. It follows from the same integration by parts as for the slab (Exercise 2c), because the radial equation can be written $(sF')' - \frac{m^2}sF = -\lambda\,s\,F$. For the sphere the weight is $s^2$.
     """, title="Where the Bessel functions come from")
@@ -1353,13 +1418,13 @@ def _(mo):
 
     **Modes on the circle.** With arc length $\ell = R\phi$, the eigenproblem is $-u'' = \lambda u$ with $u$ periodic:
 
-    $$u_0 = \frac{1}{\sqrt{2\pi R}},\qquad u_n = \frac{\cos n\phi}{\sqrt{\pi R}},\ \frac{\sin n\phi}{\sqrt{\pi R}},\qquad \lambda_n = \frac{n^2}{R^2}\quad(n\ge1,\ \text{each twice}).\tag{1.24}$$
+    $$u_0 = \frac{1}{\sqrt{2\pi R}},\qquad u_n = \frac{\cos n\phi}{\sqrt{\pi R}},\ \frac{\sin n\phi}{\sqrt{\pi R}},\qquad \lambda_n = \frac{n^2}{R^2}\quad(n\ge1,\ \text{each twice}).\tag{1.27}$$
 
     The slowest decay time is $\tau_1 = R^2/D$, about 3.4 times longer than for the inside of a disk of the same radius ($0.295\,R^2/D$): a molecule on the rim cannot cut across, it has to go around.
 
     **Concentric layers.** The walls between layers are impermeable, so the modes of the whole sheath are simply the modes of each circle, and every layer keeps its own uniform mode (the $\kappa = 0$ case of the next section). A uniform start puts in layer $i$ a share of the molecules proportional to its circumference, and anything summed over the sheath is a weighted sum over the layers:
 
-    $$w_i = \frac{R_i}{\sum_j R_j}.\tag{1.25}$$
+    $$w_i = \frac{R_i}{\sum_j R_j}.\tag{1.28}$$
 
     The layers are evenly spaced between the inner radius (the axon) and the outer radius; in the 2025 simulations they are 7.5 nm apart, roughly a 4–5 nm lipid bilayer plus about 3 nm of water. Outer layers hold more water, so a sheath-averaged quantity leans towards the outer radius. The 2025 paper summarises the sheath by the radius-weighted mean $\sum_i w_i R_i = \sum_i R_i^2/\sum_i R_i$. Chapter 2 uses the modes of one cylindrical surface again ([Canales-Rodríguez, Tax et al. 2026](https://doi.org/10.1088/1361-6560/aeb2a0)).
 
@@ -1469,13 +1534,13 @@ def _(mo):
 
     A compact way to describe a distribution is by its **cumulants** $\kappa_n$: the mean ($\kappa_1$, zero here by symmetry), the variance ($\kappa_2 = \langle r^2\rangle_{x,x_0}$), and then the shape ($\kappa_4 = \langle r^4\rangle_{x,x_0} - 3\langle r^2\rangle_{x,x_0}^2$ for a symmetric distribution). In 1D define
 
-    $$\boxed{\ D(t) = \frac{\langle r^2\rangle_{x,x_0}}{2t},\qquad K(t) = \frac{\kappa_4}{\kappa_2^2} = \frac{\langle r^4\rangle_{x,x_0}}{\langle r^2\rangle_{x,x_0}^2} - 3\ }.\tag{1.26}$$
+    $$\boxed{\ D(t) = \frac{\langle r^2\rangle_{x,x_0}}{2t},\qquad K(t) = \frac{\kappa_4}{\kappa_2^2} = \frac{\langle r^4\rangle_{x,x_0}}{\langle r^2\rangle_{x,x_0}^2} - 3\ }.\tag{1.29}$$
 
     $D(t)$ is the apparent diffusivity of the mean-squared-displacement figure. $K(t)$, the **excess kurtosis**, measures how far the shape is from a Gaussian. Free diffusion is Gaussian at every time, so $K = 0$ (Exercise 8a): **any nonzero $K$ comes from the geometry.**
 
     **The characteristic function** holds all moments and cumulants at once. For a probability density $p(r)$ it is the Fourier transform,
 
-    $$\boxed{\ \phi(\xi) = \langle e^{i\xi r}\rangle = \int e^{i\xi r}\,p(r)\,dr\ }\tag{1.27}$$
+    $$\boxed{\ \phi(\xi) = \langle e^{i\xi r}\rangle = \int e^{i\xi r}\,p(r)\,dr\ }\tag{1.30}$$
 
     with $\xi$ the Fourier variable, a wavenumber in 1/µm.
 
@@ -1485,7 +1550,7 @@ def _(mo):
 
     ⇒ Its logarithm holds the cumulants. For molecules starting uniformly, $p = \bar P(r,t)$ and the average is over start and end:
 
-    $$\boxed{\ \ln\big\langle e^{i\xi r}\big\rangle_{x,x_0} = \sum_{n\ge1}\frac{(i\xi)^n}{n!}\,\kappa_n = -\frac{\xi^2}{2}\langle r^2\rangle_{x,x_0} + \frac{\xi^4}{24}\,\kappa_4 - \dots\ }\tag{1.28}$$
+    $$\boxed{\ \ln\big\langle e^{i\xi r}\big\rangle_{x,x_0} = \sum_{n\ge1}\frac{(i\xi)^n}{n!}\,\kappa_n = -\frac{\xi^2}{2}\langle r^2\rangle_{x,x_0} + \frac{\xi^4}{24}\,\kappa_4 - \dots\ }\tag{1.31}$$
 
     (For molecules from a known start $x_0$, $p = P(x_0 + r\mid x_0, t)$ and the average is $\langle\cdot\rangle_{x\mid x_0}$.) A Gaussian stops at $\xi^2$, so all its cumulants beyond the variance vanish (Exercise 8a).
 
@@ -1505,7 +1570,7 @@ def _(maths):
 
     ⇒ The coefficients of $y$, $y^2$, $y^3$ follow from integrating by parts. With $k_n = n\pi/L$:
 
-    $$y_n = -\frac{2\sqrt2\,L^{3/2}}{(n\pi)^2}\ (n\ \text{odd}),\qquad (y^2)_n = \frac{2\sqrt2\,L^{5/2}}{(n\pi)^2}\ (n\ \text{even} \ge 2),\qquad (y^3)_n = \sqrt2\,L^{7/2}\Big[-\frac{3}{2(n\pi)^2} + \frac{12}{(n\pi)^4}\Big]\ (n\ \text{odd}),\tag{1.29}$$
+    $$y_n = -\frac{2\sqrt2\,L^{3/2}}{(n\pi)^2}\ (n\ \text{odd}),\qquad (y^2)_n = \frac{2\sqrt2\,L^{5/2}}{(n\pi)^2}\ (n\ \text{even} \ge 2),\qquad (y^3)_n = \sqrt2\,L^{7/2}\Big[-\frac{3}{2(n\pi)^2} + \frac{12}{(n\pi)^4}\Big]\ (n\ \text{odd}),\tag{1.32}$$
 
     and zero otherwise; for $n=0$ only $(y^2)_0 = L^{5/2}/12$ survives.
 
@@ -1647,7 +1712,7 @@ def _(mo):
 
     The exact result holds for every pore shape with smooth walls ([Mitra, Sen, Schwartz & Le Doussal, *Phys. Rev. Lett.* 68:3555, 1992](https://doi.org/10.1103/PhysRevLett.68.3555)):
 
-    $$\boxed{\ \frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t)\qquad\text{in } d \text{ dimensions}\ }.\tag{1.30}$$
+    $$\boxed{\ \frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t)\qquad\text{in } d \text{ dimensions}\ }.\tag{1.33}$$
 
     | Pore | $S/V$ | $d$ | $D(t)/D$ at short times |
     | --- | --- | --- | --- |
@@ -1751,7 +1816,7 @@ def _(exercise):
 
     (i) Show that the surface pool holds a fraction $f\approx\ell_D\,S/V$ of the water.
 
-    (ii) Suppose the surface pool loses a fraction $\beta$ of its mean-squared displacement. Show that $D(t)/D\approx1 - \beta\,(S/V)\sqrt{Dt}$: the form of Eq. (1.30).
+    (ii) Suppose the surface pool loses a fraction $\beta$ of its mean-squared displacement. Show that $D(t)/D\approx1 - \beta\,(S/V)\sqrt{Dt}$: the form of Eq. (1.33).
 
     (iii) A wall only stops motion along its normal, one of the $d$ directions. Estimate $\beta$ if a molecule in the layer loses half of its motion along the normal, and compare with the exact $4/(3\sqrt\pi\,d)$. Use the figure.
 
@@ -1833,7 +1898,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(takeaway):
     takeaway(r"""
-    At short times only a layer of thickness $\sim\sqrt{Dt}$ along the walls feels them, and that layer holds a fraction $\propto\sqrt{Dt}\,S/V$ of the water → $D(t)/D = 1 - \frac{4}{3\sqrt\pi\,d}\frac SV\sqrt{Dt}$, Eq. (1.30), for any shape: a short-time measurement gives $S/V$.
+    At short times only a layer of thickness $\sim\sqrt{Dt}$ along the walls feels them, and that layer holds a fraction $\propto\sqrt{Dt}\,S/V$ of the water → $D(t)/D = 1 - \frac{4}{3\sqrt\pi\,d}\frac SV\sqrt{Dt}$, Eq. (1.33), for any shape: a short-time measurement gives $S/V$.
     """)
     return
 
@@ -1864,7 +1929,7 @@ def _(maths):
 
     ① **Solve piece by piece.** On each piece $D$ is constant and $-u'' = \lambda u$, so with $k = \sqrt\lambda$
 
-    $$u = A_1\cos kx + B_1\sin kx\ \ (x < 0),\qquad u = A_2\cos kx + B_2\sin kx\ \ (x > 0).\tag{1.31}$$
+    $$u = A_1\cos kx + B_1\sin kx\ \ (x < 0),\qquad u = A_2\cos kx + B_2\sin kx\ \ (x > 0).\tag{1.34}$$
 
     Four unknowns, $A_1, B_1, A_2, B_2$, and one eigenvalue to find.
 
@@ -1997,7 +2062,7 @@ def _(exercise):
 
         **(b)** For the odd modes, try $u = \cos k(a - x)$ for $x>0$ and $u = -\cos k(a + x)$ for $x<0$. Use the membrane condition to show that
 
-        $$k\tan(ka) = \frac{2\kappa}{D}.\tag{1.32}$$
+        $$k\tan(ka) = \frac{2\kappa}{D}.\tag{1.35}$$
 
         **(c)** Check the limits $\kappa\to 0$ and $\kappa\to\infty$ against what you expect.
 
@@ -2079,7 +2144,7 @@ def _(mo):
 
     ⇒ Keep track of the characteristic function separately for the molecules that are in compartment $i$ at time $t$, $f_i(\xi,t)$. Diffusion inside and hopping between give a linear system (Exercise 11b):
 
-    $$\boxed{\ \frac{d\mathbf f}{dt} = -\big(\xi^2\mathbf D + \mathbf K\big)\,\mathbf f,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},\quad \mathbf f(0) = \mathbf p\ },\tag{1.33}$$
+    $$\boxed{\ \frac{d\mathbf f}{dt} = -\big(\xi^2\mathbf D + \mathbf K\big)\,\mathbf f,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},\quad \mathbf f(0) = \mathbf p\ },\tag{1.36}$$
 
     so that $\langle e^{i\xi r}\rangle_{x,x_0} = (1,1)\,e^{-(\xi^2\mathbf D + \mathbf K)t}\,\mathbf p$. (Bold $\mathbf K$ is the matrix of rates; italic $K$ stays the kurtosis.)
 
@@ -2235,7 +2300,7 @@ def _(exercise):
 
     **(d)** Given its history, a molecule's displacement is Gaussian with variance $2Y$, where $Y = \int_0^tD(t')\,dt'$. Show that $K(t) = 3\,\mathrm{Var}(Y)/(\bar Dt)^2$. Then use the correlation of a two-state switch, $\langle(D(t') - \bar D)(D(t'') - \bar D)\rangle_{\text{paths}} = p_1p_2(D_1 - D_2)^2e^{-\lvert t' - t''\rvert/\tau_{\text{ex}}}$, to derive
 
-    $$K(t) = K_0\,\frac{2\big(x - 1 + e^{-x}\big)}{x^2},\qquad x = \frac{t}{\tau_{\text{ex}}},\qquad K_0 = \frac{3p_1p_2(D_1 - D_2)^2}{\bar D^2}.\tag{1.34}$$
+    $$K(t) = K_0\,\frac{2\big(x - 1 + e^{-x}\big)}{x^2},\qquad x = \frac{t}{\tau_{\text{ex}}},\qquad K_0 = \frac{3p_1p_2(D_1 - D_2)^2}{\bar D^2}.\tag{1.37}$$
 
     **(e)** With the sliders: at which $t/\tau_{\text{ex}}$ has $K$ dropped to half of $K_0$? Does it depend on $p_1$? How does $K$ fall at long times, and what would you measure over a range of times to tell exchange from restriction (Exercise 8)?
     """, "11 · Two compartments that exchange")
@@ -2384,7 +2449,7 @@ def _(C_ALT, C_FREE, C_MAIN, np, plt):
 @app.cell(hide_code=True)
 def _(takeaway):
     takeaway(r"""
-    A gradient makes the phase of a spin record its position, $\varphi = \gamma\int\mathbf g\cdot\mathbf x\,dt$, Eq. (1.38) → static spins refocus at the echo, moving spins keep a phase, and the spread of phases attenuates the signal $E = S/S_0$.
+    A gradient makes the phase of a spin record its position, $\varphi = \gamma\int\mathbf g\cdot\mathbf x\,dt$, Eq. (1.41) → static spins refocus at the echo, moving spins keep a phase, and the spread of phases attenuates the signal $E = S/S_0$.
     """)
     return
 
@@ -2425,7 +2490,7 @@ def _(mo):
 
     Precession alone turns each arrow at its own rate: $\partial m/\partial t = -i\gamma\,\mathbf g(t)\cdot\mathbf x\,m$. The spins also diffuse, and magnetization is carried with them exactly like the concentration in Section 1.1. [Torrey (1956)](https://doi.org/10.1103/PhysRev.104.563) added the two effects to [Bloch's (1946)](https://doi.org/10.1103/PhysRev.70.460) equations:
 
-    $$\boxed{\ \frac{\partial m}{\partial t} = D\,\nabla^2 m \;-\; i\gamma\,\mathbf g(t)\cdot\mathbf x\; m\ }\qquad m(\mathbf x,0) = \rho,\qquad \frac{\partial m}{\partial n}=0 \text{ on impermeable interfaces}.\tag{1.35}$$
+    $$\boxed{\ \frac{\partial m}{\partial t} = D\,\nabla^2 m \;-\; i\gamma\,\mathbf g(t)\cdot\mathbf x\; m\ }\qquad m(\mathbf x,0) = \rho,\qquad \frac{\partial m}{\partial n}=0 \text{ on impermeable interfaces}.\tag{1.38}$$
 
     - **Diffusion** smooths phase differences out; the **gradient** winds them up. Every regime in this course is a contest between those two.
     - $\mathbf g(t)$ is the effective gradient, so the 180° pulse is already in the equation.
@@ -2442,7 +2507,7 @@ def _(mo):
 
     The magnetization lives in the same compartments, with the same conditions, as the concentration in Section 1.1 (Eqs. 1.9–1.10); the block of tissue $\Omega$ is now the imaging voxel, or a piece of it. Two things are added: the gradient, and relaxation, which can differ between compartments. With the gradient written as $\mathbf g(t) = f(t)\,\mathbf g$ (for PGSE, $f = +1$ during the first lobe and $-1$ during the second, once the 180° pulse is folded in), each compartment obeys
 
-    $$\boxed{\ \frac{\partial m_n}{\partial t} = \nabla\cdot(D_n\nabla m_n) - \frac{m_n}{T_{2,n}} - i\gamma f(t)\,(\mathbf g\cdot\mathbf x)\,m_n\ \text{ in }\Omega_n,\qquad m_n(\mathbf x,0) = \rho_n\ },\tag{1.36}$$
+    $$\boxed{\ \frac{\partial m_n}{\partial t} = \nabla\cdot(D_n\nabla m_n) - \frac{m_n}{T_{2,n}} - i\gamma f(t)\,(\mathbf g\cdot\mathbf x)\,m_n\ \text{ in }\Omega_n,\qquad m_n(\mathbf x,0) = \rho_n\ },\tag{1.39}$$
 
     | Where | Condition | Meaning |
     | --- | --- | --- |
@@ -2461,7 +2526,7 @@ def _(mo):
 
     ① **Uniform $T_2$:** relaxation then multiplies the signal by $e^{-T/T_2}$, which cancels in $E$ (Exercise 12). Drop the $T_2$ term.
     ② **Equal densities:** $c_{nm} = 1$; with $\rho = 1$ the start is $m = 1$.
-    ③ **One compartment:** impermeable interfaces, so each pore is solved on its own. This is Eq. (1.35).
+    ③ **One compartment:** impermeable interfaces, so each pore is solved on its own. This is Eq. (1.38).
 
     → Each step is a statement about the tissue, and each can be false: compartments do relax differently (Exercise 12), and membranes do leak. Chapters 4 and 5 are how to find out what a simplification costs.
     """)
@@ -2504,7 +2569,7 @@ def _(mo):
 
     ⇒ Integrate the diffusion term by parts (Green's identity). Half of the derivatives move onto $w$, and a boundary term appears:
 
-    $$\boxed{\ \int_\Omega w\,\partial_tm\,d\mathbf x + \int_\Omega D\,\nabla w\cdot\nabla m\,d\mathbf x + i\gamma f(t)\int_\Omega w\,(\mathbf g\cdot\mathbf x)\,m\,d\mathbf x = \oint_{\partial\Omega}w\,D\,\frac{\partial m}{\partial n}\,dS\qquad\text{for every } w\ }.\tag{1.37}$$
+    $$\boxed{\ \int_\Omega w\,\partial_tm\,d\mathbf x + \int_\Omega D\,\nabla w\cdot\nabla m\,d\mathbf x + i\gamma f(t)\int_\Omega w\,(\mathbf g\cdot\mathbf x)\,m\,d\mathbf x = \oint_{\partial\Omega}w\,D\,\frac{\partial m}{\partial n}\,dS\qquad\text{for every } w\ }.\tag{1.40}$$
 
     This is the **weak form**. It needs only first derivatives of $m$, so $m$ may have kinks, which the equation itself would not allow.
 
@@ -2594,7 +2659,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(takeaway):
     takeaway(r"""
-    Bloch–Torrey is the diffusion equation of Section 1.1 plus a phase term $-i\gamma\,\mathbf g\cdot\mathbf x\,m$, with the same compartments and conditions → in weak form, Eq. (1.37), the wall conditions sit in a boundary term, and choosing the test functions chooses the method: modes give Chapter 2, hat functions give finite elements (Chapter 4).
+    Bloch–Torrey is the diffusion equation of Section 1.1 plus a phase term $-i\gamma\,\mathbf g\cdot\mathbf x\,m$, with the same compartments and conditions → in weak form, Eq. (1.40), the wall conditions sit in a boundary term, and choosing the test functions chooses the method: modes give Chapter 2, hat functions give finite elements (Chapter 4).
     """)
     return
 
@@ -2606,11 +2671,11 @@ def _(mo):
 
     Follow single spins. Each spin random-walks along its own path $\mathbf x(t)$ (reflected at walls, as in Section 1.1) and gathers its own phase
 
-    $$\boxed{\ \varphi = \gamma\int_0^T \mathbf g(t)\cdot\mathbf x(t)\,dt\ }.\tag{1.38}$$
+    $$\boxed{\ \varphi = \gamma\int_0^T \mathbf g(t)\cdot\mathbf x(t)\,dt\ }.\tag{1.41}$$
 
     The voxel contains so many spins that the signal is the **average phase factor** over all possible paths, starting from uniformly spread positions:
 
-    $$\boxed{\ E = \big\langle e^{-i\varphi}\big\rangle_{\text{paths}}\ }.\tag{1.39}$$
+    $$\boxed{\ E = \big\langle e^{-i\varphi}\big\rangle_{\text{paths}}\ }.\tag{1.42}$$
 
     In the language of probability: the signal is the **characteristic function** of the random phase. Chapter 5 (Monte Carlo) works this way.
 
@@ -2618,11 +2683,11 @@ def _(mo):
 
     **Short pulses: the distribution of displacements.** Make both lobes so short that the spins hardly move during them. The first lobe gives each spin the phase $\mathbf q\cdot\mathbf x(0)$ and the second takes away $\mathbf q\cdot\mathbf x(\Delta)$, so $\varphi = -\mathbf q\cdot\mathbf r$ with $\mathbf r$ the displacement of Section 1.1 over the time $\Delta$. Then
 
-    $$\boxed{\ E = \big\langle e^{i\mathbf q\cdot\mathbf r}\big\rangle_{\mathbf x,\mathbf x_0}\ },\tag{1.40}$$
+    $$\boxed{\ E = \big\langle e^{i\mathbf q\cdot\mathbf r}\big\rangle_{\mathbf x,\mathbf x_0}\ },\tag{1.43}$$
 
-    the characteristic function of the displacements of Section 1.1, Eq. (1.27), with the Fourier variable $\xi$ set by the gradient: $\xi = q$. Its logarithm has the cumulants of Section 1.1 as coefficients, so in this limit $D(t)$ and $K(t)$ are what diffusion and kurtosis imaging estimate. Chapter 3 maps where the limit holds; Chapter 2 shows what changes when the pulses are not short.
+    the characteristic function of the displacements of Section 1.1, Eq. (1.30), with the Fourier variable $\xi$ set by the gradient: $\xi = q$. Its logarithm has the cumulants of Section 1.1 as coefficients, so in this limit $D(t)$ and $K(t)$ are what diffusion and kurtosis imaging estimate. Chapter 3 maps where the limit holds; Chapter 2 shows what changes when the pulses are not short.
 
-    **The two routes agree.** The average phase factor of Eq. (1.39) gives exactly the same $E$ as integrating the solution of the Bloch–Torrey equation (1.33). This is an example of the **Feynman–Kac relation** between parabolic PDEs and averages over random paths. [Carr & Purcell (1954)](https://doi.org/10.1103/PhysRev.94.630) already computed echo attenuation this way, as an average phase over random walks; the general relation is due to [Kac (1949)](https://doi.org/10.1090/S0002-9947-1949-0027960-X), inspired by [Feynman's (1948)](https://doi.org/10.1103/RevModPhys.20.367) path integrals. You can derive it yourself in a few lines.
+    **The two routes agree.** The average phase factor of Eq. (1.42) gives exactly the same $E$ as integrating the solution of the Bloch–Torrey equation (1.33). This is an example of the **Feynman–Kac relation** between parabolic PDEs and averages over random paths. [Carr & Purcell (1954)](https://doi.org/10.1103/PhysRev.94.630) already computed echo attenuation this way, as an average phase over random walks; the general relation is due to [Kac (1949)](https://doi.org/10.1090/S0002-9947-1949-0027960-X), inspired by [Feynman's (1948)](https://doi.org/10.1103/RevModPhys.20.367) path integrals. You can derive it yourself in a few lines.
     """)
     return
 
@@ -2632,7 +2697,7 @@ def _(exercise):
     exercise(r"""
     Work in 1D, in a slab with a constant-in-space gradient $g(t)$ along $x$. Define the **phase-weighted density of walkers**
 
-    $$w(x,t) = \Big\langle e^{-i\varphi_t}\;\delta\big(x - x(t)\big)\Big\rangle_{\text{paths}} ,\qquad \varphi_t = \gamma\int_0^t g(t')r_{t'}\,dt' ,\tag{1.41}$$
+    $$w(x,t) = \Big\langle e^{-i\varphi_t}\;\delta\big(x - x(t)\big)\Big\rangle_{\text{paths}} ,\qquad \varphi_t = \gamma\int_0^t g(t')r_{t'}\,dt' ,\tag{1.44}$$
 
     where $x(t)$ is the position of a walker at time $t$. In words: count the walkers that are at $x$ at time $t$, each one weighted by its current phase factor.
 
@@ -2699,7 +2764,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(takeaway):
     takeaway(r"""
-    The signal is the average phase factor over random paths, $E = \langle e^{-i\varphi}\rangle_{\text{paths}}$, Eq. (1.39); for short pulses it is the characteristic function of the displacement → the PDE and the random walk give the same signal (Feynman–Kac), and "move each walker, then add its phase" is a Monte Carlo simulation.
+    The signal is the average phase factor over random paths, $E = \langle e^{-i\varphi}\rangle_{\text{paths}}$, Eq. (1.42); for short pulses it is the characteristic function of the displacement → the PDE and the random walk give the same signal (Feynman–Kac), and "move each walker, then add its phase" is a Monte Carlo simulation.
     """)
     return
 
@@ -2744,7 +2809,7 @@ def _(maths):
 
     ⇒ From the second, $t = 1/(\gamma g\ell)$. Put it in the first: $\ell^2 = D/(\gamma g\ell)$, so
 
-    $$\boxed{\ \ell_g = \left(\frac{D}{\gamma g}\right)^{1/3},\qquad \tau_g = \frac{\ell_g^2}{D}\ }.\tag{1.42}$$
+    $$\boxed{\ \ell_g = \left(\frac{D}{\gamma g}\right)^{1/3},\qquad \tau_g = \frac{\ell_g^2}{D}\ }.\tag{1.45}$$
 
     → The same length from the table: $\ell_D = \sqrt{DT}$ grows with $T$ and $\ell_q = 1/(\gamma gT)$ shrinks. They are equal at $T = \tau_g$, and there both equal $\ell_g$ (Exercise 15a).
 
@@ -2963,7 +3028,9 @@ def _(mo):
     | 1994 | [T. M. de Swiet & P. N. Sen, *J. Chem. Phys.* 100:5597](https://doi.org/10.1063/1.467127) | bounded diffusion in a constant gradient; regimes set by length scales |
     | 2007 | [D. S. Grebenkov, *Rev. Mod. Phys.* 79:1077](https://doi.org/10.1103/RevModPhys.79.1077) | review: length scales, eigenmode (MCF) description, numerical methods |
     | 2011 | [P. T. Callaghan, *Translational Dynamics and Magnetic Resonance*, Oxford University Press](https://doi.org/10.1093/acprof:oso/9780199556984.001.0001) | the boundary-layer picture of restricted diffusion, and much more |
+    | 2014 | [D. S. Novikov, J. H. Jensen, J. A. Helpern & E. Fieremans, *PNAS* 111:5088](https://doi.org/10.1073/pnas.1316944111) | the instantaneous diffusivity; time-dependent diffusion from structural disorder |
     | 2014 | [D. V. Nguyen, J.-R. Li, D. Grebenkov & D. Le Bihan, *J. Comput. Phys.* 263:283](https://doi.org/10.1016/j.jcp.2014.01.009) | the multi-compartment Bloch–Torrey equation in weak form, with membranes as double nodes |
+    | 2019 | [D. S. Novikov, E. Fieremans, S. N. Jespersen & V. G. Kiselev, *NMR Biomed.* 32:e3998](https://doi.org/10.1002/nbm.3998) | review: time-dependent diffusion, effective and instantaneous diffusivities |
     | 2025 | [E. J. Canales-Rodríguez, C. M. W. Tax et al., *Front. Phys.* 13:1516630](https://doi.org/10.3389/fphy.2025.1516630) | diffusion on cylindrical surfaces; concentric cylinders for myelin |
     | 2026 | [E. J. Canales-Rodríguez, C. M. W. Tax et al., *Phys. Med. Biol.*](https://doi.org/10.1088/1361-6560/aeb2a0) | exact PGSE signal on a cylindrical surface with the spectral matrix formalism ([arXiv 2603.23421](https://arxiv.org/abs/2603.23421)) |
     """)
