@@ -296,6 +296,108 @@ def _(mo):
     ---
     # 1.1 · Diffusion and the eigenmodes of a pore
 
+    **The map of this part.** We start without walls: **free diffusion**, where everything follows from one Gaussian. Then we add walls and the conditions that hold on them. First the walls only reflect: **restricted diffusion**, solved with the eigenmodes of the pore. Then molecules can pass or be lost: **permeable** membranes and **exchange** between compartments. Nothing in this part involves MRI yet; the signal comes in Section 1.2.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(C_ALT, C_FREE, C_MAIN, np, plt):
+    from matplotlib.patches import FancyArrowPatch as _Arrow, FancyBboxPatch as _RBox, Rectangle as _Rect
+
+    _fig = plt.figure(figsize=(11, 5.0))
+    _ax = _fig.add_axes([0, 0, 1, 1]); _ax.set_xlim(0, 11); _ax.set_ylim(0, 5); _ax.axis("off")
+    _rng = np.random.default_rng(3)
+
+    def _box(x, y, w, h, fc, ec, lw=1.2, ls="-"):
+        _ax.add_patch(_RBox((x, y), w, h, boxstyle="round,pad=0.02,rounding_size=0.12", fc=fc, ec=ec, lw=lw, ls=ls))
+
+    def _arrow(x0, x1, y):
+        _ax.add_patch(_Arrow((x0, y), (x1, y), arrowstyle="-|>", mutation_scale=16, lw=1.6, color="0.35"))
+
+    # frame: everything with boundary and interface conditions
+    _box(3.5, 0.12, 7.38, 4.76, "#f6f7f9", "0.55", lw=1.0, ls="--")
+    _ax.text(7.19, 4.64, "with boundary and interface conditions   ·   1.1.2 domain  ·  1.1.3 conditions  ·  1.1.4 full problem",
+             ha="center", va="center", fontsize=8.5, color="0.3")
+
+    _stages = [
+        (0.12, "① Free diffusion", "1.1.1", "0.45",
+         ["diffusion equation, Eq. (1.3)", "propagators $P$ and $\\bar P$", "free Gaussian, variance $2Dt$",
+          "diffusion length $\\ell_D\\sim\\sqrt{Dt}$"]),
+        (3.68, "② Restricted: walls reflect", "1.1.5 – 1.1.10", C_MAIN,
+         ["1.1.5  eigenmodes $u_n$, $\\lambda_n$", "1.1.6  MSD, $D_{\\rm eff}$, $D_{\\rm inst}$", "1.1.7  position matrix $\\mathbf{B}$",
+          "1.1.8  disk, sphere, surfaces", "1.1.9  cumulants: $D(t)$, $K(t)$", "1.1.10  short times: $S/V$"]),
+        (7.6, "③ Permeable: walls let through", "1.1.11 – 1.1.12", C_ALT,
+         ["1.1.11  membranes $\\kappa$, absorbing walls $\\varrho$", "1.1.12  exchange: the Kärger model"]),
+    ]
+    _W, _H = 3.12, 4.1
+    for _x, _title, _secs, _col, _items in _stages:
+        _y = 0.3
+        _box(_x, _y, _W, _H, "white", _col, lw=1.8)
+        _ax.text(_x + _W / 2, _y + _H - 0.22, _title, ha="center", va="center", fontsize=10.5, weight="bold", color=_col)
+        _ax.text(_x + _W / 2, _y + _H - 0.5, _secs, ha="center", va="center", fontsize=8.5, color="0.4")
+        for _k, _it in enumerate(_items):
+            _ax.text(_x + 0.18, _y + 1.42 - 0.25 * _k, _it, ha="left", va="center", fontsize=8.2)
+
+    # ① three Gaussians that widen with time
+    _xx = np.linspace(-1.4, 1.4, 200)
+    for _k, _sg in enumerate([0.12, 0.25, 0.45]):
+        _g = np.exp(-_xx**2 / (2 * _sg**2))
+        _ax.plot(0.12 + _W / 2 + _xx * 0.95, 2.1 + 1.15 * _g * (0.12 / _sg) ** 0.6,
+                 color=C_FREE, lw=1.6, alpha=0.45 + 0.25 * _k)
+    _ax.annotate("", xy=(0.12 + _W / 2 + 1.2, 2.4), xytext=(0.12 + _W / 2 + 0.35, 2.9), arrowprops=dict(arrowstyle="->", color="0.4"))
+    _ax.text(0.12 + _W / 2 + 1.0, 2.85, "t", fontsize=9, color="0.4", style="italic")
+
+    # ② a walk reflected between walls
+    _x0, _y0, _bw, _bh = 3.68 + 0.51, 2.1, 2.1, 1.25
+    _rng = np.random.default_rng(5)
+    _ax.add_patch(_Rect((_x0, _y0), _bw, _bh, fc=C_MAIN, alpha=0.08, lw=0))
+    _ax.add_patch(_Rect((_x0, _y0), _bw, _bh, fc="none", ec="0.3", lw=2.4))
+    _p = np.array([_x0 + _bw / 2, _y0 + _bh / 2]); _pts = [_p.copy()]
+    for _ in range(900):
+        _p = _p + 0.06 * _rng.standard_normal(2)
+        for _d, (_lo, _hi) in enumerate([(_x0, _x0 + _bw), (_y0, _y0 + _bh)]):
+            if _p[_d] < _lo: _p[_d] = 2 * _lo - _p[_d]
+            if _p[_d] > _hi: _p[_d] = 2 * _hi - _p[_d]
+        _pts.append(_p.copy())
+    _pts = np.array(_pts)
+    _ax.plot(_pts[:, 0], _pts[:, 1], color=C_MAIN, lw=0.8, alpha=0.8)
+
+    # ③ two compartments with a membrane, walk crosses now and then
+    _x0 = 7.6 + 0.51
+    _rng = np.random.default_rng(11)
+    _ax.add_patch(_Rect((_x0, _y0), _bw / 2, _bh, fc=C_MAIN, alpha=0.08, lw=0))
+    _ax.add_patch(_Rect((_x0 + _bw / 2, _y0), _bw / 2, _bh, fc=C_ALT, alpha=0.10, lw=0))
+    _ax.add_patch(_Rect((_x0, _y0), _bw, _bh, fc="none", ec="0.3", lw=2.4))
+    _ax.plot([_x0 + _bw / 2] * 2, [_y0, _y0 + _bh], color=C_ALT, lw=2, ls=(0, (3, 2)))
+    _p = np.array([_x0 + _bw / 4, _y0 + _bh / 2]); _seg = [_p.copy()]; _segs = []
+    _side = 0
+    for _ in range(900):
+        _q = _p + 0.06 * _rng.standard_normal(2)
+        for _d, (_lo, _hi) in enumerate([(_x0, _x0 + _bw), (_y0, _y0 + _bh)]):
+            if _q[_d] < _lo: _q[_d] = 2 * _lo - _q[_d]
+            if _q[_d] > _hi: _q[_d] = 2 * _hi - _q[_d]
+        _m = _x0 + _bw / 2
+        if (_q[0] - _m) * (_p[0] - _m) < 0 and _rng.random() > 0.5:   # membrane: reflect half of the attempts
+            _q[0] = 2 * _m - _q[0]
+        _new_side = int(_q[0] > _m)
+        _seg.append(_q.copy())
+        if _new_side != _side:
+            _segs.append((_side, np.array(_seg))); _seg = [_q.copy()]; _side = _new_side
+        _p = _q
+    _segs.append((_side, np.array(_seg)))
+    for _sd, _sg in _segs:
+        _ax.plot(_sg[:, 0], _sg[:, 1], color=C_MAIN if _sd == 0 else C_ALT, lw=0.8, alpha=0.85)
+
+    _arrow(0.12 + _W + 0.03, 3.68 - 0.03, 2.75)
+    _arrow(3.68 + _W + 0.03, 7.6 - 0.03, 2.75)
+    _fig
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
     ## 1.1.1 The diffusion equation
 
     A water molecule is knocked about by its neighbours roughly every picosecond. Over milliseconds, the times that matter in this course, each molecule therefore performs a random walk: **Brownian motion**. Molecules that start near the same point $\mathbf x_0$ spread out in random directions, with a probability density $P(\mathbf x\mid\mathbf x_0,t)$ to be at $\mathbf x$ at time $t$: the **propagator**. The concentration is what very many such walkers add up to.
