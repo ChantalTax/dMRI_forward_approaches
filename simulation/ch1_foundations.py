@@ -154,8 +154,10 @@ def _(mo, show_answers):
             return mo.callout(mo.md(f"**{title}**\n\n" + text), kind="success")
         return mo.accordion({f"▸ {title}": mo.md(text)})
 
-    def exercise(text, number):
-        return mo.callout(mo.md(f"### ✎ Exercise {number}\n\n" + text), kind="info")
+    def exercise(text, number, why=None):
+        """An exercise; `why` says what it is for, shown first."""
+        lead = f"*Why this exercise.* {why}\n\n" if why else ""
+        return mo.callout(mo.md(f"### ✎ Exercise {number}\n\n" + lead + text), kind="info")
 
     def takeaway(text):
         """The one thing to remember from a section."""
@@ -388,7 +390,7 @@ def _(exercise):
     Property (iii) is the actual definition; (i) and (ii) are the picture: an infinitely narrow spike of unit area. Check each for $G$ as $t\to0$.
 
     **(c)** Show that the mean displacement is zero and that its variance is $\langle r^2\rangle_{x\mid x_0} = \langle (x - x_0)^2\rangle_{x\mid x_0} = 2Dt$.
-    """, "1 · The free Gaussian")
+    """, "1 · The free Gaussian", why=r"""Free diffusion is the reference every restricted case is compared with. It gives the diffusion length that decides when walls start to matter, it is the short-time limit of every propagator, and it is the step distribution of a Monte Carlo walker (Chapter 5).""")
     return
 
 
@@ -901,7 +903,7 @@ def _(exercise):
     **(c)** Show that two different modes are orthogonal.
 
     **(d)** A molecule starts at $x_0$: the initial condition is $C(x,0) = \delta(x - x_0)$. Expand it in the modes and write down the propagator $P(x\,|\,x_0,t)$ for the slab.
-    """, "2 · Eigenmodes of a slab")
+    """, "2 · Eigenmodes of a slab", why=r"""The slab is the one pore where every mode can be written down by hand. Doing it once shows where the boundary conditions, the normalisation and the initial condition enter, and the result is the test case that the numerical methods of Chapters 2–5 are checked against.""")
     return
 
 
@@ -950,7 +952,7 @@ def _(exercise):
     **(b)** At short times the walls have not been felt yet. Which curve should the propagator then match?
 
     **(c)** The **computational cost** of an eigenmode method is the work of computing the modes you keep and summing them: it grows with $N$. What does (a) tell you about when eigenmode methods are cheap to compute, and when they are expensive?
-    """, "3 · How many modes?")
+    """, "3 · How many modes?", why=r"""A mode sum has to be cut off somewhere, and the number of modes kept sets the computational cost of every eigenmode method. Knowing how that number depends on time tells you when to use modes, and when a Gaussian or a random walk is the better tool.""")
     return
 
 
@@ -1023,7 +1025,7 @@ def _(exercise):
     and that it tends to $L^2/6$ at long times. (In the random-walk notebook the walkers between two walls levelled off at $L^2/6$. Here is where that number comes from.) This is part **(a)**.
 
     **(b)** From Eq. (1.22), find $D_{\text{inst}}(t)$ and $D_{\text{eff}}(t)$ for the slab. Check that both start at $D$. How does each fall at long times?
-    """, "4 · Mean-squared displacement and diffusivities in a slab")
+    """, "4 · Mean-squared displacement and diffusivities in a slab", why=r"""The MSD and the diffusivities read off it are what a diffusion measurement reports. Computing them exactly for a slab shows how walls make the diffusivity depend on time, where the $L^2/6$ plateau comes from, and gives a check for any simulation.""")
     return
 
 
@@ -1170,7 +1172,7 @@ def _(exercise):
     **(d)** Show that for $n, m \ge 1$
 
     $$B_{nm} = \frac{L}{\pi^2}\left[\frac{(-1)^{n-m}-1}{(n-m)^2} + \frac{(-1)^{n+m}-1}{(n+m)^2}\right].\tag{1.24}$$
-    """, "5 · The position in the mode basis")
+    """, "5 · The position in the mode basis", why=r"""The position matrix $\mathbf B$ is how a gradient couples the modes; together with the eigenvalues it is all the matrix methods of Chapter 2 need. Its symmetry and parity rules halve the work, and its couplings to the uniform mode are the MSD weights of Exercise 4.""")
     return
 
 
@@ -1369,7 +1371,7 @@ def _(exercise):
     (i) a slab with $L = 8$ µm, (ii) a cylinder with **radius** $R = 5$ µm, (iii) a sphere with radius $R = 5$ µm.
 
     In which pores have the molecules explored the whole pore after 20 ms? What does that mean for what any observation at 20 ms can tell you about pore *size*?
-    """, "6 · Time scales of three pores")
+    """, "6 · Time scales of three pores", why=r"""$\tau_1$ tells you whether an experiment at a given diffusion time can still see the pore size, or only that the pore is closed. These back-of-the-envelope numbers come back whenever you plan or interpret a protocol.""")
     return
 
 
@@ -1496,7 +1498,7 @@ def _(exercise):
         **(b)** Molecules are spread uniformly over a stack of concentric cylindrical surfaces of equal length. Show that layer $i$ holds a share $w_i = R_i/\sum_j R_j$ of them.
 
         **(c)** For $R = 1$ µm and $D = 0.8$ µm²/ms, compare $\tau_1$ on the surface with $\tau_1$ inside a solid cylinder of the same radius.
-        """, "7 · Modes on a cylindrical surface")
+        """, "7 · Modes on a cylindrical surface", why=r"""Myelin water diffuses on thin wrapped layers, not in a volume. This exercise shows how the same mode machinery handles a surface and how to weight many layers: the basis for models of the myelin sheath radius.""")
     return
 
 
@@ -1637,7 +1639,7 @@ def _(exercise):
     **(c)** Show that its characteristic function is $\langle e^{i\xi r}\rangle_{x,x_0} = \operatorname{sinc}^2(\xi L/2)$, with $\operatorname{sinc}z = \sin z/z$. Expand $\ln\operatorname{sinc}^2(\xi L/2)$ to order $\xi^4$ and read off $\kappa_2$ and $\kappa_4$. Do they agree with (a)?
 
     **(d)** In the figure $K(t)$ is **positive** at short times before it turns negative. Explain both signs.
-    """, "8 · The kurtosis of a slab")
+    """, "8 · The kurtosis of a slab", why=r"""The kurtosis is the first measure beyond the diffusivity and is widely used to characterise tissue. Working it out for a slab shows what restriction alone does to it, before heterogeneity or exchange are added.""")
     return
 
 
@@ -1829,7 +1831,7 @@ def _(exercise):
     **(d)** Do the same as in (b) for $r^4 - W^4$, and show that the slab kurtosis grows as $K(t) \approx \frac{16}{5\sqrt\pi}\frac{\sqrt{Dt}}{L}$.
 
     **(e)** In the cumulant figure, up to which $Dt/L^2$ does each dashed line stay within 5% of the exact curve? (Read $Dt/L^2$ off with the sliders: for $L = 10$ µm and $D = 2$ µm²/ms, $Dt/L^2 = 0.01$ is $t = 0.5$ ms.) Why does the kurtosis line fail first?
-    """, "9 · The surface-to-volume law")
+    """, "9 · The surface-to-volume law", why=r"""The short-time law holds for any pore shape, and it is how $S/V$ is measured in practice. Deriving it, first from a picture and then exactly, shows what a short diffusion time can and cannot tell you about the walls.""")
     return
 
 
@@ -2067,7 +2069,7 @@ def _(exercise):
         **(c)** Check the limits $\kappa\to 0$ and $\kappa\to\infty$ against what you expect.
 
         **(d)** For small $\kappa$, show that the slowest odd mode decays at the rate $D\lambda \approx 4\kappa/L$, and interpret it.
-        """, "10 · Eigenmodes with a permeable membrane")
+        """, "10 · Eigenmodes with a permeable membrane", why=r"""Real membranes leak. This exercise shows how a membrane enters the modes and how its permeability $\kappa$ becomes an exchange rate: the link between the membrane and the exchange times that exchange models fit to data.""")
     return
 
 
@@ -2303,7 +2305,7 @@ def _(exercise):
     $$K(t) = K_0\,\frac{2\big(x - 1 + e^{-x}\big)}{x^2},\qquad x = \frac{t}{\tau_{\text{ex}}},\qquad K_0 = \frac{3p_1p_2(D_1 - D_2)^2}{\bar D^2}.\tag{1.37}$$
 
     **(e)** With the sliders: at which $t/\tau_{\text{ex}}$ has $K$ dropped to half of $K_0$? Does it depend on $p_1$? How does $K$ fall at long times, and what would you measure over a range of times to tell exchange from restriction (Exercise 8)?
-    """, "11 · Two compartments that exchange")
+    """, "11 · Two compartments that exchange", why=r"""The Kärger model is the standard description of exchange between compartments in diffusion MRI. Deriving it from the modes shows when its two-compartment picture is valid, and why exchange shows up in the kurtosis but not in the MSD.""")
     return
 
 
@@ -2538,7 +2540,7 @@ def _(exercise):
     exercise(r"""
     With transverse relaxation the equation reads $\partial m/\partial t = D\nabla^2 m - i\gamma\,\mathbf g\cdot\mathbf x\,m - m/T_2$.
     Show that, for a uniform $T_2$, relaxation only multiplies the signal by $e^{-T/T_2}$, so that it cancels in $E = S/S_0$ when $S_0$ is measured at the same echo time.
-    """, "12 · Where did T₂ go?")
+    """, "12 · Where did T₂ go?", why=r"""Relaxation is always present in a real experiment. This exercise shows when a simulation can leave it out, by normalising to $S_0$, and when it cannot: when compartments have different $T_2$.""")
     return
 
 
@@ -2607,7 +2609,7 @@ def _(exercise):
     **(c)** For a membrane at $x = 0$ between $[a, 0]$ and $[0, b]$, equal densities, with $m$ and $w$ allowed to jump there: collect the two boundary terms at $x = 0$ and show that they combine into $-\kappa(m_1 - m_2)(w_1 - w_2)$, where 1 and 2 label the two sides.
 
     **(d)** *Unequal densities.* Redo (c) with the general condition $D\,\partial_{n}m_n = \kappa(c_{nm}m_m - c_{mn}m_n)$, compartment $n$ on the left and $m$ on the right. Show that, moved to the left-hand side, the membrane term is $(w_n, w_m)\,\mathbf Q\,(m_n, m_m)^{\mathsf T}$ with $\mathbf Q = \kappa\begin{pmatrix}c_{mn}&-c_{nm}\\-c_{mn}&c_{nm}\end{pmatrix}$. Check that the columns of $\mathbf Q$ sum to zero and that $(\rho_n, \rho_m)$ is in its null space. What does each property guarantee?
-    """, "13 · The weak form")
+    """, "13 · The weak form", why=r"""Every finite-element code (Chapter 4), and also the matrix method of Chapter 2, solves the weak form. Deriving it shows why reflecting walls need no extra work, and how choosing the test functions chooses the numerical method.""")
     return
 
 
@@ -2708,7 +2710,7 @@ def _(exercise):
     **(c)** Expand for small $\delta t$ and show that $w$ obeys the Bloch–Torrey equation.
 
     **(d)** What are the initial and interface conditions for $w$? Conclude that $\int m\,dx = \langle e^{-i\varphi}\rangle_{\text{paths}}$.
-    """, "14 · Derive the Feynman–Kac relation")
+    """, "14 · Derive the Feynman–Kac relation", why=r"""This relation is why a Monte Carlo simulation (Chapter 5) and a PDE solver give the same signal. Deriving it shows exactly what the random walkers carry, and how the walls of the PDE become reflections of the walkers.""")
     return
 
 
@@ -2907,7 +2909,7 @@ def _(exercise):
         **(c)** For the 1 µm case, estimate the attenuation from the motional-narrowing formula for a slab at 300 mT/m. What does it tell you about measuring axon diameters?
 
         **(d)** With an illustrative relaxivity $\varrho = 10^{-3}$ µm/ms, are 10 µm cells in the fast-diffusion regime?
-        """, "15 · Length scales on real scanners")
+        """, "15 · Length scales on real scanners", why=r"""Before simulating or fitting, you need to know which regime a protocol is in: it decides which formula applies (Chapter 3) and how fine a grid must be (Chapter 4). These are the numbers for real scanners and real cells.""")
     return
 
 

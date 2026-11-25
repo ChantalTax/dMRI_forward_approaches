@@ -360,8 +360,10 @@ def _(mo, show_answers):
             return mo.callout(mo.md(f"**{title}**\n\n" + text), kind="success")
         return mo.accordion({f"▸ {title}": mo.md(text)})
 
-    def exercise(text, number):
-        return mo.callout(mo.md(f"### ✎ Exercise {number}\n\n" + text), kind="info")
+    def exercise(text, number, why=None):
+        """An exercise; `why` says what it is for, shown first."""
+        lead = f"*Why this exercise.* {why}\n\n" if why else ""
+        return mo.callout(mo.md(f"### ✎ Exercise {number}\n\n" + lead + text), kind="info")
 
     return answer, exercise, hint, maths
 
@@ -498,7 +500,7 @@ def _(exercise):
     **(c)** In the figure, how does each error fall as you double $n$? Explain the order of each from how the representation is built.
 
     **(d)** The modes win easily in this figure. Why does nobody use them for a segmented neuron?
-    """, "1 · Three bases for one equation")
+    """, "1 · Three bases for one equation", why=r"""Every method in this course picks a basis that makes one part of the problem easy. Comparing their costs helps you choose a method for a given problem.""")
     return
 
 
@@ -583,7 +585,7 @@ def _(exercise):
     **(c)** Derive the membrane conductance $c = 1/(h/D + 1/\kappa)$ from three resistances in series. Check the two limits $\kappa\to0$ and $\kappa\to\infty$.
 
     **(d)** In the relaxing-wall rule, the first cell loses magnetization at rate $c_w/h$. For a fine grid ($h\ll D/\rho$), show that the total loss rate of a slab with two relaxing walls is $2\rho/L$, the fast-diffusion result of Brownstein and Tarr (Chapter 3).
-    """, "2 · Faces and fluxes")
+    """, "2 · Faces and fluxes", why=r"""The finite-difference stencil and its wall rule are the core of every grid-based simulator. Deriving them shows how accurate they are and why a reflecting wall needs nothing more than a ghost cell.""")
     return
 
 
@@ -738,7 +740,7 @@ def _(exercise):
     **(c)** Set $r = 2$ in the left panel. Which patterns does each method get badly wrong? Why does that hardly affect the signal?
 
     **(d)** Estimate the creep of explicit Euler's phase term for the running example: $x$ up to $L/2 = 4$ µm, $G = 300$ mT/m, $\delta t = h^2/2D$ with $h = 0.1$ µm, $T = 30$ ms.
-    """, "3 · Stability and accuracy in time")
+    """, "3 · Stability and accuracy in time", why=r"""The time step decides both the run time and whether the simulation blows up. This gives the limits you need to choose $\delta t$.""")
     return
 
 
@@ -851,7 +853,7 @@ def _(exercise):
     **(c)** A tissue has $D_1 = 2$ µm²/ms inside the cells and $D_2 = 3$ µm²/ms outside. Which compartment sets the largest allowed $\delta t$ of an explicit 3D simulation with $h = 0.1$ µm? Does a membrane make the limit stricter?
 
     **(d)** With one $T_2$ in every cell, show that the MFD signal at the echo is *exactly* $e^{-T_E/T_2}$ times the signal without relaxation (the last line under the table). Why is this no longer true when the two compartments of (c) have different $T_2$?
-    """, "4 · Jump probabilities")
+    """, "4 · Jump probabilities", why=r"""GPU simulators write the grid as jump probabilities between voxels. This exercise links that picture to the stencil and shows that a membrane is simply a smaller jump probability.""")
     return
 
 
@@ -958,7 +960,7 @@ def _(exercise):
     **(c)** In the right panel, $D_{\text{app}}$ approaches $D_\infty$ as $1/\Delta$. Chapter 3 said that ordered (periodic) structures approach as $1/t$. Explain the $1/\Delta$ from $\langle (x - x_0)^2\rangle_{x,x_0} = 2D_\infty t + c$.
 
     **(d)** Make the membranes very permeable ($\kappa = 10$ µm/ms) and then nearly closed ($\kappa = 0.01$). How long must $\Delta$ be in each case before $D_{\text{app}}$ is within 5% of $D_\infty$? Relate it to the exchange time between cells.
-    """, "5 · A periodic cell")
+    """, "5 · A periodic cell", why=r"""Simulating one repeating cell instead of a large block saves a lot of computing time. This shows the trick that makes it work, and the check that it does.""")
     return
 
 
@@ -1094,7 +1096,7 @@ def _(exercise):
     **(b)** Assemble $\mathbf K$ for three equal elements on $[0, 3h]$ (four nodes). Compare its rows with the finite-difference matrix of Section 4.1. Where do they differ, and why?
 
     **(c)** Show that $w_i = \int N_i$ is the sum of row $i$ of $\boldsymbol{\mathcal M}$, and that $\sum_iw_i = L$. Why does $E = \frac1L\sum_iw_iM_i$ give exactly 1 at $t = 0$?
-    """, "6 · Element matrices")
+    """, "6 · Element matrices", why=r"""These small matrices are what a finite-element code computes and assembles. Deriving them once makes the method transparent and shows how close it is to finite differences in 1D.""")
     return
 
 
@@ -1191,7 +1193,7 @@ def _(exercise):
     **(b)** Why does the finite-element eigenvalue approach from **above**? (Think of the eigenvalue as the minimum of a Rayleigh quotient $\int D\lvert\nabla u\rvert^2\big/\int u^2$ over all allowed $u$.)
 
     **(c)** Why does $\mathbf U^{\mathsf T}\boldsymbol{\mathcal M}\mathbf U = \mathbf I$ play the role of the orthonormality $\int u_nu_m = \delta_{nm}$ of Chapter 1? And why is $\mathbf B = \mathbf U^{\mathsf T}\mathbf J\mathbf U$ the discrete version of $B_{nm} = \int u_n\,x\,u_m$?
-    """, "7 · Membranes and modes on the mesh")
+    """, "7 · Membranes and modes on the mesh", why=r"""To choose a mesh size you need to know how fast each method converges, and a mesh is also how the eigenmodes of a realistic cell are found. This exercise reads both off the numbers.""")
     return
 
 
@@ -1318,7 +1320,7 @@ def _(exercise):
     **(b)** Why does the eigenvalue still converge (slowly) when the perimeter does not?
 
     **(c)** The short-time diffusivity of Chapter 3 depends on $S/V$. What would you check before using a voxel substrate to study short diffusion times?
-    """, "8 · The staircase")
+    """, "8 · The staircase", why=r"""Voxelised shapes are the easiest to build from microscopy, but their walls are staircases. This exercise shows the price: the wrong surface area, which biases exactly the short-time $S/V$ law.""")
     return
 
 
@@ -1413,7 +1415,7 @@ def _(exercise):
     **(b)** A 3D voxel simulation of a $20\times20\times20$ µm³ block with $h = 0.2$ µm, for the 30 ms running example. How many voxels and explicit steps? Roughly how many voxel updates, and how long on a GPU that does $10^{10}$ voxel updates per second?
 
     **(c)** A finite-element mesh of the same block with similar wall accuracy might need $10^5$–$10^6$ nodes and 300 Crank–Nicolson steps, each with a sparse solve. What decides which approach is faster?
-    """, "9 · Planning a simulation")
+    """, "9 · Planning a simulation", why=r"""Before running a large simulation you need to know its size and cost. This exercise walks through estimating the grid spacing, the number of voxels and the run time for a realistic case.""")
     return
 
 

@@ -212,8 +212,10 @@ def _(mo, show_answers):
             return mo.callout(mo.md(f"**{title}**\n\n" + text), kind="success")
         return mo.accordion({f"▸ {title}": mo.md(text)})
 
-    def exercise(text, number):
-        return mo.callout(mo.md(f"### ✎ Exercise {number}\n\n" + text), kind="info")
+    def exercise(text, number, why=None):
+        """An exercise; `why` says what it is for, shown first."""
+        lead = f"*Why this exercise.* {why}\n\n" if why else ""
+        return mo.callout(mo.md(f"### ✎ Exercise {number}\n\n" + lead + text), kind="info")
 
     return answer, exercise, hint, maths
 
@@ -344,7 +346,7 @@ def _(exercise):
     **(b)** Show that on the narrow-pulse face only $\Gamma\tilde\delta$ survives, and that it equals $qL$.
 
     **(c)** Show that on the long-pulse face the three numbers become the three length scales $L$, $\ell_D = \sqrt{DT}$ and $\ell_g$, with $\Gamma = (L/\ell_g)^3$ and $DT/L^2 = (\ell_D/L)^2$.
-    """, "1 · Three numbers")
+    """, "1 · Three numbers", why=r"""Three dimensionless numbers place any PGSE sequence in the parameter box and tell you which closed formula applies. You will use them to pick the right model for a protocol.""")
     return
 
 
@@ -711,7 +713,7 @@ def _(exercise):
     Chapter 1 (Exercise 9) derived the two short-time laws in the left panel, and how far they reach. Here is the same physics seen locally.
 
     Move the profile sliders. How thick is the bright layer? Show that for a spin starting exactly at the wall the real part of its signal equals the bulk value $e^{-q^2Dt}$. Where does the extra echo come from, then?
-    """, "2 · Edge enhancement")
+    """, "2 · Edge enhancement", why=r"""Near a wall the signal differs from the bulk; this is where the $S/V$ law comes from, seen locally. It also explains the bright edges in high-resolution diffusion images of restricted samples.""")
     return
 
 
@@ -774,7 +776,7 @@ def _(exercise):
     **(b)** Derive $1/D_\infty = 1/D + 1/(\kappa L)$ from a steady flux $J$ through many cells: in each cell, the concentration drops across the water layer and jumps across the membrane. Evaluate it for the running example ($L = 8$ µm, $D = 2$ µm²/ms) with $\kappa = 0.1$ µm/ms. When is the membrane the bottleneck?
 
     **(c)** In the left panel of the short-time figure, from which $Dt/L^2$ on is $L^2/(12Dt)$ within 5% of the exact $D(t)/D$? Compare with $\tau_1 = L^2/(\pi^2D)$.
-    """, "3 · Long times")
+    """, "3 · Long times", why=r"""At long times the signal depends only on the pore shape and on how leaky the walls are. These results give pore size from the kurtosis or the diffraction pattern, and permeability from the long-time diffusivity.""")
     return
 
 
@@ -884,7 +886,7 @@ def _(exercise):
     How long must $\Delta$ be, for the running example, before the dip reaches $10^{-2}$? Check with the slider.
 
     **(c)** $\ln\operatorname{sinc}^2(qL/2)$ is the long-time limit of the cumulant series in $q$. Where is it singular? What does that say about the largest $q$ at which any truncated cumulant expansion can work at long times? Relate this to the complex zero of $E(G)$ of Chapter 2.
-    """, "4 · Diffraction")
+    """, "4 · Diffraction", why=r"""Diffraction minima give the pore size directly, without a model of the walls. This exercise shows how to read the size off the first minimum, and why the minimum washes out when sizes vary.""")
     return
 
 
@@ -951,7 +953,7 @@ def _(exercise):
     **(b)** Translate the rule into $b$-values for the running example at long times, and for free water ($D = 2$ µm²/ms) at short times. Why is the long-time limit not a statement about $b$ alone?
 
     **(c)** Does adding the fourth cumulant (dotted purple) extend the range? By how much, and what limits it?
-    """, "5 · Where the cumulants stop")
+    """, "5 · Where the cumulants stop", why=r"""Many analyses fit $D$ and $K$ over a range of $b$-values. This tells you up to which $b$ that is valid for a given pore size, so that the fit is not biased.""")
     return
 
 
@@ -1120,7 +1122,7 @@ def _(exercise):
     **(c)** The same sum with the Bessel weights of Chapter 1 gives $\frac7{96}R^4$ for a cylinder and $\frac8{175}R^4$ for a sphere ([Neuman 1974](https://doi.org/10.1063/1.1680931)). For the same $\gamma g$, $T$ and $D$, which of slab ($L = 2R$), cylinder and sphere attenuates most? Why does the comparison favour the slab?
 
     **(d)** Why is it called motional narrowing?
-    """, "6 · The long-pulse map")
+    """, "6 · The long-pulse map", why=r"""With long pulses, three regimes give three different signal laws. This exercise shows where the boundaries between them lie, so you know which law to use for a protocol.""")
     return
 
 
@@ -1172,7 +1174,7 @@ def _(exercise):
     **(b)** Why is the prefactor proportional to $\ell_g/L$?
 
     **(c)** For the running example with $\delta = \Delta = 20$ ms ($T = 40$ ms), from which $G$ on is the localisation law within 20% of the exact signal? How large is $E$ there? Use the cut panel, or the table in the answer.
-    """, "7 · Localisation")
+    """, "7 · Localisation", why=r"""At strong gradients the signal no longer falls as $g^2$ but as $g^{2/3}$: the localisation regime, now within reach of strong scanners. The scaling shows what sets the signal there and why it is so sensitive to the walls.""")
     return
 
 
@@ -1336,7 +1338,7 @@ def _(exercise):
     **(c)** Show that $H_2$ reduces to the narrow-pulse boundary $q\min(\ell_D, L)$ for $\delta\ll\ell^2/D$, and to $(\min(\ell_D, L)/\ell_g)^3$ for $\delta\gg\ell^2/D$.
 
     **(d)** Turn the result into a recipe of three steps that you could give a student who wants to fit a GPA-based model (for example an axon-diameter model) to data.
-    """, "8 · Testing a rule of thumb")
+    """, "8 · Testing a rule of thumb", why=r"""Rules of thumb decide in practice whether the GPA, and the models built on it, may be used. This exercise tests one against the exact answer and shows where it misleads.""")
     return
 
 
@@ -1426,7 +1428,7 @@ def _(exercise):
     **(b)** In the fast-diffusion regime, show that $1/T_{2,\text{surf}} = \rho\,S/V$ for any pore shape, by integrating $\partial m/\partial t = D\nabla^2m$ over the pore with an almost uniform $m$.
 
     **(c)** Why does the fast-diffusion regime give a single exponential? Read the weight of the slowest mode off the right panel at $\rho L/D = 0.04$ and at $\rho L/D = 100$.
-    """, "9 · Relaxing walls")
+    """, "9 · Relaxing walls", why=r"""Surface relaxation makes $T_2$ depend on $S/V$: the basis of NMR relaxometry in rocks, and a confound in tissue. This exercise gives the two regimes and shows when relaxation and diffusion can be told apart.""")
     return
 
 
@@ -1513,7 +1515,7 @@ def _(exercise):
     **(b)** In between, fit two exponentials to the highlighted curve by eye. Do the "apparent fractions" equal $p_1$ and $p_2$? What does that mean for a two-compartment model fitted at one $\Delta$?
 
     **(c)** For a slab compartment of width $L = 8$ µm with membranes of permeability $\kappa = 0.02$ µm/ms on both sides, compute the exit rate $k = \kappa S/V$ and the residence time $1/k$. Is the Kärger model justified ($\kappa L/D\ll1$)?
-    """, "10 · Exchange")
+    """, "10 · Exchange", why=r"""When water exchanges, the fractions fitted from a bi-exponential depend on the diffusion time. This exercise shows when the fitted fractions are the true ones and when they are not.""")
     return
 
 

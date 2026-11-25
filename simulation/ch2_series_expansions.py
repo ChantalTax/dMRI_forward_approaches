@@ -154,8 +154,10 @@ def _(mo, show_answers):
             return mo.callout(mo.md(f"**{title}**\n\n" + text), kind="success")
         return mo.accordion({f"▸ {title}": mo.md(text)})
 
-    def exercise(text, number):
-        return mo.callout(mo.md(f"### ✎ Exercise {number}\n\n" + text), kind="info")
+    def exercise(text, number, why=None):
+        """An exercise; `why` says what it is for, shown first."""
+        lead = f"*Why this exercise.* {why}\n\n" if why else ""
+        return mo.callout(mo.md(f"### ✎ Exercise {number}\n\n" + lead + text), kind="info")
 
     return answer, exercise, hint, maths
 
@@ -321,7 +323,7 @@ def _(exercise):
     **(c)** Why is it enough to know the first row and column of each matrix product at the very start and end, while the full matrices are needed in between?
 
     **(d)** Make $\Delta$ much longer than $\tau_1 = L^2/(\pi^2 D)$. Which factor in the product changes, and what does it do to the modes $n \ge 1$?
-    """, "1 · PGSE in three matrix exponentials")
+    """, "1 · PGSE in three matrix exponentials", why=r"""This is the matrix method in its simplest form, and the fastest exact way to compute a PGSE signal in a simple pore. Trying it with few modes shows how many are needed and how it fails when there are too few.""")
     return
 
 
@@ -446,7 +448,7 @@ def _(exercise):
     **(b)** Set the ramp time to its smallest value. Why does the staircase MCF then need hardly any steps?
 
     **(c)** Per step, the staircase MCF costs a matrix exponential and the multiple propagator two matrix–vector products. For $N$ modes, how do the costs scale? When would you still choose the staircase?
-    """, "2 · Two ways through a trapezoid")
+    """, "2 · Two ways through a trapezoid", why=r"""Real gradients have ramps and arbitrary shapes, so the signal has to be built up step by step. This exercise shows how the error depends on the step size, so you can choose the number of steps for a given accuracy.""")
     return
 
 
@@ -557,7 +559,7 @@ def _(exercise):
     **(b)** Use rule 2 for $L = 8$ µm, $D = 2$ µm²/ms and $G = 300$ mT/m: from which $N$ on is the last mode damped more strongly than it is dephased? Compare with the right-hand panel.
 
     **(c)** Raise $G$ to 600 mT/m. What happens to the error at fixed $N$, and to $\ell_g$? Which regime of the Chapter 1 length-scale table are you moving towards?
-    """, "3 · Why the couplings fall as 1/n²")
+    """, "3 · Why the couplings fall as 1/n²", why=r"""How fast the couplings fall decides how many modes you need at a given gradient strength. The result is a rule for choosing $N$ before running anything.""")
     return
 
 
@@ -653,7 +655,7 @@ def _(exercise):
 
     - Large pore (all $a\delta, a\Delta \ll 1$): you should recover free diffusion, $\langle\varphi^2\rangle_{\text{paths}} = 2bD$ with $b = \gamma^2G^2\delta^2(\Delta - \delta/3)$.
     - Small pore (all $a\delta \gg 1$): you should recover motional narrowing, $\ln E = -\gamma^2G^2L^4(2\delta)/(120D)$, the formula in the Chapter 1 length-scale table with $T = 2\delta$ the time the gradient is on.
-    """, "4 · The Gaussian phase approximation for a slab")
+    """, "4 · The Gaussian phase approximation for a slab", why=r"""The Gaussian phase approximation gives the closed formulas that many microstructure models (axon diameter, for one) are built on. Deriving it for a slab shows what it contains and what it assumes.""")
     return
 
 
@@ -745,7 +747,7 @@ def _(exercise):
     **(c)** For a finite number of modes, $E(G)$ is an **entire** function of $G$: a finite sum of exponentials, finite everywhere in the complex plane. It has a zero at $G^* \approx 463 + 20i$ mT/m. What does that imply for the cumulant series of $\ln E$ in powers of $G$?
 
     **(d)** Make the slab smaller ($L = 4$ µm). Where does the GPA fail now, and why?
-    """, "5 · When is the phase Gaussian?")
+    """, "5 · When is the phase Gaussian?", why=r"""Every model built on the GPA inherits its range of validity. This exercise maps where it holds and why it must fail at strong gradients, so you know when the closed formulas can be trusted.""")
     return
 
 
@@ -829,7 +831,7 @@ def _(exercise):
     **(b)** For $\delta = 10$ ms, compare $D_{\text{app}}$ with the displacement value at long $\Delta$. Is the apparent pore larger or smaller than the real one? Explain with the time-averaged position during a lobe.
 
     **(c)** Two groups report the kurtosis of the same tissue at the same $\Delta$, one with $\delta = 2$ ms, the other with $\delta = 10$ ms. Should they agree?
-    """, "6 · Kurtosis with finite pulses")
+    """, "6 · Kurtosis with finite pulses", why=r"""Real pulses are not short, and that changes the apparent diffusivity and kurtosis. This explains why two studies can report different values for the same tissue, and how to compare them.""")
     return
 
 
@@ -912,7 +914,7 @@ def _(exercise):
     **(b)** Show that the second-order term equals $-\langle\varphi^2\rangle_{\text{paths}}/2$ with $\langle\varphi^2\rangle_{\text{paths}}$ from Section 2.2. Use $\mathbf e_0^{\mathsf T}e^{-D\Lambda s} = \mathbf e_0^{\mathsf T}$ and $e^{-D\Lambda s}\mathbf e_0 = \mathbf e_0$.
 
     **(c)** For a finite number of modes, the series for $E = c_0(T)$ converges for every $G$, but the cumulant series for $\ln E$ does not. Explain the difference in one sentence. Which would you use to compute the signal at $G = 600$ mT/m in an 8 µm slab, and which to write down a model you can fit?
-    """, "7 · The second-order term is the GPA")
+    """, "7 · The second-order term is the GPA", why=r"""This links the two halves of the chapter: the exact matrix method and the cumulant expansion are the same series. Seeing it makes clear what the GPA leaves out.""")
     return
 
 
@@ -1190,7 +1192,7 @@ def _(exercise):
     **(d)** A DKI protocol on this sample goes up to $b = 2.5$ ms/µm². Is it inside the radius of convergence? How biased is the fitted kurtosis, and why is it biased even though the series converges there?
 
     **(e)** In the recipe, what goes wrong if the Cauchy circle encloses a zero? How could you turn that failure into a way of counting zeros?
-    """, "8 · The radius of convergence in practice")
+    """, "8 · The radius of convergence in practice", why=r"""A cumulant fit (diffusivity and kurtosis) can fail without warning beyond the radius of convergence. This exercise shows how to compute that limit for a given pore and sequence.""")
     return
 
 
