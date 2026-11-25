@@ -391,15 +391,15 @@ def _(mo):
 
     | Idea | Formula |
     | --- | --- |
-    | Bloch–Torrey | $\partial M/\partial t = \nabla\cdot(D\nabla M) - i\gamma\,g(t)\,x\,M$, $\ M(\mathbf x, 0) = 1$, $\ E = \frac1V\int M(\mathbf x, T)\,d\mathbf x$ (Eq. 1.33) |
+    | Bloch–Torrey | $\partial M/\partial t = \nabla\cdot(D\nabla M) - i\gamma\,g(t)\,x\,M$, $\ M(\mathbf x, 0) = 1$, $\ E = \frac1V\int M(\mathbf x, T)\,d\mathbf x$ (Eq. 1.35) |
     | Wall and interface conditions | impermeable: $D\,\partial M/\partial n = 0$; membrane: continuous flux $= \kappa\times$ jump in $M$; relaxing wall: $D\,\partial M/\partial n + \rho M = 0$ |
-    | The full problem (Ch 1) | compartments $\Omega_n$ with $D_n$, $T_{2,n}$ and spin density $\rho_n$; reflecting outer boundary; on a membrane $\Gamma_{nm}$ continuous flux $= \kappa_{nm}(c_{nm}M_m - c_{mn}M_n)$, $\ c_{nm} = 2\rho_n/(\rho_n + \rho_m)$; the gradient $f(t)\,\mathbf g$ (Eq. 1.34) |
-    | Weak form (Ch 1) | $\int w\,\partial_tM + \int D\nabla w\cdot\nabla M + i\gamma g\int w\,x\,M = \oint wD\,\partial_nM$ for every $w$; walls natural; modes as test functions give Chapter 2 (Eq. 1.35) |
+    | The full problem (Ch 1) | compartments $\Omega_n$ with $D_n$, $T_{2,n}$ and spin density $\rho_n$; reflecting outer boundary; on a membrane $\Gamma_{nm}$ continuous flux $= \kappa_{nm}(c_{nm}M_m - c_{mn}M_n)$, $\ c_{nm} = 2\rho_n/(\rho_n + \rho_m)$; the gradient $f(t)\,\mathbf g$ (Eq. 1.36) |
+    | Weak form (Ch 1) | $\int w\,\partial_tM + \int D\nabla w\cdot\nabla M + i\gamma g\int w\,x\,M = \oint wD\,\partial_nM$ for every $w$; walls natural; modes as test functions give Chapter 2 (Eq. 1.37) |
     | Averages (Ch 1) | the subscript says over what: $\langle f\rangle_{x,x_0}$ over start (uniform) and end, $\langle f\rangle_{\text{paths}}$ over whole random paths |
     | Matrix method (Ch 2) | $d\mathbf c/dt = -(D\Lambda + i\gamma g(t)\mathbf B)\,\mathbf c$ in the eigenmodes: $\Lambda$ diagonal, $\mathbf B$ dense (Eq. 2.2) |
-    | Length scales | $\ell_D = \sqrt{Dt}$, $\ \ell_g = (D/\gamma g)^{1/3}$, phase wavelength $2\pi/q$ (Eq. 1.40) |
+    | Length scales | $\ell_D = \sqrt{Dt}$, $\ \ell_g = (D/\gamma g)^{1/3}$, phase wavelength $2\pi/q$ (Eq. 1.42) |
     | Tortuosity (Ch 3) | membranes with spacing $L$: $1/D_\infty = 1/D + 1/(\kappa L)$ (Eq. 3.10) |
-    | Exchange mode (Ch 1) | slab $[-a, a]$, membrane at 0: slowest odd mode from $k\tan(ka) = 2\kappa/D$, rate $Dk^2\approx4\kappa/L$ (Eq. 1.30) |
+    | Exchange mode (Ch 1) | slab $[-a, a]$, membrane at 0: slowest odd mode from $k\tan(ka) = 2\kappa/D$, rate $Dk^2\approx4\kappa/L$ (Eq. 1.32) |
 
     **Refresh first**
 
@@ -990,7 +990,7 @@ def _(mo):
 
     ## ① Start from the weak form
 
-    Chapter 1 wrote the Bloch–Torrey equation in weak form, Eq. (1.35): for every test function $w$,
+    Chapter 1 wrote the Bloch–Torrey equation in weak form, Eq. (1.37): for every test function $w$,
 
     $$\int_\Omega w\,\partial_tM + \int_\Omega D\,\nabla w\cdot\nabla M + i\gamma g\int_\Omega w\,x\,M = \oint_{\partial\Omega}w\,D\,\partial_nM\,dS .\tag{4.8}$$
 
@@ -1024,7 +1024,7 @@ def _(mo):
 
     ## ④ The full system: compartments, relaxation and membranes
 
-    With several compartments, each gets its own set of hat functions, living only on the elements of that compartment. A node on an interface $\Gamma_{nm}$ is therefore **doubled**: one copy belongs to $\Omega_n$, the other to $\Omega_m$, so that $M$ can jump across the membrane (⑥ shows it in 1D). Put all nodal values in one vector $\boldsymbol\xi$ and write $\varphi_k$ for the hat function of node $k$. The weak form of the full problem of Chapter 1, Eqs. (1.34)–(1.35), then gives
+    With several compartments, each gets its own set of hat functions, living only on the elements of that compartment. A node on an interface $\Gamma_{nm}$ is therefore **doubled**: one copy belongs to $\Omega_n$, the other to $\Omega_m$, so that $M$ can jump across the membrane (⑥ shows it in 1D). Put all nodal values in one vector $\boldsymbol\xi$ and write $\varphi_k$ for the hat function of node $k$. The weak form of the full problem of Chapter 1, Eqs. (1.36)–(1.37), then gives
 
     $$\boldsymbol{\mathcal M}\,\frac{d\boldsymbol\xi}{dt} = -\big(\mathbf S + \mathbf R + \mathbf Q + i\gamma f(t)\,\mathbf J(\mathbf g)\big)\,\boldsymbol\xi,\qquad \xi_k(0) = \rho_n\ \text{ for every node } k \text{ of } \Omega_n .\tag{4.11}$$
 

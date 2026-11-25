@@ -296,39 +296,21 @@ def _(mo):
 
     Let $C(\mathbf x,t)$ be the concentration of tagged water molecules. Two ingredients give the diffusion equation:
 
-    1. **Conservation.** Molecules are not created or destroyed. What leaves a small volume must flow out through its surface.
-    2. **Fick's law.** The flux points downhill, from high to low concentration: $\mathbf J = -D\nabla C$.
+    **① Conservation.** Molecules are not created or destroyed, so the amount in a small volume only changes by what flows through its surface (derivation in the panel below). Per unit volume:
 
-    Together they give
+    $$\frac{\partial C}{\partial t} = -\nabla\cdot\mathbf J .\tag{1.1}$$
 
-    $$\boxed{\ \frac{\partial C}{\partial t} = D\,\nabla^2 C\ }.\tag{1.1}$$
+    → $\mathbf J$ is the **flux**: molecules per unit area per unit time. Where more flows out than in, $\nabla\cdot\mathbf J > 0$ and the concentration drops.
 
-    **Two propagators: a known start, and a uniform start.** The **propagator** $P(\mathbf x\mid\mathbf x_0,t)$ is the probability density of finding a molecule at $\mathbf x$ at time $t$, given that it started at $\mathbf x_0$. Molecules do not interact, so it is just as well the share of many molecules, all released together at $\mathbf x_0$, that are at $\mathbf x$ at time $t$. One molecule or many makes no difference; what matters is that they all start at the same known point. It is one particular solution of the diffusion equation. Put a single molecule at $\mathbf x_0$, so $C(\mathbf x, 0) = \delta(\mathbf x - \mathbf x_0)$, and solve with the wall conditions of the domain:
+    **② Fick's law.** The flux points downhill, from high to low concentration:
 
-    $$\boxed{\ P(\mathbf x\mid\mathbf x_0,t) = C(\mathbf x,t)\quad\text{for}\quad C(\mathbf x,0) = \delta(\mathbf x - \mathbf x_0)\ }\tag{1.2}$$
+    $$\mathbf J = -D\,\nabla C .\tag{1.2}$$
 
-    → Every other start is a sum of point sources, so one propagator solves the equation for every initial condition: $C(\mathbf x,t) = \int P(\mathbf x\mid\mathbf x_0,t)\,C(\mathbf x_0,0)\,d\mathbf x_0$.
+    **③ Combine.** Insert Eq. (1.2) into Eq. (1.1): $\partial C/\partial t = \nabla\cdot(D\nabla C)$. For uniform $D$ this is the **diffusion equation**
 
-    In tissue the molecules do not start at one point. They start spread over the domain with a density $\rho(\mathbf x_0)$, molecules per volume, $N = \int_\Omega\rho\,d\mathbf x_0$ in total. Then we ask only how far each one moved: the **displacement** $\mathbf r = \mathbf x - \mathbf x_0$. Its probability density is the **ensemble-average propagator**: the propagator for a move by $\mathbf r$, averaged over the starting points, each weighted by how many molecules start there:
+    $$\boxed{\ \frac{\partial C}{\partial t} = D\,\nabla^2 C\ }.\tag{1.3}$$
 
-    $$\boxed{\ \bar P(\mathbf r,t) = \frac1N\int_\Omega\rho(\mathbf x_0)\,P(\mathbf x_0 + \mathbf r\mid\mathbf x_0,t)\,d\mathbf x_0 = \frac1N\iint\rho(\mathbf x_0)\,\delta\big(\mathbf r - (\mathbf x - \mathbf x_0)\big)\,P(\mathbf x\mid\mathbf x_0,t)\,d\mathbf x\,d\mathbf x_0\ }\tag{1.3}$$
-
-    The two forms are the same: the second counts every pair of start and end points whose difference is $\mathbf r$, and integrating out $\mathbf x$ against the delta function sets $\mathbf x = \mathbf x_0 + \mathbf r$, which gives the first.
-
-    → **Uniform start.** At equilibrium in one pore the density is the same everywhere, $\rho(\mathbf x_0) = \rho$ (the initial condition below). Then $N = \rho V$, the density cancels, and
-
-    $$\boxed{\ \bar P(\mathbf r,t) = \frac1V\int_V P(\mathbf x_0 + \mathbf r\mid\mathbf x_0,t)\,d\mathbf x_0\ }\tag{1.4}$$
-
-    This is the form used in this course unless a start density is given. With several compartments at different densities, $\rho$ is constant within each compartment, $\rho_n$, and Eq. (1.3) weights the compartments by $\rho_nV_n$.
-
-    | | $P(\mathbf x\mid\mathbf x_0,t)$ | $\bar P(\mathbf r,t)$ |
-    | --- | --- | --- |
-    | describes | molecules from a known start $\mathbf x_0$ (one, or many released together) | molecules starting with density $\rho(\mathbf x_0)$ over the domain (uniform in most of this course) |
-    | variable | where the molecule ends up, $\mathbf x$ | how far each molecule moved, $\mathbf r = \mathbf x - \mathbf x_0$ |
-    | averages taken with it | $\langle\cdot\rangle_{\mathbf x\mid\mathbf x_0}$ | $\langle\cdot\rangle_{\mathbf x,\mathbf x_0}$ |
-    | without walls | $G(r,t)$, the same for every start | $G(r,t)$ as well |
-
-    → Without walls every start is equivalent, so the propagator depends only on the displacement, and the two are the same function: the free Gaussian $G(r,t)$ of Exercise 1, Eq. (1.6). With walls, $P$ depends on where the molecule starts, and $\bar P$ averages that dependence away. Both are built from the eigenmodes of the pore, Eq. (1.15) (next sections, Exercise 2).
+    → Keep the form $\nabla\cdot(D\nabla C)$ in mind: it is the one to use when $D$ differs between compartments.
 
     [Fick (1855)](https://doi.org/10.1002/andp.18551700105) proposed the flux law by analogy with Fourier's law of heat conduction (Fourier 1822): the same equation describes heat, with temperature for $C$ and conductivity for $D$.
     """)
@@ -340,16 +322,47 @@ def _(maths):
     maths(r"""
     ⇒ Take any fixed volume $V$ with surface $S$ and outward normal $\mathbf n$. The amount inside changes only by flow through the surface:
 
-    $$\frac{d}{dt}\int_V C\,dV = -\oint_S \mathbf J\cdot\mathbf n\,dS .\tag{1.5}$$
+    $$\frac{d}{dt}\int_V C\,dV = -\oint_S \mathbf J\cdot\mathbf n\,dS .\tag{1.4}$$
+
+    ⇒ The volume is fixed, so the time derivative moves inside: $\frac{d}{dt}\int_V C\,dV = \int_V \frac{\partial C}{\partial t}\,dV$.
 
     ⇒ The divergence theorem turns the surface integral into a volume integral: $\oint_S \mathbf J\cdot\mathbf n\,dS = \int_V \nabla\cdot\mathbf J\,dV$.
 
-    ⇒ This holds for *every* volume $V$, so the integrands must be equal: $\partial C/\partial t = -\nabla\cdot\mathbf J$.
+    ⇒ So $\int_V\left(\frac{\partial C}{\partial t} + \nabla\cdot\mathbf J\right)dV = 0$ for *every* volume $V$, however small. That is only possible if the integrand itself is zero: $\partial C/\partial t = -\nabla\cdot\mathbf J$, Eq. (1.1). ✓
+    """, title="Conservation: from a volume to a point")
+    return
 
-    ⇒ Insert Fick's law: $\partial C/\partial t = \nabla\cdot(D\nabla C)$. For uniform $D$ this is $D\nabla^2 C$.
 
-    → Keep the form $\nabla\cdot(D\nabla C)$ in mind: it is the one to use when $D$ differs between compartments.
-    """, title="Derivation in four steps")
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    **Two propagators: a known start, and a uniform start.** The **propagator** $P(\mathbf x\mid\mathbf x_0,t)$ is the probability density of finding a molecule at $\mathbf x$ at time $t$, given that it started at $\mathbf x_0$. Molecules do not interact, so it is just as well the share of many molecules, all released together at $\mathbf x_0$, that are at $\mathbf x$ at time $t$. One molecule or many makes no difference; what matters is that they all start at the same known point. It is one particular solution of the diffusion equation. Put a single molecule at $\mathbf x_0$, so $C(\mathbf x, 0) = \delta(\mathbf x - \mathbf x_0)$, and solve with the wall conditions of the domain:
+
+    $$\boxed{\ P(\mathbf x\mid\mathbf x_0,t) = C(\mathbf x,t)\quad\text{for}\quad C(\mathbf x,0) = \delta(\mathbf x - \mathbf x_0)\ }\tag{1.5}$$
+
+    → Every other start is a sum of point sources, so one propagator solves the equation for every initial condition: $C(\mathbf x,t) = \int P(\mathbf x\mid\mathbf x_0,t)\,C(\mathbf x_0,0)\,d\mathbf x_0$.
+
+    In tissue the molecules do not start at one point. They start spread over the domain with a density $\rho(\mathbf x_0)$, molecules per volume, $N = \int_\Omega\rho\,d\mathbf x_0$ in total. Then we ask only how far each one moved: the **displacement** $\mathbf r = \mathbf x - \mathbf x_0$. Its probability density is the **ensemble-average propagator**: the propagator for a move by $\mathbf r$, averaged over the starting points, each weighted by how many molecules start there:
+
+    $$\boxed{\ \bar P(\mathbf r,t) = \frac1N\int_\Omega\rho(\mathbf x_0)\,P(\mathbf x_0 + \mathbf r\mid\mathbf x_0,t)\,d\mathbf x_0 = \frac1N\iint\rho(\mathbf x_0)\,\delta\big(\mathbf r - (\mathbf x - \mathbf x_0)\big)\,P(\mathbf x\mid\mathbf x_0,t)\,d\mathbf x\,d\mathbf x_0\ }\tag{1.6}$$
+
+    The two forms are the same: the second counts every pair of start and end points whose difference is $\mathbf r$, and integrating out $\mathbf x$ against the delta function sets $\mathbf x = \mathbf x_0 + \mathbf r$, which gives the first.
+
+    → **Uniform start.** At equilibrium in one pore the density is the same everywhere, $\rho(\mathbf x_0) = \rho$ (the initial condition below). Then $N = \rho V$, the density cancels, and
+
+    $$\boxed{\ \bar P(\mathbf r,t) = \frac1V\int_V P(\mathbf x_0 + \mathbf r\mid\mathbf x_0,t)\,d\mathbf x_0\ }\tag{1.7}$$
+
+    This is the form used in this course unless a start density is given. With several compartments at different densities, $\rho$ is constant within each compartment, $\rho_n$, and Eq. (1.6) weights the compartments by $\rho_nV_n$.
+
+    | | $P(\mathbf x\mid\mathbf x_0,t)$ | $\bar P(\mathbf r,t)$ |
+    | --- | --- | --- |
+    | describes | molecules from a known start $\mathbf x_0$ (one, or many released together) | molecules starting with density $\rho(\mathbf x_0)$ over the domain (uniform in most of this course) |
+    | variable | where the molecule ends up, $\mathbf x$ | how far each molecule moved, $\mathbf r = \mathbf x - \mathbf x_0$ |
+    | averages taken with it | $\langle\cdot\rangle_{\mathbf x\mid\mathbf x_0}$ | $\langle\cdot\rangle_{\mathbf x,\mathbf x_0}$ |
+    | without walls | $G(r,t)$, the same for every start | $G(r,t)$ as well |
+
+    → Without walls every start is equivalent, so the propagator depends only on the displacement, and the two are the same function: the free Gaussian $G(r,t)$ of Exercise 1, Eq. (1.8). With walls, $P$ depends on where the molecule starts, and $\bar P$ averages that dependence away. Both are built from the eigenmodes of the pore, Eq. (1.17) (next sections, Exercise 2).
+    """)
     return
 
 
@@ -358,13 +371,19 @@ def _(exercise):
     exercise(r"""
     Without walls (1D), a molecule that starts at $x_0$ is found at time $t$ at $x$ with probability density
 
-    $$\boxed{\ P(x\mid x_0,t) = G(r,t) = \frac{1}{\sqrt{4\pi Dt}}\exp\!\left(-\frac{r^2}{4Dt}\right),\qquad r = x - x_0\ }\tag{1.6}$$
+    $$\boxed{\ P(x\mid x_0,t) = G(r,t) = \frac{1}{\sqrt{4\pi Dt}}\exp\!\left(-\frac{r^2}{4Dt}\right),\qquad r = x - x_0\ }\tag{1.8}$$
 
     It depends only on the displacement $r$, not on where the molecule started: without walls every start is equivalent. So $G$ is also the ensemble-average propagator, $\bar P(r,t) = G(r,t)$.
 
-    **(a)** Check that $G$ solves the diffusion equation, $\partial G/\partial t = D\,\partial^2 G/\partial r^2$ (the same as $D\,\partial^2/\partial x^2$ for fixed $x_0$), and that it starts as a point: $G(r,t)\to\delta(r)$ as $t\to0$ (it keeps unit area while its width shrinks to zero).
+    **(a)** Check that $G$ solves the diffusion equation, $\partial G/\partial t = D\,\partial^2 G/\partial r^2$ (the same as $D\,\partial^2/\partial x^2$ for fixed $x_0$).
 
-    **(b)** Show that the variance of the displacement is $\langle r^2\rangle_{x\mid x_0} = \langle (x - x_0)^2\rangle_{x\mid x_0} = 2Dt$.
+    **(b)** Check that it starts as a point: $G(r,t)\to\delta(r)$ as $t\to0$, so it has the initial condition of Eq. (1.5). The **Dirac delta** $\delta(r)$ is not an ordinary function but is defined by what it does under an integral. It has three properties:
+
+    (i) $\delta(r) = 0$ for $r\neq0$; (ii) $\int_{-\infty}^{\infty}\delta(r)\,dr = 1$; (iii) $\int_{-\infty}^{\infty}f(r)\,\delta(r)\,dr = f(0)$ for every smooth function $f$.
+
+    Property (iii) is the actual definition; (i) and (ii) are the picture: an infinitely narrow spike of unit area. Check each for $G$ as $t\to0$.
+
+    **(c)** Show that the mean displacement is zero and that its variance is $\langle r^2\rangle_{x\mid x_0} = \langle (x - x_0)^2\rangle_{x\mid x_0} = 2Dt$.
     """, "1 · The free Gaussian")
     return
 
@@ -372,9 +391,11 @@ def _(exercise):
 @app.cell(hide_code=True)
 def _(hint):
     hint(r"""
-    (a) Write $G = (4\pi D t)^{-1/2} e^{-u}$ with $u = r^2/(4Dt)$, and differentiate the prefactor and the exponent separately.
+    (a) Write $G = A(t)\,e^{-u}$ with prefactor $A = (4\pi D t)^{-1/2}$ and exponent $u = r^2/(4Dt)$. Use the product rule, and the chain rule $\partial e^{-u} = -e^{-u}\,\partial u$.
 
-    (b) Compare $G$ with a normal distribution $\frac{1}{\sqrt{2\pi\sigma^2}}e^{-r^2/2\sigma^2}$ and read off $\sigma^2$.
+    (b) Substitute $r = \sqrt{4Dt}\,v$, so $dr = \sqrt{4Dt}\,dv$, and use the Gaussian integral $\int_{-\infty}^{\infty}e^{-v^2}dv = \sqrt\pi$.
+
+    (c) For a probability density $P(r)$, the **mean** is $\langle r\rangle = \int r\,P(r)\,dr$ and the **variance** is the mean squared distance from the mean: $\operatorname{Var}(r) = \langle(r - \langle r\rangle)^2\rangle = \int(r - \langle r\rangle)^2P(r)\,dr = \langle r^2\rangle - \langle r\rangle^2$. Here $P = G$, and the average is over end points for a fixed start, $\langle\cdot\rangle_{x\mid x_0}$. Use the same substitution as in (b), and $\int_{-\infty}^{\infty}v^2e^{-v^2}dv = \frac{\sqrt\pi}2$.
     """)
     return
 
@@ -382,13 +403,35 @@ def _(hint):
 @app.cell(hide_code=True)
 def _(answer):
     answer(r"""
-    **(a)** ⇒ Time derivative: $\dfrac{\partial G}{\partial t} = G\left(-\dfrac{1}{2t} + \dfrac{r^2}{4Dt^2}\right)$.
+    **(a)** Write $G = A\,e^{-u}$, $A = (4\pi Dt)^{-1/2}$, $u = r^2/(4Dt)$.
 
-    ⇒ Space derivatives: $\dfrac{\partial G}{\partial r} = -\dfrac{r}{2Dt}G$, and $\dfrac{\partial^2 G}{\partial r^2} = G\left(\dfrac{r^2}{4D^2t^2} - \dfrac{1}{2Dt}\right)$.
+    ⇒ Prefactor: $A = (4\pi D)^{-1/2}\,t^{-1/2}$, so $\dfrac{\partial A}{\partial t} = -\dfrac12(4\pi D)^{-1/2}\,t^{-3/2} = -\dfrac{A}{2t}$.
 
-    ⇒ Multiply the second by $D$: $D\,\partial^2 G/\partial r^2 = G\left(\dfrac{r^2}{4Dt^2} - \dfrac{1}{2t}\right)$, which is $\partial G/\partial t$. ✓ For fixed $x_0$, $\partial/\partial r = \partial/\partial x$, so this is the diffusion equation in $x$.
+    ⇒ Exponent: $\dfrac{\partial u}{\partial t} = -\dfrac{r^2}{4Dt^2}$, so $\dfrac{\partial e^{-u}}{\partial t} = -e^{-u}\dfrac{\partial u}{\partial t} = \dfrac{r^2}{4Dt^2}\,e^{-u}$.
 
-    **(b)** $G$ is a normal distribution in $r$ with $2\sigma^2 = 4Dt$, so $\langle r^2\rangle_{x\mid x_0} = \sigma^2 = 2Dt$ (per axis; $\langle\lvert\mathbf r\rvert^2\rangle = 6Dt$ in 3D).
+    ⇒ Product rule: $\dfrac{\partial G}{\partial t} = \dfrac{\partial A}{\partial t}e^{-u} + A\dfrac{\partial e^{-u}}{\partial t} = G\left(-\dfrac{1}{2t} + \dfrac{r^2}{4Dt^2}\right)$.
+
+    ⇒ First space derivative: $A$ does not depend on $r$, and $\dfrac{\partial u}{\partial r} = \dfrac{2r}{4Dt} = \dfrac{r}{2Dt}$, so $\dfrac{\partial G}{\partial r} = -A\,e^{-u}\dfrac{\partial u}{\partial r} = -\dfrac{r}{2Dt}\,G$.
+
+    ⇒ Second space derivative, product rule on $-\dfrac{r}{2Dt}\cdot G$: $\dfrac{\partial^2 G}{\partial r^2} = -\dfrac{1}{2Dt}\,G - \dfrac{r}{2Dt}\dfrac{\partial G}{\partial r} = -\dfrac{1}{2Dt}\,G + \dfrac{r^2}{4D^2t^2}\,G$.
+
+    ⇒ Multiply by $D$: $D\,\dfrac{\partial^2 G}{\partial r^2} = G\left(\dfrac{r^2}{4Dt^2} - \dfrac{1}{2t}\right) = \dfrac{\partial G}{\partial t}$. ✓
+
+    → For fixed $x_0$, $r = x - x_0$ gives $\partial r/\partial x = 1$, so $\partial/\partial r = \partial/\partial x$: this is the diffusion equation in $x$.
+
+    **(b)** ⇒ (i) For $r\neq0$: the prefactor grows as $t^{-1/2}$, but the exponential $e^{-r^2/4Dt}$ falls faster than any power of $t$. Write $s = 1/t$: $\sqrt s\,e^{-r^2s/4D}\to0$ as $s\to\infty$. So $G\to0$. ✓ (At $r = 0$, $G = (4\pi Dt)^{-1/2}\to\infty$: the spike.)
+
+    ⇒ (ii) Substitute $r = \sqrt{4Dt}\,v$: $\int G\,dr = \int\dfrac{1}{\sqrt{4\pi Dt}}\,e^{-v^2}\sqrt{4Dt}\,dv = \dfrac{1}{\sqrt\pi}\int e^{-v^2}dv = 1$ at every $t$, so also in the limit. ✓
+
+    ⇒ (iii) The same substitution: $\int f(r)\,G\,dr = \dfrac{1}{\sqrt\pi}\int f\big(\sqrt{4Dt}\,v\big)\,e^{-v^2}dv$. As $t\to0$ the argument $\sqrt{4Dt}\,v\to0$ for every $v$, so $f(\sqrt{4Dt}\,v)\to f(0)$ and the integral $\to f(0)\cdot\frac{1}{\sqrt\pi}\sqrt\pi = f(0)$. ✓
+
+    → $G(r,0) = \delta(r)$, i.e. $C(x,0) = \delta(x - x_0)$: with (a), $G$ is the propagator of Eq. (1.5) for a domain without walls.
+
+    **(c)** ⇒ Mean: $G$ is even in $r$, so $r\,G$ is odd and $\langle r\rangle_{x\mid x_0} = \int r\,G\,dr = 0$. The variance is therefore just $\langle r^2\rangle_{x\mid x_0}$.
+
+    ⇒ With $r = \sqrt{4Dt}\,v$: $\langle r^2\rangle_{x\mid x_0} = \int r^2G\,dr = 4Dt\cdot\dfrac{1}{\sqrt\pi}\int v^2e^{-v^2}dv = 4Dt\cdot\dfrac12 = 2Dt$. ✓
+
+    → Shortcut: $G$ is a normal distribution $\frac{1}{\sqrt{2\pi\sigma^2}}e^{-r^2/2\sigma^2}$ with $2\sigma^2 = 4Dt$, whose variance is $\sigma^2 = 2Dt$. This is per axis; in 3D, $\langle\lvert\mathbf r\rvert^2\rangle = 6Dt$.
 
     → This is the same $\sqrt{2Dt}$ spread you get from a random walk. The equation for the *concentration* and the random walk of *one molecule* describe the same thing. [Einstein (1905)](https://doi.org/10.1002/andp.19053220806) made exactly this link, deriving $\langle r^2\rangle = 2Dt$ from the random motion of suspended particles. Part 1b builds on exactly that.
     """)
@@ -425,7 +468,7 @@ def _(C_ALT, C_MAIN, mo, np, plt, rw_D, rw_n, rw_t):
 
     _fig, (_a1, _a2) = plt.subplots(1, 2, figsize=(10, 3.7))
     # left: histogram against the Gaussian
-    _xx = np.linspace(-4.5 * _sig, 4.5 * _sig, 400)
+    _xx = np.linspace(-35, 35, 800)                 # fixed axis: the spread is visible as t or D changes
     _G = np.exp(-_xx**2 / (4 * _D * _t)) / np.sqrt(4 * np.pi * _D * _t)
     if _n <= 5:
         _vals, _cnt = np.unique(np.round(_x / _a).astype(int), return_counts=True)
@@ -434,7 +477,7 @@ def _(C_ALT, C_MAIN, mo, np, plt, rw_D, rw_n, rw_t):
         _edges = np.arange(-(_n + 1) * _a, (_n + 1.01) * _a, 2 * _a)   # one bin per lattice site (sites are 2a apart)
         _a1.hist(_x, bins=_edges, density=True, color=C_MAIN, alpha=0.55, label="walkers")
     _a1.plot(_xx, _G, color=C_ALT, lw=2, label="G(r, t)")
-    _a1.set(xlabel="displacement r = x − x₀ (µm)", ylabel="density (1/µm)", xlim=(-4.5 * _sig, 4.5 * _sig), title=f"Displacements at t = {_t:g} ms, n = {_n}")
+    _a1.set(xlabel="displacement r = x − x₀ (µm)", ylabel="density (1/µm)", xlim=(-35, 35), title=f"Displacements at t = {_t:g} ms, n = {_n}")
     _a1.legend(frameon=False, fontsize=8, loc="upper right")
 
     # middle: variance against time
@@ -575,11 +618,11 @@ def _(mo):
 
     Put the pieces together. In every compartment the molecules diffuse with their own diffusivity, starting from their own equilibrium density:
 
-    $$\boxed{\ \frac{\partial C_n}{\partial t} = \nabla\cdot(D_n\nabla C_n)\ \text{ in }\Omega_n,\qquad C_n(\mathbf x,0) = \rho_n\ },\tag{1.7}$$
+    $$\boxed{\ \frac{\partial C_n}{\partial t} = \nabla\cdot(D_n\nabla C_n)\ \text{ in }\Omega_n,\qquad C_n(\mathbf x,0) = \rho_n\ },\tag{1.9}$$
 
     with a reflecting outer edge, $D_n\,\partial C_n/\partial n = 0$ on $\Gamma_n$, and on every membrane $\Gamma_{nm}$
 
-    $$D_n\frac{\partial C_n}{\partial n_n} = -D_m\frac{\partial C_m}{\partial n_m} = \kappa_{nm}\big(c_{nm}C_m - c_{mn}C_n\big),\qquad c_{nm} = \frac{2\rho_n}{\rho_n + \rho_m} .\tag{1.8}$$
+    $$D_n\frac{\partial C_n}{\partial n_n} = -D_m\frac{\partial C_m}{\partial n_m} = \kappa_{nm}\big(c_{nm}C_m - c_{mn}C_n\big),\qquad c_{nm} = \frac{2\rho_n}{\rho_n + \rho_m} .\tag{1.10}$$
 
     → **Why the factors $c_{nm}$?** Compartments can hold different amounts of water at equilibrium, $\rho_n\ne\rho_m$. The plain condition $\kappa(C_m - C_n)$ would then drive a flux even at equilibrium and slowly even out the two densities, which real tissue does not do. The factors make the equilibrium state, $C_n = \rho_n$ in every compartment, a state without flux: $c_{nm}\rho_m - c_{mn}\rho_n = 0$ (check it). For equal densities $c_{nm} = 1$, and the condition is the one in the table.
 
@@ -595,7 +638,7 @@ def _(mo):
 
     Put the diffusion equation in a bounded domain $\Omega$: one pore, or several compartments joined by membranes, with any of the interface and boundary conditions of the tables above. Some concentration patterns keep their **shape** and only fade in amplitude. These are the **eigenmodes** $u_n(\mathbf x)$ of the domain. Any initial concentration can be written as a sum of eigenmodes, and each one fades at its own rate:
 
-    $$\boxed{\ C(\mathbf x,t) = \sum_n c_n\, u_n(\mathbf x)\, e^{-D\lambda_n t}, \qquad -\nabla^2 u_n = \lambda_n u_n \ \text{in } \Omega, \qquad \text{with the same wall and interface conditions as } C\ }.\tag{1.9}$$
+    $$\boxed{\ C(\mathbf x,t) = \sum_n c_n\, u_n(\mathbf x)\, e^{-D\lambda_n t}, \qquad -\nabla^2 u_n = \lambda_n u_n \ \text{in } \Omega, \qquad \text{with the same wall and interface conditions as } C\ }.\tag{1.11}$$
 
     The derivation below shows why the conditions on $C$ carry over to every $u_n$ unchanged. For the reflecting walls of most of this chapter, that is $\partial u_n/\partial n = 0$.
 
@@ -612,11 +655,11 @@ def _(maths):
     maths(r"""
     ⇒ **Try a product.** Guess $C(\mathbf x,t)=u(\mathbf x)\,T(t)$ and put it in $\partial C/\partial t = D\nabla^2 C$:
 
-    $$u\,T' = D\,T\,\nabla^2 u .\tag{1.10}$$
+    $$u\,T' = D\,T\,\nabla^2 u .\tag{1.12}$$
 
     ⇒ **Separate.** Divide by $D\,u\,T$:
 
-    $$\frac{T'}{D\,T} = \frac{\nabla^2 u}{u}.\tag{1.11}$$
+    $$\frac{T'}{D\,T} = \frac{\nabla^2 u}{u}.\tag{1.13}$$
 
     The left side depends only on $t$, the right only on $\mathbf x$. Both must equal the same constant; call it $-\lambda$.
 
@@ -624,7 +667,7 @@ def _(maths):
 
     ⇒ **Space part, and this is where the boundary conditions go in:** $-\nabla^2 u = \lambda u$. Every wall and interface condition in the tables above is **linear and homogeneous**: a combination of $C$ and its normal derivative set equal to zero. Put $C = u\,T$ into one of them, for example the absorbing wall:
 
-    $$D\frac{\partial C}{\partial n} + \varrho\,C = T(t)\Big[D\frac{\partial u}{\partial n} + \varrho\,u\Big] = 0\quad\text{for all } t\quad\Longrightarrow\quad D\frac{\partial u}{\partial n} + \varrho\,u = 0 .\tag{1.12}$$
+    $$D\frac{\partial C}{\partial n} + \varrho\,C = T(t)\Big[D\frac{\partial u}{\partial n} + \varrho\,u\Big] = 0\quad\text{for all } t\quad\Longrightarrow\quad D\frac{\partial u}{\partial n} + \varrho\,u = 0 .\tag{1.14}$$
 
     $T(t)$ drops out, and $u$ inherits exactly the condition of $C$:
 
@@ -642,17 +685,17 @@ def _(maths):
 
     ⇒ **The eigenvalues.** The equation $-\nabla^2u = \lambda u$ has a nonzero solution that obeys these conditions only for special values $\lambda_n$: the eigenvalues. The conditions decide which values (Exercise 2 for a reflecting slab, the recipe before Exercise 10 for membranes and absorbing walls). They are never negative: multiply by $u$, integrate, and use Green's identity,
 
-    $$\lambda\int_\Omega u^2\,d\mathbf x = \int_\Omega\lvert\nabla u\rvert^2\,d\mathbf x + \frac\varrho D\oint_{\text{absorbing walls}}u^2\,dS + \frac\kappa D\oint_{\text{membranes}}(u^- - u^+)^2\,dS\ \ge0 .\tag{1.13}$$
+    $$\lambda\int_\Omega u^2\,d\mathbf x = \int_\Omega\lvert\nabla u\rvert^2\,d\mathbf x + \frac\varrho D\oint_{\text{absorbing walls}}u^2\,dS + \frac\kappa D\oint_{\text{membranes}}(u^- - u^+)^2\,dS\ \ge0 .\tag{1.15}$$
 
     Each term is zero exactly when its effect is absent: no gradient inside, no absorbing wall, no jump across a membrane. So $\lambda_0 = 0$ needs a constant mode and walls that lose nothing.
 
     ⇒ **Superpose.** The equation is linear, so any sum of such products is again a solution. The eigenmodes are orthonormal, $\int_\Omega u_m u_n\,d\mathbf x = \delta_{mn}$. (Green's identity again: $(\lambda_m - \lambda_n)\int u_mu_n$ is a sum of boundary terms, and they cancel because both modes obey the same homogeneous conditions.) So the coefficients follow from the initial condition by projection:
 
-    $$c_n = \int_\Omega u_n(\mathbf x)\,C(\mathbf x,0)\,d\mathbf x .\tag{1.14}$$
+    $$c_n = \int_\Omega u_n(\mathbf x)\,C(\mathbf x,0)\,d\mathbf x .\tag{1.16}$$
 
     ⇒ **Point source.** Start with one molecule at $\mathbf x_0$: $C(\mathbf x,0) = \delta(\mathbf x - \mathbf x_0)$. Then $c_n = u_n(\mathbf x_0)$, and the solution is the **propagator**, the probability density of being at $\mathbf x$ at time $t$ after starting at $\mathbf x_0$:
 
-    $$\boxed{\ P(\mathbf x\mid\mathbf x_0,t) = \sum_n u_n(\mathbf x)\,u_n(\mathbf x_0)\,e^{-D\lambda_n t}\ }.\tag{1.15}$$
+    $$\boxed{\ P(\mathbf x\mid\mathbf x_0,t) = \sum_n u_n(\mathbf x)\,u_n(\mathbf x_0)\,e^{-D\lambda_n t}\ }.\tag{1.17}$$
 
     → Why a point source if molecules start everywhere? Because every other start is a sum of point sources: $C(\mathbf x,t) = \int P(\mathbf x|\mathbf x_0,t)\,C(\mathbf x_0,0)\,d\mathbf x_0$. One propagator serves all initial conditions.
     """, title="Derivation: separation of variables")
@@ -878,11 +921,11 @@ def _(exercise):
     exercise(r"""
     Molecules start **uniformly** in the slab. The mean-squared displacement averages over where each molecule starts *and* where it ends,
 
-    $$\langle (x - x_0)^2\rangle_{x,x_0} = \frac1L\int_0^L\!\!\int_0^L (x - x_0)^2\,P(x\mid x_0,t)\,dx\,dx_0 .\tag{1.16}$$
+    $$\langle (x - x_0)^2\rangle_{x,x_0} = \frac1L\int_0^L\!\!\int_0^L (x - x_0)^2\,P(x\mid x_0,t)\,dx\,dx_0 .\tag{1.18}$$
 
     Using the propagator, show that
 
-    $$\langle (x - x_0)^2\rangle_{x,x_0}(t) = \frac{L^2}{6} - \frac{16L^2}{\pi^4}\sum_{n\ \text{odd}}\frac{e^{-D(n\pi/L)^2 t}}{n^4},\tag{1.17}$$
+    $$\langle (x - x_0)^2\rangle_{x,x_0}(t) = \frac{L^2}{6} - \frac{16L^2}{\pi^4}\sum_{n\ \text{odd}}\frac{e^{-D(n\pi/L)^2 t}}{n^4},\tag{1.19}$$
 
     and that it tends to $L^2/6$ at long times. (In the random-walk notebook the walkers between two walls levelled off at $L^2/6$. Here is where that number comes from.)
     """, "4 · Mean-squared displacement in a slab")
@@ -953,7 +996,7 @@ def _(mo):
 
     The MSD needed the integrals $\int x\,u_n\,dx$. They are the first row of a matrix that every later chapter uses: the **position written in the mode basis**,
 
-    $$\boxed{\ B_{nm} = \int u_n(x)\;x\;u_m(x)\,dx\ },\tag{1.18}$$
+    $$\boxed{\ B_{nm} = \int u_n(x)\;x\;u_m(x)\,dx\ },\tag{1.20}$$
 
     with $x$ measured from the centre of the pore. Like the eigenvalues $\lambda_n$, it depends only on the geometry. Some of its properties hold for any pore, others only for special shapes:
 
@@ -982,7 +1025,7 @@ def _(exercise):
 
     **(d)** Show that for $n, m \ge 1$
 
-    $$B_{nm} = \frac{L}{\pi^2}\left[\frac{(-1)^{n-m}-1}{(n-m)^2} + \frac{(-1)^{n+m}-1}{(n+m)^2}\right].\tag{1.19}$$
+    $$B_{nm} = \frac{L}{\pi^2}\left[\frac{(-1)^{n-m}-1}{(n-m)^2} + \frac{(-1)^{n+m}-1}{(n+m)^2}\right].\tag{1.21}$$
     """, "5 · The position in the mode basis")
     return
 
@@ -1078,7 +1121,7 @@ def _(maths):
 
     **Cylinder.** Write $u = F(s)\,\Theta(\theta)\,Z(z)$ in $-\nabla^2u = \lambda u$, with the Laplacian in cylindrical coordinates (notation section). For the modes of the cross-section $Z$ is constant. $\Theta$ must come back to itself after one turn, so $\Theta = \cos m\theta$ or $\sin m\theta$ with $m = 0, 1, 2, \dots$ What is left for the radial part $F$:
 
-    $$s^2F'' + s\,F' + \big(\lambda s^2 - m^2\big)F = 0 .\tag{1.20}$$
+    $$s^2F'' + s\,F' + \big(\lambda s^2 - m^2\big)F = 0 .\tag{1.22}$$
 
     ⇒ With $y = \sqrt\lambda\,s$ this is **Bessel's equation**. Its solution that stays finite at the centre is $J_m(\sqrt\lambda\,s)$. (The second solution, $Y_m$, blows up at $s = 0$; it returns in an annulus, where the centre is not part of the domain.)
 
@@ -1088,7 +1131,7 @@ def _(maths):
 
     **Orthogonality.** Modes with different $m$ are orthogonal through the angle: $\int_0^{2\pi}\cos m\theta\cos m'\theta\,d\theta = 0$. Modes with the same $m$ and different roots are orthogonal through the radial coordinate, **with weight $s$**:
 
-    $$\int_0^R J_m\Big(\frac{\alpha_{mk}s}{R}\Big)\,J_m\Big(\frac{\alpha_{mk'}s}{R}\Big)\,s\,ds = 0\qquad (k\ne k').\tag{1.21}$$
+    $$\int_0^R J_m\Big(\frac{\alpha_{mk}s}{R}\Big)\,J_m\Big(\frac{\alpha_{mk'}s}{R}\Big)\,s\,ds = 0\qquad (k\ne k').\tag{1.23}$$
 
     → The weight is the $s\,ds$ of the area element, so this is ordinary orthogonality, $\int u\,u'\,dA = 0$. It follows from the same integration by parts as for the slab (Exercise 2c), because the radial equation can be written $(sF')' - \frac{m^2}sF = -\lambda\,s\,F$. For the sphere the weight is $s^2$.
     """, title="Where the Bessel functions come from")
@@ -1223,13 +1266,13 @@ def _(mo):
 
     **Modes on the circle.** With arc length $\ell = R\phi$, the eigenproblem is $-u'' = \lambda u$ with $u$ periodic:
 
-    $$u_0 = \frac{1}{\sqrt{2\pi R}},\qquad u_n = \frac{\cos n\phi}{\sqrt{\pi R}},\ \frac{\sin n\phi}{\sqrt{\pi R}},\qquad \lambda_n = \frac{n^2}{R^2}\quad(n\ge1,\ \text{each twice}).\tag{1.22}$$
+    $$u_0 = \frac{1}{\sqrt{2\pi R}},\qquad u_n = \frac{\cos n\phi}{\sqrt{\pi R}},\ \frac{\sin n\phi}{\sqrt{\pi R}},\qquad \lambda_n = \frac{n^2}{R^2}\quad(n\ge1,\ \text{each twice}).\tag{1.24}$$
 
     The slowest decay time is $\tau_1 = R^2/D$, about 3.4 times longer than for the inside of a disk of the same radius ($0.295\,R^2/D$): a molecule on the rim cannot cut across, it has to go around.
 
     **Concentric layers.** The walls between layers are impermeable, so the modes of the whole sheath are simply the modes of each circle, and every layer keeps its own uniform mode (the $\kappa = 0$ case of the next section). A uniform start puts in layer $i$ a share of the molecules proportional to its circumference, and anything summed over the sheath is a weighted sum over the layers:
 
-    $$w_i = \frac{R_i}{\sum_j R_j}.\tag{1.23}$$
+    $$w_i = \frac{R_i}{\sum_j R_j}.\tag{1.25}$$
 
     The layers are evenly spaced between the inner radius (the axon) and the outer radius; in the 2025 simulations they are 7.5 nm apart, roughly a 4–5 nm lipid bilayer plus about 3 nm of water. Outer layers hold more water, so a sheath-averaged quantity leans towards the outer radius. The 2025 paper summarises the sheath by the radius-weighted mean $\sum_i w_i R_i = \sum_i R_i^2/\sum_i R_i$. Chapter 2 uses the modes of one cylindrical surface again ([Canales-Rodríguez, Tax et al. 2026](https://doi.org/10.1088/1361-6560/aeb2a0)).
 
@@ -1327,17 +1370,17 @@ def _(mo):
     mo.md(r"""
     ## Beyond the mean-squared displacement: cumulants of the displacement
 
-    The MSD is one number per time. The ensemble-average propagator $\bar P(r,t)$ of Eqs. (1.3)–(1.4) holds the whole **distribution of displacements** $r = x - x_0$ over all molecules, starting uniformly.
+    The MSD is one number per time. The ensemble-average propagator $\bar P(r,t)$ of Eqs. (1.6)–(1.7) holds the whole **distribution of displacements** $r = x - x_0$ over all molecules, starting uniformly.
 
     A compact way to describe a distribution is by its **cumulants** $\kappa_n$: the mean ($\kappa_1$, zero here by symmetry), the variance ($\kappa_2 = \langle r^2\rangle_{x,x_0}$), and then the shape ($\kappa_4 = \langle r^4\rangle_{x,x_0} - 3\langle r^2\rangle_{x,x_0}^2$ for a symmetric distribution). In 1D define
 
-    $$\boxed{\ D(t) = \frac{\langle r^2\rangle_{x,x_0}}{2t},\qquad K(t) = \frac{\kappa_4}{\kappa_2^2} = \frac{\langle r^4\rangle_{x,x_0}}{\langle r^2\rangle_{x,x_0}^2} - 3\ }.\tag{1.24}$$
+    $$\boxed{\ D(t) = \frac{\langle r^2\rangle_{x,x_0}}{2t},\qquad K(t) = \frac{\kappa_4}{\kappa_2^2} = \frac{\langle r^4\rangle_{x,x_0}}{\langle r^2\rangle_{x,x_0}^2} - 3\ }.\tag{1.26}$$
 
     $D(t)$ is the apparent diffusivity of the mean-squared-displacement figure. $K(t)$, the **excess kurtosis**, measures how far the shape is from a Gaussian. Free diffusion is Gaussian at every time, so $K = 0$ (Exercise 8a): **any nonzero $K$ comes from the geometry.**
 
     **The characteristic function** holds all moments and cumulants at once. For a probability density $p(r)$ it is the Fourier transform,
 
-    $$\boxed{\ \phi(\xi) = \langle e^{i\xi r}\rangle = \int e^{i\xi r}\,p(r)\,dr\ }\tag{1.25}$$
+    $$\boxed{\ \phi(\xi) = \langle e^{i\xi r}\rangle = \int e^{i\xi r}\,p(r)\,dr\ }\tag{1.27}$$
 
     with $\xi$ the Fourier variable, a wavenumber in 1/µm.
 
@@ -1347,7 +1390,7 @@ def _(mo):
 
     ⇒ Its logarithm holds the cumulants. For molecules starting uniformly, $p = \bar P(r,t)$ and the average is over start and end:
 
-    $$\boxed{\ \ln\big\langle e^{i\xi r}\big\rangle_{x,x_0} = \sum_{n\ge1}\frac{(i\xi)^n}{n!}\,\kappa_n = -\frac{\xi^2}{2}\langle r^2\rangle_{x,x_0} + \frac{\xi^4}{24}\,\kappa_4 - \dots\ }\tag{1.26}$$
+    $$\boxed{\ \ln\big\langle e^{i\xi r}\big\rangle_{x,x_0} = \sum_{n\ge1}\frac{(i\xi)^n}{n!}\,\kappa_n = -\frac{\xi^2}{2}\langle r^2\rangle_{x,x_0} + \frac{\xi^4}{24}\,\kappa_4 - \dots\ }\tag{1.28}$$
 
     (For molecules from a known start $x_0$, $p = P(x_0 + r\mid x_0, t)$ and the average is $\langle\cdot\rangle_{x\mid x_0}$.) A Gaussian stops at $\xi^2$, so all its cumulants beyond the variance vanish (Exercise 8a).
 
@@ -1367,7 +1410,7 @@ def _(maths):
 
     ⇒ The coefficients of $y$, $y^2$, $y^3$ follow from integrating by parts. With $k_n = n\pi/L$:
 
-    $$y_n = -\frac{2\sqrt2\,L^{3/2}}{(n\pi)^2}\ (n\ \text{odd}),\qquad (y^2)_n = \frac{2\sqrt2\,L^{5/2}}{(n\pi)^2}\ (n\ \text{even} \ge 2),\qquad (y^3)_n = \sqrt2\,L^{7/2}\Big[-\frac{3}{2(n\pi)^2} + \frac{12}{(n\pi)^4}\Big]\ (n\ \text{odd}),\tag{1.27}$$
+    $$y_n = -\frac{2\sqrt2\,L^{3/2}}{(n\pi)^2}\ (n\ \text{odd}),\qquad (y^2)_n = \frac{2\sqrt2\,L^{5/2}}{(n\pi)^2}\ (n\ \text{even} \ge 2),\qquad (y^3)_n = \sqrt2\,L^{7/2}\Big[-\frac{3}{2(n\pi)^2} + \frac{12}{(n\pi)^4}\Big]\ (n\ \text{odd}),\tag{1.29}$$
 
     and zero otherwise; for $n=0$ only $(y^2)_0 = L^{5/2}/12$ survives.
 
@@ -1501,7 +1544,7 @@ def _(mo):
 
     The exact result holds for every pore shape with smooth walls ([Mitra, Sen, Schwartz & Le Doussal, *Phys. Rev. Lett.* 68:3555, 1992](https://doi.org/10.1103/PhysRevLett.68.3555)):
 
-    $$\boxed{\ \frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t)\qquad\text{in } d \text{ dimensions}\ }.\tag{1.28}$$
+    $$\boxed{\ \frac{D(t)}{D} = 1 - \frac{4}{3\sqrt\pi\,d}\,\frac SV\,\sqrt{Dt} + O(t)\qquad\text{in } d \text{ dimensions}\ }.\tag{1.30}$$
 
     | Pore | $S/V$ | $d$ | $D(t)/D$ at short times |
     | --- | --- | --- | --- |
@@ -1585,7 +1628,7 @@ def _(exercise):
 
     (i) Show that the surface pool holds a fraction $f\approx\ell_D\,S/V$ of the water.
 
-    (ii) Suppose the surface pool loses a fraction $\beta$ of its mean-squared displacement. Show that $D(t)/D\approx1 - \beta\,(S/V)\sqrt{Dt}$: the form of Eq. (1.28).
+    (ii) Suppose the surface pool loses a fraction $\beta$ of its mean-squared displacement. Show that $D(t)/D\approx1 - \beta\,(S/V)\sqrt{Dt}$: the form of Eq. (1.30).
 
     (iii) A wall only stops motion along its normal, one of the $d$ directions. Estimate $\beta$ if a molecule in the layer loses half of its motion along the normal, and compare with the exact $4/(3\sqrt\pi\,d)$. Use the figure.
 
@@ -1690,7 +1733,7 @@ def _(maths):
 
     ① **Solve piece by piece.** On each piece $D$ is constant and $-u'' = \lambda u$, so with $k = \sqrt\lambda$
 
-    $$u = A_1\cos kx + B_1\sin kx\ \ (x < 0),\qquad u = A_2\cos kx + B_2\sin kx\ \ (x > 0).\tag{1.29}$$
+    $$u = A_1\cos kx + B_1\sin kx\ \ (x < 0),\qquad u = A_2\cos kx + B_2\sin kx\ \ (x > 0).\tag{1.31}$$
 
     Four unknowns, $A_1, B_1, A_2, B_2$, and one eigenvalue to find.
 
@@ -1823,7 +1866,7 @@ def _(exercise):
 
         **(b)** For the odd modes, try $u = \cos k(a - x)$ for $x>0$ and $u = -\cos k(a + x)$ for $x<0$. Use the membrane condition to show that
 
-        $$k\tan(ka) = \frac{2\kappa}{D}.\tag{1.30}$$
+        $$k\tan(ka) = \frac{2\kappa}{D}.\tag{1.32}$$
 
         **(c)** Check the limits $\kappa\to 0$ and $\kappa\to\infty$ against what you expect.
 
@@ -1897,7 +1940,7 @@ def _(mo):
 
     ⇒ Keep track of the characteristic function separately for the molecules that are in compartment $i$ at time $t$, $f_i(\xi,t)$. Diffusion inside and hopping between give a linear system (Exercise 11b):
 
-    $$\boxed{\ \frac{d\mathbf f}{dt} = -\big(\xi^2\mathbf D + \mathbf K\big)\,\mathbf f,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},\quad \mathbf f(0) = \mathbf p\ },\tag{1.31}$$
+    $$\boxed{\ \frac{d\mathbf f}{dt} = -\big(\xi^2\mathbf D + \mathbf K\big)\,\mathbf f,\qquad \mathbf D = \begin{pmatrix}D_1&0\\0&D_2\end{pmatrix},\quad \mathbf K = \begin{pmatrix}k_1&-k_2\\-k_1&k_2\end{pmatrix},\quad \mathbf f(0) = \mathbf p\ },\tag{1.33}$$
 
     so that $\langle e^{i\xi r}\rangle_{x,x_0} = (1,1)\,e^{-(\xi^2\mathbf D + \mathbf K)t}\,\mathbf p$. (Bold $\mathbf K$ is the matrix of rates; italic $K$ stays the kurtosis.)
 
@@ -2012,7 +2055,7 @@ def _(exercise):
 
     **(d)** Given its history, a molecule's displacement is Gaussian with variance $2Y$, where $Y = \int_0^tD(t')\,dt'$. Show that $K(t) = 3\,\mathrm{Var}(Y)/(\bar Dt)^2$. Then use the correlation of a two-state switch, $\langle(D(t') - \bar D)(D(t'') - \bar D)\rangle_{\text{paths}} = p_1p_2(D_1 - D_2)^2e^{-\lvert t' - t''\rvert/\tau_{\text{ex}}}$, to derive
 
-    $$K(t) = K_0\,\frac{2\big(x - 1 + e^{-x}\big)}{x^2},\qquad x = \frac{t}{\tau_{\text{ex}}},\qquad K_0 = \frac{3p_1p_2(D_1 - D_2)^2}{\bar D^2}.\tag{1.32}$$
+    $$K(t) = K_0\,\frac{2\big(x - 1 + e^{-x}\big)}{x^2},\qquad x = \frac{t}{\tau_{\text{ex}}},\qquad K_0 = \frac{3p_1p_2(D_1 - D_2)^2}{\bar D^2}.\tag{1.34}$$
 
     **(e)** With the sliders: at which $t/\tau_{\text{ex}}$ has $K$ dropped to half of $K_0$? Does it depend on $p_1$? How does $K$ fall at long times, and what would you measure over a range of times to tell exchange from restriction (Exercise 8)?
     """, "11 · Two compartments that exchange")
@@ -2178,7 +2221,7 @@ def _(mo):
 
     Precession alone turns each arrow at its own rate: $\partial m/\partial t = -i\gamma\,\mathbf g(t)\cdot\mathbf x\,m$. The spins also diffuse, and magnetization is carried with them exactly like the concentration in 1a. [Torrey (1956)](https://doi.org/10.1103/PhysRev.104.563) added the two effects to [Bloch's (1946)](https://doi.org/10.1103/PhysRev.70.460) equations:
 
-    $$\boxed{\ \frac{\partial m}{\partial t} = D\,\nabla^2 m \;-\; i\gamma\,\mathbf g(t)\cdot\mathbf x\; m\ }\qquad m(\mathbf x,0) = \rho,\qquad \frac{\partial m}{\partial n}=0 \text{ on impermeable interfaces}.\tag{1.33}$$
+    $$\boxed{\ \frac{\partial m}{\partial t} = D\,\nabla^2 m \;-\; i\gamma\,\mathbf g(t)\cdot\mathbf x\; m\ }\qquad m(\mathbf x,0) = \rho,\qquad \frac{\partial m}{\partial n}=0 \text{ on impermeable interfaces}.\tag{1.35}$$
 
     - **Diffusion** smooths phase differences out; the **gradient** winds them up. Every regime in this course is a contest between those two.
     - $\mathbf g(t)$ is the effective gradient, so the 180° pulse is already in the equation.
@@ -2193,9 +2236,9 @@ def _(mo):
     mo.md(r"""
     ### The full problem every simulator solves
 
-    The magnetization lives in the same compartments, with the same conditions, as the concentration in 1a (Eqs. 1.7–1.8); the block of tissue $\Omega$ is now the imaging voxel, or a piece of it. Two things are added: the gradient, and relaxation, which can differ between compartments. With the gradient written as $\mathbf g(t) = f(t)\,\mathbf g$ (for PGSE, $f = +1$ during the first lobe and $-1$ during the second, once the 180° pulse is folded in), each compartment obeys
+    The magnetization lives in the same compartments, with the same conditions, as the concentration in 1a (Eqs. 1.9–1.10); the block of tissue $\Omega$ is now the imaging voxel, or a piece of it. Two things are added: the gradient, and relaxation, which can differ between compartments. With the gradient written as $\mathbf g(t) = f(t)\,\mathbf g$ (for PGSE, $f = +1$ during the first lobe and $-1$ during the second, once the 180° pulse is folded in), each compartment obeys
 
-    $$\boxed{\ \frac{\partial m_n}{\partial t} = \nabla\cdot(D_n\nabla m_n) - \frac{m_n}{T_{2,n}} - i\gamma f(t)\,(\mathbf g\cdot\mathbf x)\,m_n\ \text{ in }\Omega_n,\qquad m_n(\mathbf x,0) = \rho_n\ },\tag{1.34}$$
+    $$\boxed{\ \frac{\partial m_n}{\partial t} = \nabla\cdot(D_n\nabla m_n) - \frac{m_n}{T_{2,n}} - i\gamma f(t)\,(\mathbf g\cdot\mathbf x)\,m_n\ \text{ in }\Omega_n,\qquad m_n(\mathbf x,0) = \rho_n\ },\tag{1.36}$$
 
     | Where | Condition | Meaning |
     | --- | --- | --- |
@@ -2214,7 +2257,7 @@ def _(mo):
 
     ① **Uniform $T_2$:** relaxation then multiplies the signal by $e^{-T/T_2}$, which cancels in $E$ (Exercise 12). Drop the $T_2$ term.
     ② **Equal densities:** $c_{nm} = 1$; with $\rho = 1$ the start is $m = 1$.
-    ③ **One compartment:** impermeable interfaces, so each pore is solved on its own. This is Eq. (1.33).
+    ③ **One compartment:** impermeable interfaces, so each pore is solved on its own. This is Eq. (1.35).
 
     → Each step is a statement about the tissue, and each can be false: compartments do relax differently (Exercise 12), and membranes do leak. Chapters 4 and 5 are how to find out what a simplification costs.
     """)
@@ -2257,7 +2300,7 @@ def _(mo):
 
     ⇒ Integrate the diffusion term by parts (Green's identity). Half of the derivatives move onto $w$, and a boundary term appears:
 
-    $$\boxed{\ \int_\Omega w\,\partial_tm\,d\mathbf x + \int_\Omega D\,\nabla w\cdot\nabla m\,d\mathbf x + i\gamma f(t)\int_\Omega w\,(\mathbf g\cdot\mathbf x)\,m\,d\mathbf x = \oint_{\partial\Omega}w\,D\,\frac{\partial m}{\partial n}\,dS\qquad\text{for every } w\ }.\tag{1.35}$$
+    $$\boxed{\ \int_\Omega w\,\partial_tm\,d\mathbf x + \int_\Omega D\,\nabla w\cdot\nabla m\,d\mathbf x + i\gamma f(t)\int_\Omega w\,(\mathbf g\cdot\mathbf x)\,m\,d\mathbf x = \oint_{\partial\Omega}w\,D\,\frac{\partial m}{\partial n}\,dS\qquad\text{for every } w\ }.\tag{1.37}$$
 
     This is the **weak form**. It needs only first derivatives of $m$, so $m$ may have kinks, which the equation itself would not allow.
 
@@ -2351,11 +2394,11 @@ def _(mo):
 
     Follow single spins. Each spin random-walks along its own path $\mathbf x(t)$ (reflected at walls, as in 1a) and gathers its own phase
 
-    $$\boxed{\ \varphi = \gamma\int_0^T \mathbf g(t)\cdot\mathbf x(t)\,dt\ }.\tag{1.36}$$
+    $$\boxed{\ \varphi = \gamma\int_0^T \mathbf g(t)\cdot\mathbf x(t)\,dt\ }.\tag{1.38}$$
 
     The voxel contains so many spins that the signal is the **average phase factor** over all possible paths, starting from uniformly spread positions:
 
-    $$\boxed{\ E = \big\langle e^{-i\varphi}\big\rangle_{\text{paths}}\ }.\tag{1.37}$$
+    $$\boxed{\ E = \big\langle e^{-i\varphi}\big\rangle_{\text{paths}}\ }.\tag{1.39}$$
 
     In the language of probability: the signal is the **characteristic function** of the random phase. Chapter 5 (Monte Carlo) works this way.
 
@@ -2363,11 +2406,11 @@ def _(mo):
 
     **Short pulses: the distribution of displacements.** Make both lobes so short that the spins hardly move during them. The first lobe gives each spin the phase $\mathbf q\cdot\mathbf x(0)$ and the second takes away $\mathbf q\cdot\mathbf x(\Delta)$, so $\varphi = -\mathbf q\cdot\mathbf r$ with $\mathbf r$ the displacement of 1a over the time $\Delta$. Then
 
-    $$\boxed{\ E = \big\langle e^{i\mathbf q\cdot\mathbf r}\big\rangle_{\mathbf x,\mathbf x_0}\ },\tag{1.38}$$
+    $$\boxed{\ E = \big\langle e^{i\mathbf q\cdot\mathbf r}\big\rangle_{\mathbf x,\mathbf x_0}\ },\tag{1.40}$$
 
-    the characteristic function of the displacements of 1a, Eq. (1.25), with the Fourier variable $\xi$ set by the gradient: $\xi = q$. Its logarithm has the cumulants of 1a as coefficients, so in this limit $D(t)$ and $K(t)$ are what diffusion and kurtosis imaging estimate. Chapter 3 maps where the limit holds; Chapter 2 shows what changes when the pulses are not short.
+    the characteristic function of the displacements of 1a, Eq. (1.27), with the Fourier variable $\xi$ set by the gradient: $\xi = q$. Its logarithm has the cumulants of 1a as coefficients, so in this limit $D(t)$ and $K(t)$ are what diffusion and kurtosis imaging estimate. Chapter 3 maps where the limit holds; Chapter 2 shows what changes when the pulses are not short.
 
-    **The two routes agree.** The average phase factor of Eq. (1.37) gives exactly the same $E$ as integrating the solution of the Bloch–Torrey equation (1.33). This is an example of the **Feynman–Kac relation** between parabolic PDEs and averages over random paths. [Carr & Purcell (1954)](https://doi.org/10.1103/PhysRev.94.630) already computed echo attenuation this way, as an average phase over random walks; the general relation is due to [Kac (1949)](https://doi.org/10.1090/S0002-9947-1949-0027960-X), inspired by [Feynman's (1948)](https://doi.org/10.1103/RevModPhys.20.367) path integrals. You can derive it yourself in a few lines.
+    **The two routes agree.** The average phase factor of Eq. (1.39) gives exactly the same $E$ as integrating the solution of the Bloch–Torrey equation (1.33). This is an example of the **Feynman–Kac relation** between parabolic PDEs and averages over random paths. [Carr & Purcell (1954)](https://doi.org/10.1103/PhysRev.94.630) already computed echo attenuation this way, as an average phase over random walks; the general relation is due to [Kac (1949)](https://doi.org/10.1090/S0002-9947-1949-0027960-X), inspired by [Feynman's (1948)](https://doi.org/10.1103/RevModPhys.20.367) path integrals. You can derive it yourself in a few lines.
     """)
     return
 
@@ -2377,7 +2420,7 @@ def _(exercise):
     exercise(r"""
     Work in 1D, in a slab with a constant-in-space gradient $g(t)$ along $x$. Define the **phase-weighted density of walkers**
 
-    $$w(x,t) = \Big\langle e^{-i\varphi_t}\;\delta\big(x - x(t)\big)\Big\rangle_{\text{paths}} ,\qquad \varphi_t = \gamma\int_0^t g(t')r_{t'}\,dt' ,\tag{1.39}$$
+    $$w(x,t) = \Big\langle e^{-i\varphi_t}\;\delta\big(x - x(t)\big)\Big\rangle_{\text{paths}} ,\qquad \varphi_t = \gamma\int_0^t g(t')r_{t'}\,dt' ,\tag{1.41}$$
 
     where $x(t)$ is the position of a walker at time $t$. In words: count the walkers that are at $x$ at time $t$, each one weighted by its current phase factor.
 
@@ -2481,7 +2524,7 @@ def _(maths):
 
     ⇒ From the second, $t = 1/(\gamma g\ell)$. Put it in the first: $\ell^2 = D/(\gamma g\ell)$, so
 
-    $$\boxed{\ \ell_g = \left(\frac{D}{\gamma g}\right)^{1/3},\qquad \tau_g = \frac{\ell_g^2}{D}\ }.\tag{1.40}$$
+    $$\boxed{\ \ell_g = \left(\frac{D}{\gamma g}\right)^{1/3},\qquad \tau_g = \frac{\ell_g^2}{D}\ }.\tag{1.42}$$
 
     → The same length from the table: $\ell_D = \sqrt{DT}$ grows with $T$ and $\ell_q = 1/(\gamma gT)$ shrinks. They are equal at $T = \tau_g$, and there both equal $\ell_g$ (Exercise 15a).
 
