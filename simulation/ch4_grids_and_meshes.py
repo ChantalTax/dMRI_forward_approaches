@@ -435,7 +435,7 @@ def _(mo):
 
     → In the mode basis diffusion is diagonal and the gradient couples every mode. On a grid the gradient is diagonal and diffusion couples neighbours. Same equation, opposite trade-off: modes are compact for simple shapes, grids and meshes work for any shape.
 
-    → After this step, solving the PDE means two separate choices: how to cut **space** (sections 4a–4c) and how to step in **time** (section 4a ④).
+    → After this step, solving the PDE means two separate choices: how to cut **space** (Sections 4.1–4.3) and how to step in **time** (Section 4.1.4).
 
     The figure shows the three ways of storing the same magnetization: a slab profile at the end of a short, strong gradient lobe, rebuilt from $n$ unknowns.
     """)
@@ -515,9 +515,9 @@ def _(answer):
 
     → A piecewise-constant function differs from a smooth one by about $h\,\lvert M'\rvert$ in each cell: error $\propto h$. Linear interpolation between nodes leaves the curvature, about $h^2\lvert M''\rvert/8$: error $\propto h^2$. The modes converge as fast as the smoothness of the mirrored profile allows (Jackson, Chapter 2): algebraically, with a high power.
 
-    → The finite-difference *solver* is still second order (section 4a): it computes cell values that are accurate to $O(h^2)$ at the cell centres. The first-order error here is only in drawing those values as flat steps.
+    → The finite-difference *solver* is still second order (Section 4.1): it computes cell values that are accurate to $O(h^2)$ at the cell centres. The first-order error here is only in drawing those values as flat steps.
 
-    **(d)** ⇒ Nobody knows the eigenmodes of a neuron. They have to be computed first, on a mesh, which is a finite-element problem (section 4b ⑦). This is exactly what SpinDoctor's matrix formalism does.
+    **(d)** ⇒ Nobody knows the eigenmodes of a neuron. They have to be computed first, on a mesh, which is a finite-element problem (Section 4.2.7). This is exactly what SpinDoctor's matrix formalism does.
     """)
     return
 
@@ -526,9 +526,9 @@ def _(answer):
 def _(mo):
     mo.md(r"""
     ---
-    # 4a · Finite differences
+    # 4.1 · Finite differences
 
-    ## ① The grid, and the Laplacian as a flux balance
+    ## 4.1.1 The grid, and the Laplacian as a flux balance
 
     Cut the pore into cells of width $h$, with one value $M_i$ at each cell centre $x_i$. Think of $M_i$ as the amount of magnetization in cell $i$, divided by its volume. Diffusion only moves magnetization between neighbouring cells, through the faces between them.
 
@@ -542,7 +542,7 @@ def _(mo):
 
     → Writing the scheme as a flux balance (a **finite-volume** view) has two advantages. Magnetization is conserved exactly, because every flux leaves one cell and enters the next. And every kind of wall becomes a rule for the flux through one face.
 
-    ## ② Walls, membranes and relaxing walls as face rules
+    ## 4.1.2 Walls, membranes and relaxing walls as face rules
 
     Each face gets a **conductance** $c$, so that the flux is $c$ times the difference across it. In matrix form $d\mathbf M/dt = -\mathbf A\mathbf M$, a face between cells $i$ and $j$ adds $c/h$ to $A_{ii}$ and $A_{jj}$, and $-c/h$ to $A_{ij}$ and $A_{ji}$.
 
@@ -556,7 +556,7 @@ def _(mo):
 
     → All the rules come from one idea: **resistances in series**. Between two cell centres the flux passes half a cell, perhaps a membrane, and another half cell. Their resistances $h/2D$, $1/\kappa$, $h/2D$ add. This is the same reasoning as the tortuosity formula of Chapter 3.
 
-    ## ③ The gradient
+    ## 4.1.3 The gradient
 
     The gradient term is local: each cell dephases at its own rate. It adds $i\gamma g(t)x_i$ to $A_{ii}$, a diagonal matrix. Relaxation is just as local: a cell in compartment $n$ gets an extra $1/T_{2,n}$ on the diagonal. Without relaxation, assembled:
 
@@ -564,7 +564,7 @@ def _(mo):
 
     **Recipe**
 
-    ① Choose $h$ (see 4d) and place the cell centres.
+    ① Choose $h$ (see Section 4.4) and place the cell centres.
     ② Give every face its conductance: bulk, wall, membrane or relaxing wall.
     ③ Assemble $\mathbf A$ and $\mathrm{diag}(x_i)$, start from $\mathbf M = 1$.
     ④ Step in time (next section) through the gradient waveform.
@@ -620,7 +620,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## ④ Stepping in time
+    ## 4.1.4 Stepping in time
 
     The ODE system $d\mathbf M/dt = -\mathbf A_g\mathbf M$, with $\mathbf A_g = \mathbf A + i\gamma g\,\mathrm{diag}(x)$, is stepped with one of three classic one-step methods:
 
@@ -721,7 +721,7 @@ def _(mo):
     mo.md(r"""
     **What the right panel says.** Explicit Euler needs 30 000 steps at $\delta t = 0.1\,h^2/2D$ for an error of $2\times10^{-5}$, and the error only halves when $\delta t$ halves. Crank–Nicolson takes steps 20 times *larger* than the explicit limit ($\delta t = 0.2$ ms, 150 steps) and is still 5 times more accurate ($4\times10^{-6}$). Implicit Euler is stable at any step but, being first order, is the least accurate of the three at large steps. Each Crank–Nicolson step costs a sparse solve instead of a product, but in 1D that is cheap.
 
-    → So why do GPU codes such as MATI step explicitly? In 3D a sparse solve is expensive and hard to parallelise, while an explicit step is the same small stencil for every voxel. Millions of voxels updated independently, many times, can beat fewer but sequential solves (section 4d).
+    → So why do GPU codes such as MATI step explicitly? In 3D a sparse solve is expensive and hard to parallelise, while an explicit step is the same small stencil for every voxel. Millions of voxels updated independently, many times, can beat fewer but sequential solves (Section 4.4).
 
     **A trap for explicit Euler: the phase term.** For the gradient alone, one explicit step multiplies $M_i$ by $1 - i\gamma gx_i\,\delta t$, whose modulus is $\sqrt{1 + (\gamma gx_i\delta t)^2} > 1$. Diffusion damps the fast patterns, but the uniform pattern is not damped, and its magnitude creeps up by about $\exp\big(\frac12(\gamma gx)^2\,\delta t\,T\big)$ over the sequence. A common cure is to apply the phase exactly, $M_i\to M_i\,e^{-i\gamma gx_i\delta t}$, and diffusion explicitly: an operator split, as in Chapter 2. That is the update of the next section.
     """)
@@ -775,7 +775,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## ⑤ The matrix form used by GPU codes: jump probabilities
+    ## 4.1.5 The matrix form used by GPU codes: jump probabilities
 
     Write one explicit Euler step of the flux balance cell by cell, leaving the gradient out for a moment:
 
@@ -785,9 +785,9 @@ def _(mo):
 
     ⇒ One number per face holds everything about the structure: the diffusivity, a membrane ($c = 1/(h/D + 1/\kappa)$), a wall ($s = 0$), a change of $D$. The structure enters only through these numbers, which are computed once, before the simulation starts. A Monte Carlo simulation instead meets the structure again in every step of every walker (Chapter 5).
 
-    ⇒ The probability to stay must not be negative: $1 - s_{j\to j-1} - s_{j\to j+1}\ge0$, so $r\le\frac12$ in the bulk. This is the stability limit of ④ again, now with a physical reading: **a cell cannot give away more than it holds.**
+    ⇒ The probability to stay must not be negative: $1 - s_{j\to j-1} - s_{j\to j+1}\ge0$, so $r\le\frac12$ in the bulk. This is the stability limit of Section 4.1.4 again, now with a physical reading: **a cell cannot give away more than it holds.**
 
-    **The matrix.** Number the cells $1\dots n$ and collect the jump probabilities in a matrix $\mathbf S$: off the diagonal $S_{kj} = s_{j\to k}$, on the diagonal $S_{jj} = -\sum_ks_{j\to k}$. One diffusion step is $\mathbf M^+ = (\mathbf I + \mathbf S)\,\mathbf M$, and $\mathbf I + \mathbf S = \mathbf I - \delta t\,\mathbf A$ in the notation of ④.
+    **The matrix.** Number the cells $1\dots n$ and collect the jump probabilities in a matrix $\mathbf S$: off the diagonal $S_{kj} = s_{j\to k}$, on the diagonal $S_{jj} = -\sum_ks_{j\to k}$. One diffusion step is $\mathbf M^+ = (\mathbf I + \mathbf S)\,\mathbf M$, and $\mathbf I + \mathbf S = \mathbf I - \delta t\,\mathbf A$ in the notation of Section 4.1.4.
 
     → Every column of $\mathbf S$ sums to zero: what leaves cell $j$ arrives in another cell. The total magnetization is conserved exactly, step after step.
 
@@ -795,7 +795,7 @@ def _(mo):
 
     $$\Phi_j = \exp\!\Big(-i\gamma f(t)\,(\mathbf g\cdot\mathbf x_j)\,\delta t - \frac{\delta t}{T_{2,j}}\Big),\qquad \mathbf M^{n+1} = \boldsymbol\Phi\odot(\mathbf I + \mathbf S)\,\mathbf M^n,\tag{4.6}$$
 
-    where $\odot$ multiplies entry by entry. This is the **matrix-based finite-difference (MFD)** update of [Xu, Does & Gore (2007)](https://doi.org/10.1088/0031-9155/52/7/N01): diffusion explicitly, everything local exactly. It removes the phase-term trap of ④.
+    where $\odot$ multiplies entry by entry. This is the **matrix-based finite-difference (MFD)** update of [Xu, Does & Gore (2007)](https://doi.org/10.1088/0031-9155/52/7/N01): diffusion explicitly, everything local exactly. It removes the phase-term trap of Section 4.1.4.
 
     → In 3D, $\mathbf S$ couples each voxel to its six neighbours. MATI describes a substrate as a 3D matrix of labels (1 for the extracellular space, 2 for the intracellular space), turns the labels into jump probabilities once, and then repeats the same sparse product and entry-wise multiplication at every step: an ideal job for a GPU.
 
@@ -889,7 +889,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## ⑥ Periodic media: one cell with a phase-shifted boundary
+    ## 4.1.6 Periodic media: one cell with a phase-shifted boundary
 
     Tissue is often modelled as a periodic array: the same cell repeated in every direction. Simulating a large block of cells is expensive, and its outer walls are artificial. Can one cell stand for the whole array?
 
@@ -907,7 +907,7 @@ def _(mo):
 
     ⇒ At the echo $q(T) = 0$, so $E = \frac1V\int M = \frac1V\int m$.
 
-    → **The same trick without a change of variables.** Keep $M$ itself on the grid, with the ordinary stencil and the gradient term of ③. Since $m$ is periodic and $M = m\,e^{-iqx}$, $M$ is periodic up to a phase: $M(x + L) = e^{-iq(t)L}\,M(x)$. So only the face that wraps from the last cell back to the first needs a phase factor, $e^{\mp iq(t)L}$. Across one period the gradient has added the phase $\gamma L\int_0^tg\,dt'$, and the boundary must know it. This is the **revised periodic boundary condition** of [Xu, Does & Gore (2007)](https://doi.org/10.1088/0031-9155/52/7/N01), used in MATI. A plain periodic boundary, $M_{n+1} = M_1$, ignores the phase: it puts a false jump in $M$ at the wrap face, and an error in the signal. Both bookkeepings give the same signal at the echo, where $q = 0$. Finite elements use the same idea under the name pseudo-periodic conditions ([Nguyen et al. 2014](https://doi.org/10.1016/j.jcp.2014.01.009)).
+    → **The same trick without a change of variables.** Keep $M$ itself on the grid, with the ordinary stencil and the gradient term of Section 4.1.3. Since $m$ is periodic and $M = m\,e^{-iqx}$, $M$ is periodic up to a phase: $M(x + L) = e^{-iq(t)L}\,M(x)$. So only the face that wraps from the last cell back to the first needs a phase factor, $e^{\mp iq(t)L}$. Across one period the gradient has added the phase $\gamma L\int_0^tg\,dt'$, and the boundary must know it. This is the **revised periodic boundary condition** of [Xu, Does & Gore (2007)](https://doi.org/10.1088/0031-9155/52/7/N01), used in MATI. A plain periodic boundary, $M_{n+1} = M_1$, ignores the phase: it puts a false jump in $M$ at the wrap face, and an error in the signal. Both bookkeepings give the same signal at the echo, where $q = 0$. Finite elements use the same idea under the name pseudo-periodic conditions ([Nguyen et al. 2014](https://doi.org/10.1016/j.jcp.2014.01.009)).
 
     **Check: tortuosity.** One cell of width $L = 8$ µm with a membrane on its face is an infinite stack of membranes. At long $\Delta$ and small $b$, the signal must decay as $e^{-bD_\infty}$, with $1/D_\infty = 1/D + 1/(\kappa L)$ from Chapter 3. The figure extracts $D_{\text{app}} = -\ln E/b$ from the single-cell simulation (narrow pulses: $\delta = 2$ ms, $G = 10$ mT/m).
     """)
@@ -984,21 +984,21 @@ def _(answer):
 def _(mo):
     mo.md(r"""
     ---
-    # 4b · Finite elements
+    # 4.2 · Finite elements
 
     Finite differences ask the PDE to hold at the cell centres. Finite elements ask something weaker, which turns out to be more useful: that the PDE holds **on average**, against any weight function. That is the weak form of Chapter 1.
 
-    ## ① Start from the weak form
+    ## 4.2.1 Start from the weak form
 
     Chapter 1 wrote the Bloch–Torrey equation in weak form, Eq. (1.37): for every test function $w$,
 
     $$\int_\Omega w\,\partial_tM + \int_\Omega D\,\nabla w\cdot\nabla M + i\gamma g\int_\Omega w\,x\,M = \oint_{\partial\Omega}w\,D\,\partial_nM\,dS .\tag{4.8}$$
 
-    Two consequences carry the whole method. It needs only first derivatives of $M$, so $M$ may be built from pieces with kinks. And the walls sit in the boundary term: impermeable walls make it zero (**nothing to code**), a membrane adds a term that couples its two sides, and a relaxing wall adds $-\rho\oint wM\,dS$. Finite differences need a rule at every wall face (4a ②); finite elements get reflecting walls for free.
+    Two consequences carry the whole method. It needs only first derivatives of $M$, so $M$ may be built from pieces with kinks. And the walls sit in the boundary term: impermeable walls make it zero (**nothing to code**), a membrane adds a term that couples its two sides, and a relaxing wall adds $-\rho\oint wM\,dS$. Finite differences need a rule at every wall face (Section 4.1.2); finite elements get reflecting walls for free.
 
     Chapter 1 also showed that the choice of test functions decides the method: eigenmodes give the matrix method of Chapter 2, Eq. (2.2). Finite elements choose functions that are easy to build on any shape.
 
-    ## ② Galerkin: hat functions as unknowns and as weights
+    ## 4.2.2 Galerkin: hat functions as unknowns and as weights
 
     ⇒ Cut $\Omega$ into elements (intervals in 1D, triangles in 2D, tetrahedra in 3D) with nodes at their corners.
 
@@ -1008,7 +1008,7 @@ def _(mo):
 
     ⇒ In one element of length $h$ with local coordinate $\xi\in[-1, 1]$, $x = \frac{x_a + x_b}2 + \frac h2\xi$, the two hats are $N_1 = \frac12(1-\xi)$ and $N_2 = \frac12(1+\xi)$. Three nodes per element give quadratic shapes, $\frac12\xi(\xi-1)$, $(1-\xi)(1+\xi)$ and $\frac12\xi(\xi+1)$.
 
-    ## ③ Element matrices and assembly
+    ## 4.2.3 Element matrices and assembly
 
     ⇒ Insert $M = \sum_jM_jN_j$ and $w = N_i$ into the weak form. Every integral becomes a sum over elements of small matrices:
 
@@ -1022,9 +1022,9 @@ def _(mo):
 
     → For linear triangles in 2D the same integrals have closed forms: $\mathbf K^e = D(\mathbf b\mathbf b^{\mathsf T} + \mathbf c\mathbf c^{\mathsf T})/(4A)$, with $b_i$, $c_i$ differences of the corner coordinates and $A$ the area; $\mathcal M^e_{ij} = \frac A{12}(1 + \delta_{ij})$; and $\int N_1^aN_2^bN_3^c\,dA = 2A\,\frac{a!\,b!\,c!}{(a+b+c+2)!}$ for $\mathbf J^e$. For curved or higher-order elements the integrals are mapped to a reference element (isoparametric mapping) and done by Gauss quadrature.
 
-    ## ④ The full system: compartments, relaxation and membranes
+    ## 4.2.4 The full system: compartments, relaxation and membranes
 
-    With several compartments, each gets its own set of hat functions, living only on the elements of that compartment. A node on an interface $\Gamma_{nm}$ is therefore **doubled**: one copy belongs to $\Omega_n$, the other to $\Omega_m$, so that $M$ can jump across the membrane (⑥ shows it in 1D). Put all nodal values in one vector $\boldsymbol\xi$ and write $\varphi_k$ for the hat function of node $k$. The weak form of the full problem of Chapter 1, Eqs. (1.36)–(1.37), then gives
+    With several compartments, each gets its own set of hat functions, living only on the elements of that compartment. A node on an interface $\Gamma_{nm}$ is therefore **doubled**: one copy belongs to $\Omega_n$, the other to $\Omega_m$, so that $M$ can jump across the membrane (Section 4.2.6 shows it in 1D). Put all nodal values in one vector $\boldsymbol\xi$ and write $\varphi_k$ for the hat function of node $k$. The weak form of the full problem of Chapter 1, Eqs. (1.36)–(1.37), then gives
 
     $$\boldsymbol{\mathcal M}\,\frac{d\boldsymbol\xi}{dt} = -\big(\mathbf S + \mathbf R + \mathbf Q + i\gamma f(t)\,\mathbf J(\mathbf g)\big)\,\boldsymbol\xi,\qquad \xi_k(0) = \rho_n\ \text{ for every node } k \text{ of } \Omega_n .\tag{4.11}$$
 
@@ -1036,15 +1036,15 @@ def _(mo):
     | $\mathbf J(\mathbf g)$, gradient | $\int\varphi_k\,(\mathbf g\cdot\mathbf x)\,\varphi_l$ | the gradient |
     | $\mathbf Q$, interface | $\kappa_{nm}\int_{\Gamma_{nm}}\varphi_k\varphi_l$, weighted by $c_{mn}$ or $-c_{nm}$ (Chapter 1, Exercise 13) | the membrane term of the weak form |
 
-    → In the 1D notation of ③, $\mathbf K = \mathbf S + \mathbf Q$, $f(t)\,\mathbf J(\mathbf g)$ is $g(t)\,\mathbf J$, and $\mathbf R = 0$.
+    → In the 1D notation of Section 4.2.3, $\mathbf K = \mathbf S + \mathbf Q$, $f(t)\,\mathbf J(\mathbf g)$ is $g(t)\,\mathbf J$, and $\mathbf R = 0$.
 
     → All five matrices are sparse and are assembled once. SpinDoctor ([Li et al. 2019](https://doi.org/10.1016/j.neuroimage.2019.116120)) builds them on a tetrahedral mesh and hands the ODE system to an adaptive solver for stiff problems (MATLAB's `ode23t`, a trapezoidal rule with error control), which picks its own time steps. The signal is $S = \sum_kw_k\xi_k$ with $w_k = \int\varphi_k$.
 
-    ## ⑤ Time stepping and the signal
+    ## 4.2.5 Time stepping and the signal
 
     Crank–Nicolson with the mass matrix: $\ (\boldsymbol{\mathcal M} + \frac{\delta t}2\mathbf A_g)\,\mathbf M^+ = (\boldsymbol{\mathcal M} - \frac{\delta t}2\mathbf A_g)\,\mathbf M$, with $\mathbf A_g = \mathbf K + i\gamma g\,\mathbf J$. The signal is the integral of $M$: $\ E = \frac1V\sum_iw_iM_i$ with $w_i = \int N_i$, the row sums of $\boldsymbol{\mathcal M}$.
 
-    → Replacing $\boldsymbol{\mathcal M}$ by the diagonal matrix of row sums ("mass lumping") turns linear finite elements on a uniform 1D grid into the finite-difference scheme of 4a. The two methods are close relatives; they part ways in how they handle geometry.
+    → Replacing $\boldsymbol{\mathcal M}$ by the diagonal matrix of row sums ("mass lumping") turns linear finite elements on a uniform 1D grid into the finite-difference scheme of Section 4.1. The two methods are close relatives; they part ways in how they handle geometry.
     """)
     return
 
@@ -1091,7 +1091,7 @@ def _(exercise):
     exercise(r"""
     **(a)** Derive $\boldsymbol{\mathcal M}^e$, $\mathbf K^e$ and $\mathbf J^e$ for a 1D element $[x_a, x_b]$ from $N_1 = (x_b - x)/h$ and $N_2 = (x - x_a)/h$.
 
-    **(b)** Assemble $\mathbf K$ for three equal elements on $[0, 3h]$ (four nodes). Compare its rows with the finite-difference matrix of 4a. Where do they differ, and why?
+    **(b)** Assemble $\mathbf K$ for three equal elements on $[0, 3h]$ (four nodes). Compare its rows with the finite-difference matrix of Section 4.1. Where do they differ, and why?
 
     **(c)** Show that $w_i = \int N_i$ is the sum of row $i$ of $\boldsymbol{\mathcal M}$, and that $\sum_iw_i = L$. Why does $E = \frac1L\sum_iw_iM_i$ give exactly 1 at $t = 0$?
     """, "6 · Element matrices")
@@ -1121,11 +1121,11 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## ⑥ Membranes, and the check against Chapter 1
+    ## 4.2.6 Membranes, and the check against Chapter 1
 
-    Chapter 1 (Exercise 10) found the exchange mode of a slab $[-a, a]$ with a membrane in the middle: its rate $Dk^2$ follows from $k\tan(ka) = 2\kappa/D$. Both discrete operators of this chapter should reproduce it: the finite-difference one through the membrane conductance of 4a ②, the finite-element one through the double node.
+    Chapter 1 (Exercise 10) found the exchange mode of a slab $[-a, a]$ with a membrane in the middle: its rate $Dk^2$ follows from $k\tan(ka) = 2\kappa/D$. Both discrete operators of this chapter should reproduce it: the finite-difference one through the membrane conductance of Section 4.1.2, the finite-element one through the double node.
 
-    ## ⑦ Modes on the mesh: the matrix method for any shape
+    ## 4.2.7 Modes on the mesh: the matrix method for any shape
 
     Setting $g = 0$ and looking for $\mathbf M(t) = \mathbf u\,e^{-\lambda t}$ turns the semi-discrete equation into a **generalised eigenproblem**,
 
@@ -1211,9 +1211,9 @@ def _(answer):
 def _(mo):
     mo.md(r"""
     ---
-    # 4c · Curved walls: a staircase or a fitted mesh
+    # 4.3 · Curved walls: a staircase or a fitted mesh
 
-    In 1D every wall sits on a face or a node, and finite differences and finite elements are equally good (4d shows it). The difference appears with curved walls. A Cartesian grid can only follow a circle as a **staircase** of cell faces. A triangle mesh puts its boundary nodes **on** the circle, so its boundary is a polygon whose corners lie on the wall.
+    In 1D every wall sits on a face or a node, and finite differences and finite elements are equally good (Section 4.4 shows it). The difference appears with curved walls. A Cartesian grid can only follow a circle as a **staircase** of cell faces. A triangle mesh puts its boundary nodes **on** the circle, so its boundary is a polygon whose corners lie on the wall.
 
     The test: the slowest non-uniform mode of a disk of radius $R$ (the cross-section of a cylinder), whose exact eigenvalue is $\lambda_1R^2 = 1.8412^2 = 3.3900$ (Chapter 1). It sets the slowest decay inside an axon, so every restricted-diffusion signal depends on it.
     """)
@@ -1349,9 +1349,9 @@ def _(answer):
 def _(mo):
     mo.md(r"""
     ---
-    # 4d · In practice: accuracy, cost and checks
+    # 4.4 · In practice: accuracy, cost and checks
 
-    ## Convergence in 1D
+    ## 4.4.1 Convergence in 1D
 
     Both methods solve the running example on the slab, with Crank–Nicolson and $\delta t = 0.02$ ms. The reference is the exact MCF signal of Chapter 2, Eq. (2.5).
     """)
@@ -1390,11 +1390,11 @@ def _(mo):
     | Convergence near curved walls | $O(h)$, erratic | $O(h^2)$ for linear elements |
     | Time stepping | explicit: no solve, but $\delta t\le h^2/(2dD)$ | implicit or adaptive: large steps, one sparse solve each |
     | Cost driver | voxels × steps, trivially parallel (GPU) | meshing, then sparse factorisations; fewer unknowns per accuracy |
-    | Extras | periodic cells with a phase-shifted boundary | eigenmodes on the mesh for the matrix method (4b ⑦) |
+    | Extras | periodic cells with a phase-shifted boundary | eigenmodes on the mesh for the matrix method (Section 4.2.7) |
 
     → The equation is the same; the difference is how space and time are cut. A grid gives up geometric fidelity and takes tiny time steps, in exchange for an update so simple that a GPU can run millions of voxels at once. A mesh pays for meshing and linear solves, in exchange for walls exactly where they are and large time steps.
 
-    ## Choosing $h$ and $\delta t$
+    ## 4.4.2 Choosing $h$ and $\delta t$
 
     ① **Space.** $h$ must resolve the finest pattern in $M$: the smallest of the structure you care about, the gradient length $\ell_g = (D/\gamma g)^{1/3}$ and the phase wavelength $2\pi/q$, with at least a few cells per length, better 5–10.
     ② **Time, explicit.** $\delta t\le h^2/(2dD)$ for stability, and small enough to follow the waveform.
@@ -1424,7 +1424,7 @@ def _(answer):
 
     **(b)** ⇒ $(20/0.2)^3 = 10^6$ voxels. $\delta t\le h^2/(6D) = 0.04/12 = 3.3$ µs, so $30/0.0033\approx9000$ steps. About $9\times10^9$ voxel updates: about one second at $10^{10}$ updates per second. Halving $h$ multiplies this by 32 (8 times more voxels, 4 times more steps).
 
-    **(c)** ⇒ The cost of a sparse solve in 3D grows faster than linearly with the number of nodes and parallelises less well, while the explicit stencil is linear and embarrassingly parallel. A mesh wins when far fewer unknowns are needed (curved walls, local refinement), when large time steps are allowed (long sequences), or when the eigenmodes can be reused for many sequences (4b ⑥). A grid wins for very large segmented volumes on a GPU. Either way, check against Chapters 2 and 3 first.
+    **(c)** ⇒ The cost of a sparse solve in 3D grows faster than linearly with the number of nodes and parallelises less well, while the explicit stencil is linear and embarrassingly parallel. A mesh wins when far fewer unknowns are needed (curved walls, local refinement), when large time steps are allowed (long sequences), or when the eigenmodes can be reused for many sequences (Section 4.2.6). A grid wins for very large segmented volumes on a GPU. Either way, check against Chapters 2 and 3 first.
     """)
     return
 
@@ -1432,7 +1432,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Implementations
+    ## 4.4.3 Implementations
 
     | Toolbox | Method | Notes |
     | --- | --- | --- |

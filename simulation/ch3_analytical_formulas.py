@@ -282,10 +282,10 @@ def _(mo):
 
     The box is the set $0 < \tilde\delta \le \tilde\Delta$, $\Gamma > 0$. It has two faces where the physics simplifies:
 
-    - **The narrow-pulse face**, $\tilde\delta\to0$. With $\Gamma\tilde\delta = \gamma g\delta L = qL$ held fixed, the gradient and the pulse length merge into one number, $q = \gamma g\delta$. The face is the **$(q,t)$ plane** (Section 3a).
-    - **The long-pulse face**, $\tilde\delta = \tilde\Delta$. The two lobes touch, and the effective gradient is $+g$ for $T/2$ and then $-g$ for $T/2$, with $T = 2\delta$. This is a spin echo in a constant gradient. The face is the **$(g,T)$ plane** (Section 3b).
+    - **The narrow-pulse face**, $\tilde\delta\to0$. With $\Gamma\tilde\delta = \gamma g\delta L = qL$ held fixed, the gradient and the pulse length merge into one number, $q = \gamma g\delta$. The face is the **$(q,t)$ plane** (Section 3.1).
+    - **The long-pulse face**, $\tilde\delta = \tilde\Delta$. The two lobes touch, and the effective gradient is $+g$ for $T/2$ and then $-g$ for $T/2$, with $T = 2\delta$. This is a spin echo in a constant gradient. The face is the **$(g,T)$ plane** (Section 3.2).
 
-    Real sequences sit **inside the box** (Section 3c). The sliders below place a sequence in it.
+    Real sequences sit **inside the box** (Section 3.3). The sliders below place a sequence in it.
     """)
     return
 
@@ -313,9 +313,9 @@ def _(C_ALT, C_FREE, C_MAIN, D0, GAMMA, box_Delta, box_G, box_L, box_delta, mo, 
     _a.fill_between(_x, _x, 40, color=C_FREE, alpha=0.12, lw=0)
     _a.plot(_x, _x, color=C_ALT, lw=2.2)
     _a.axvline(1e-3, color=C_MAIN, lw=4)
-    _a.text(0.15, 2.4, "long-pulse face  δ = Δ\n(g,T) map, Section 3b", color=C_ALT, fontsize=8.5, rotation=0)
-    _a.text(1.25e-3, 12, "narrow-pulse face\nδ → 0: (q,t) map\nSection 3a", color=C_MAIN, fontsize=8.5)
-    _a.text(3e-3, 0.3, "inside the box:\nreal PGSE, Section 3c", color="0.35", fontsize=8.5)
+    _a.text(0.15, 2.4, "long-pulse face  δ = Δ\n(g,T) map, Section 3.2", color=C_ALT, fontsize=8.5, rotation=0)
+    _a.text(1.25e-3, 12, "narrow-pulse face\nδ → 0: (q,t) map\nSection 3.1", color=C_MAIN, fontsize=8.5)
+    _a.text(3e-3, 0.3, "inside the box:\nreal PGSE, Section 3.3", color="0.35", fontsize=8.5)
     _a.axhline(1, color="0.5", lw=0.8, ls=":")
     _a.axvline(1, color="0.5", lw=0.8, ls=":")
     _a.text(12, 1.12, "Δ = L²/D", color="0.4", fontsize=8)
@@ -372,9 +372,9 @@ def _(answer):
 def _(mo):
     mo.md(r"""
     ---
-    # 3a · The narrow-pulse face: the $(q,t)$ map
+    # 3.1 · The narrow-pulse face: the $(q,t)$ map
 
-    ## From the path picture to $\langle e^{iqr}\rangle_{x,x_0}$
+    ## 3.1.1 From the path picture to $\langle e^{iqr}\rangle_{x,x_0}$
 
     Suppose both gradient pulses are so short that spins do not move while they are on. The first pulse gives each spin the phase $\gamma g\delta\,x(0)$. After the refocusing pulse, the second removes $\gamma g\delta\,x(\Delta)$. So $\varphi = -qr$, with $q = \gamma g\delta$ and the displacement $r = x(\Delta) - x(0)$, and
 
@@ -384,7 +384,7 @@ def _(mo):
 
     → **When is a pulse narrow?** A spin must not move far during a pulse compared with the two lengths the signal resolves: $\sqrt{D\delta} \ll L$ and $\sqrt{D\delta} \ll 1/q$. In addition $\delta \ll \Delta$.
 
-    ## The exact narrow-pulse signal of a slab
+    ## 3.1.2 The exact narrow-pulse signal of a slab
 
     Put the eigenmode propagator of Chapter 1 into the Fourier integral. Every mode contributes its own decay $e^{-D\lambda_nt}$, weighted by how strongly it overlaps with the phase pattern $e^{iqx}$:
 
@@ -472,7 +472,7 @@ def _(mo, np_check):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## The map
+    ## 3.1.3 The map
 
     The figure compares four closed formulas with the exact Tanner–Stejskal signal at every point $(qL, Dt/L^2)$. Each pixel is coloured by the **simplest formula that is within the tolerance**, tried in this order:
 
@@ -634,7 +634,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## ① Short times: free diffusion, the $b$-matrix, and the surface-to-volume ratio
+    ## 3.1.4 Short times: free diffusion, the $b$-matrix, and the surface-to-volume ratio
 
     **Free diffusion.** Far from any wall $\bar P$ is a Gaussian of variance $2Dt$, so $E = e^{-q^2Dt}$. For narrow pulses $b = q^2\Delta$; for finite pulses $b = q^2(\Delta-\delta/3)$ ([Stejskal & Tanner 1965](https://doi.org/10.1063/1.1695690)). In an anisotropic medium the Gaussian has a covariance $2\mathbf Dt$ and
 
@@ -738,15 +738,15 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## ② Long times: closed pores, tortuosity and disorder
+    ## 3.1.5 Long times: closed pores, tortuosity and disorder
 
     **A closed pore.** Once $\ell_D \gg L$, a spin has forgotten where it started. Its end point is uniform in the pore and independent of its start, so the displacement $r = x - x_0$ is the difference of two independent uniform positions. For a slab, $\bar P(r)$ is a **triangle** of half-width $L$:
 
     $$\bar P(r) = \frac{L-\lvert r\rvert}{L^2},\qquad \langle r^2\rangle_{x,x_0} = \frac{L^2}{6},\qquad D(t) = \frac{\langle r^2\rangle_{x,x_0}}{2t} = \frac{L^2}{12\,t},\qquad K = -\frac35 .\tag{3.9}$$
 
-    Its Fourier transform is the form factor of ③, $E = \operatorname{sinc}^2(qL/2)$. In a closed pore $D(t)$ falls to zero as $1/t$, and $K$ stays negative: the displacement is bounded, so the distribution has lighter tails than a Gaussian.
+    Its Fourier transform is the form factor of Section 3.1.6, $E = \operatorname{sinc}^2(qL/2)$. In a closed pore $D(t)$ falls to zero as $1/t$, and $K$ stays negative: the displacement is bounded, so the distribution has lighter tails than a Gaussian.
 
-    → **Motional narrowing is not on this face.** "Motional narrowing" means the phase is averaged *while the gradient is on*. With $\delta\to0$ nothing is averaged during a pulse. The long-time narrow-pulse limit is the form factor; motional narrowing belongs to the long-pulse face (Section 3b).
+    → **Motional narrowing is not on this face.** "Motional narrowing" means the phase is averaged *while the gradient is on*. With $\delta\to0$ nothing is averaged during a pulse. The long-time narrow-pulse limit is the form factor; motional narrowing belongs to the long-pulse face (Section 3.2).
 
     **A connected medium.** If spins can leave the pore, through permeable membranes or through gaps between obstacles, $D(t)$ does not go to zero but to a finite $D_\infty < D$. The ratio $D/D_\infty$ is the **tortuosity**. For a stack of membranes with spacing $L$ and permeability $\kappa$ (the interface condition of Chapter 1), the resistances to flux add in series, as for heat conduction through layers:
 
@@ -803,7 +803,7 @@ def _(answer):
 
     ⇒ $D/(\kappa L) = 2/(0.1\times8) = 2.5$, so $D_\infty = D/3.5 = 0.57$ µm²/ms, a tortuosity of 3.5.
 
-    → The membrane is the bottleneck when $D/(\kappa L)\gg1$, i.e. $\kappa L/D\ll1$. That is the same condition under which the Kärger model of Section 3d applies: exchange limited by the barrier, with well-mixed compartments.
+    → The membrane is the bottleneck when $D/(\kappa L)\gg1$, i.e. $\kappa L/D\ll1$. That is the same condition under which the Kärger model of Section 3.4 applies: exchange limited by the barrier, with well-mixed compartments.
 
     **(c)** ⇒ The ratio of $D(t)/D$ to $L^2/(12Dt)$ is $\langle r^2\rangle_{x,x_0}/(L^2/6)$. With $\langle r^2\rangle_{x,x_0}/L^2 = \frac16 - \frac{16}{\pi^4}e^{-\pi^2Dt/L^2} - \dots$, the correction is 5% of $\frac16$ when $e^{-\pi^2Dt/L^2} = 0.05\pi^4/96 = 0.051$, at $Dt/L^2 = 0.30$, i.e. $t \approx 3\tau_1$.
     """)
@@ -813,7 +813,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## ③ Large $q$: diffraction and the pore form factor
+    ## 3.1.6 Large $q$: diffraction and the pore form factor
 
     For $t\gg\tau_1$ the signal is the squared Fourier transform of the pore shape, the **form factor**, as Exercise 3a showed for the slab. It has zeros, the **diffusion–diffraction** minima, and their positions give the pore size without any model of the dynamics ([Callaghan et al. 1991](https://doi.org/10.1038/351467a0); q-space imaging: [Cory & Garroway 1990](https://doi.org/10.1002/mrm.1910140303)):
 
@@ -918,7 +918,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## ④ The cumulant boundary
+    ## 3.1.7 The cumulant boundary
 
     The cumulant series is an expansion in the phase spread, $q$ times the typical displacement. The typical displacement is the root-mean-square $r_{\text{rms}} = \sqrt{\langle r^2\rangle_{x,x_0}} = \sqrt{2D(t)\,t}$, which runs from $\sqrt{2Dt}$ at short times to $L/\sqrt6$ at long times. So the region where the Gaussian (second cumulant) works is
 
@@ -975,7 +975,7 @@ def _(answer):
 def _(mo):
     mo.md(r"""
     ---
-    # 3b · The long-pulse face: the $(g,T)$ map
+    # 3.2 · The long-pulse face: the $(g,T)$ map
 
     Put $\delta = \Delta = T/2$: the effective gradient is $+g$ for $T/2$ and $-g$ for $T/2$, a spin echo in a constant gradient. The three lengths are $L$, $\ell_D = \sqrt{DT}$ and $\ell_g = (D/\gamma g)^{1/3}$, and **whichever is the smallest sets the regime** ([de Swiet & Sen 1994](https://doi.org/10.1063/1.467127); [Grebenkov 2007](https://doi.org/10.1103/RevModPhys.79.1077)):
 
@@ -989,7 +989,7 @@ def _(mo):
 
     The boundaries are $\ell_D = L$, $\ell_g = L$ and $\ell_g = \ell_D$. The last one is also $q\ell_D = 1$ if you write $q = \gamma gT$: from $\ell_g = \ell_D$, $\gamma g = D/\ell_D^3$, so $\gamma gT\,\ell_D = DT/\ell_D^2 = 1$. The three lines meet at the **triple point** $\ell_D = \ell_g = L$.
 
-    → **Three different laws.** Free diffusion decays as $g^2T^3$. Motional narrowing decays as $g^2T$: the spins sample the whole pore many times, and the phase does a random walk with steps $\gamma gL\cdot L^2/D$. Localisation decays as $g^{2/3}T$: only the spins in a layer of thickness $\ell_g$ at each wall survive, and they lose phase slowly because the wall stops them from wandering along the gradient. This is the same "edge enhancement" as in ①, now at strong gradients.
+    → **Three different laws.** Free diffusion decays as $g^2T^3$. Motional narrowing decays as $g^2T$: the spins sample the whole pore many times, and the phase does a random walk with steps $\gamma gL\cdot L^2/D$. Localisation decays as $g^{2/3}T$: only the spins in a layer of thickness $\ell_g$ at each wall survive, and they lose phase slowly because the wall stops them from wandering along the gradient. This is the same "edge enhancement" as in Section 3.1.4, now at strong gradients.
 
     The map below is computed from the exact MCF signal of Chapter 2 on a grid of $(L/\ell_g, \ell_D/L)$. The signal spans many decades, so a formula counts as working when its **exponent** $\ln E$ is within the tolerance. The right panel is a cut at fixed gradient: $-\ln E$ against $T$, on log axes, where the three laws show up as slopes of 3 and 1.
     """)
@@ -1105,7 +1105,7 @@ def _(mo):
     - **Free → localisation** happens at $\ell_D\approx1.6\,\ell_g$, close to the line $\ell_g = \ell_D$. But the localisation law becomes accurate only for $L/\ell_g\gtrsim3$–$4$, with the signal already below about $10^{-2}$.
     - **Motional narrowing → localisation** happens near $L/\ell_g\approx2$–$3$, not at $L = \ell_g$. Exercise 6 shows where the factor comes from.
 
-    The free region is small. Like the short-time correction in ①, the walls change the exponent by a relative amount proportional to $\ell_D/L$, so the free law is within 10% only for $\ell_D\lesssim0.07\,L$. Where the attenuation is also measurable ($E < 0.99$), that leaves the bottom-right corner, at strong gradients.
+    The free region is small. Like the short-time correction in Section 3.1.4, the walls change the exponent by a relative amount proportional to $\ell_D/L$, so the free law is within 10% only for $\ell_D\lesssim0.07\,L$. Where the attenuation is also measurable ($E < 0.99$), that leaves the bottom-right corner, at strong gradients.
     """)
     return
 
@@ -1205,12 +1205,12 @@ def _(answer):
 def _(mo):
     mo.md(r"""
     ---
-    # 3c · Inside the box: real PGSE sequences
+    # 3.3 · Inside the box: real PGSE sequences
 
     Between the two faces there are no new closed formulas. What remains is the question of Chapter 2: **up to which gradient can I trust the Gaussian phase (cumulant) approximation?** On the two faces the answer is known:
 
-    - narrow pulses: $q\min(\ell_D, L)\lesssim1$ (Section 3a ④);
-    - long pulses: the smallest of $\ell_D$ and $L$ must stay below about $\ell_g$ (Section 3b), i.e. $\min(\ell_D, L)/\ell_g\lesssim1$.
+    - narrow pulses: $q\min(\ell_D, L)\lesssim1$ (Section 3.1.7);
+    - long pulses: the smallest of $\ell_D$ and $L$ must stay below about $\ell_g$ (Section 3.2), i.e. $\min(\ell_D, L)/\ell_g\lesssim1$.
 
     **A rule of thumb to test.** A natural guess for the interior is
 
@@ -1222,9 +1222,9 @@ def _(mo):
 
     $$H_2 = \gamma g\,\ell\cdot\min\big(\delta,\ \ell^2/D\big)\ \lesssim\ 1,\qquad \ell = \min(\sqrt{D\Delta}, L).\tag{3.15}$$
 
-    On the narrow-pulse face $H_2 = q\ell$, the cumulant boundary of 3a. On the long-pulse face $H_2 = (\ell/\ell_g)^3$, which gives both the free–localisation line ($\ell_D = \ell_g$) and the motional narrowing–localisation line ($L = \ell_g$) of 3b.
+    On the narrow-pulse face $H_2 = q\ell$, the cumulant boundary of Section 3.1. On the long-pulse face $H_2 = (\ell/\ell_g)^3$, which gives both the free–localisation line ($\ell_D = \ell_g$) and the motional narrowing–localisation line ($L = \ell_g$) of Section 3.2.
 
-    The map shows the exact error of the GPA, $\lvert E_{\text{GPA}}/E - 1\rvert$, over the $(L/\ell_g, \ell_\Delta/L)$ plane at a fixed ratio $\delta/\Delta$. The solid black curve is the 5% contour. Dashed: $H = 1$ and $H = 3$. Dash-dotted: $H_2 = 1$ and $H_2 = 3$. At $\delta/\Delta = 0.5$ a ring marks the running example ($\delta = 10$, $\Delta = 20$ ms, $G = 205$ mT/m, $L = 8$ µm). At $\delta/\Delta = 1$ the plane is the long-pulse face of 3b.
+    The map shows the exact error of the GPA, $\lvert E_{\text{GPA}}/E - 1\rvert$, over the $(L/\ell_g, \ell_\Delta/L)$ plane at a fixed ratio $\delta/\Delta$. The solid black curve is the 5% contour. Dashed: $H = 1$ and $H = 3$. Dash-dotted: $H_2 = 1$ and $H_2 = 3$. At $\delta/\Delta = 0.5$ a ring marks the running example ($\delta = 10$, $\Delta = 20$ ms, $G = 205$ mT/m, $L = 8$ µm). At $\delta/\Delta = 1$ the plane is the long-pulse face of Section 3.2.
     """)
     return
 
@@ -1364,11 +1364,11 @@ def _(answer):
 def _(mo):
     mo.md(r"""
     ---
-    # 3d · Two extra axes
+    # 3.4 · Two extra axes
 
     The box assumed reflecting, impermeable walls. Real walls can also **remove magnetization** (surface relaxation) or **let it through** (permeability). Each adds one dimensionless number and one more axis to the box.
 
-    ## ① Relaxing walls: Brownstein and Tarr
+    ## 3.4.1 Relaxing walls: Brownstein and Tarr
 
     If the wall relaxes magnetization with relaxivity $\rho$ (µm/ms), the reflecting condition of Chapter 1 becomes the Robin condition
 
@@ -1385,7 +1385,7 @@ def _(mo):
     | $\ll1$ | **fast diffusion** (surface-limited) | $\rho\,S/V$ ($= 2\rho/L$ for a slab) | one exponential |
     | $\gg1$ | **slow diffusion** (diffusion-limited) | $D\pi^2/L^2$ | several exponentials |
 
-    The fast-diffusion limit is why NMR relaxometry measures $S/V$ in rocks and why relaxation and pore size are linked ([Brownstein & Tarr 1979](https://doi.org/10.1103/PhysRevA.19.2446)). For diffusion MRI, relaxing walls take spins out of the layer next to the wall, the same layer that carries the short-time correction ① and the localisation signal of 3b. [Mitra et al. (1993)](https://doi.org/10.1103/PhysRevB.47.8565) show that $\rho$ enters $D(t)$ at order $t$.
+    The fast-diffusion limit is why NMR relaxometry measures $S/V$ in rocks and why relaxation and pore size are linked ([Brownstein & Tarr 1979](https://doi.org/10.1103/PhysRevA.19.2446)). For diffusion MRI, relaxing walls take spins out of the layer next to the wall, the same layer that carries the short-time correction of Section 3.1.4 and the localisation signal of Section 3.2. [Mitra et al. (1993)](https://doi.org/10.1103/PhysRevB.47.8565) show that $\rho$ enters $D(t)$ at order $t$.
     """)
     return
 
@@ -1449,7 +1449,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## ② Exchange between compartments: Kärger
+    ## 3.4.2 Exchange between compartments: Kärger
 
     Now let two compartments exchange spins across a membrane. If the membrane is the bottleneck, each compartment is well mixed and can be described by one number, its magnetization. With narrow pulses, and a Gaussian signal inside each compartment, the two magnetizations obey a linear ODE system ([Kärger 1985](<https://doi.org/10.1016/0001-8686(85)80018-X>)):
 
@@ -1459,7 +1459,7 @@ def _(mo):
 
     The new axis is $\Delta/\tau_{\text{ex}}$, with $1/\tau_{\text{ex}} = k_1 + k_2$. From Chapter 1, a barrier-limited membrane with permeability $\kappa$ gives $k_1 = \kappa\,(S/V)_1$.
 
-    → *Chapter 1 already contains this model as a set of slab modes* (the permeable-membrane figure and Exercise 10). With a membrane in the middle of a slab, the uniform mode stays, and the slowest odd mode, one half high and the other low, decays at $D\lambda\approx4\kappa/L$. That is $k_1 + k_2$: each half has $S/V = 2/L$, so $k_1 = k_2 = 2\kappa/L$. Kärger's two magnetizations are the projections on these two modes; the faster modes, which he neglects, are the ones that need $\kappa L/D\ll1$ to die out first. The model needs $\kappa L/D\ll1$ (the same condition as for tortuosity in ②), and each compartment must be inside its own cumulant region (3a ④). Filter-exchange imaging (FEXI) measures $\tau_{\text{ex}}$ this way ([Lasič et al. 2011](https://doi.org/10.1002/mrm.22782)).
+    → *Chapter 1 already contains this model as a set of slab modes* (the permeable-membrane figure and Exercise 10). With a membrane in the middle of a slab, the uniform mode stays, and the slowest odd mode, one half high and the other low, decays at $D\lambda\approx4\kappa/L$. That is $k_1 + k_2$: each half has $S/V = 2/L$, so $k_1 = k_2 = 2\kappa/L$. Kärger's two magnetizations are the projections on these two modes; the faster modes, which he neglects, are the ones that need $\kappa L/D\ll1$ to die out first. The model needs $\kappa L/D\ll1$ (the same condition as for tortuosity in Section 3.1.5), and each compartment must be inside its own cumulant region (Section 3.1.7). Filter-exchange imaging (FEXI) measures $\tau_{\text{ex}}$ this way ([Lasič et al. 2011](https://doi.org/10.1002/mrm.22782)).
     """)
     return
 
@@ -1522,7 +1522,7 @@ def _(answer):
     answer(r"""
     **(a)** ⇒ $\Delta\ll\tau_{\text{ex}}$: $\mathbf K\Delta\to0$, so $E = (1,1)e^{-b\mathbf D}\mathbf p = p_1e^{-bD_1} + p_2e^{-bD_2}$.
 
-    ⇒ $\Delta\gg\tau_{\text{ex}}$ (and also $\tau_{\text{ex}}\ll1/(q^2\lvert D_1-D_2\rvert)$, so that spins switch before they dephase): exchange mixes the compartments many times during $\Delta$. $\mathbf K$ has eigenvalues $0$ and $1/\tau_{\text{ex}}$; the second eigenvector dies, and the first is $\mathbf p$ itself. Projected on it, $b\mathbf D$ contributes $b\,(p_1D_1 + p_2D_2)$: $E\approx e^{-b\bar D}$. Every spin samples both compartments, so its displacement is Gaussian with the average diffusivity. The same averaging produced motional narrowing in 3b. In the figure, even $\Delta/\tau_{\text{ex}} = 10$ is not yet at $e^{-b\bar D}$ at $b = 5$: the second condition, $b\lvert D_1 - D_2\rvert\ll\Delta/\tau_{\text{ex}}$, fails there.
+    ⇒ $\Delta\gg\tau_{\text{ex}}$ (and also $\tau_{\text{ex}}\ll1/(q^2\lvert D_1-D_2\rvert)$, so that spins switch before they dephase): exchange mixes the compartments many times during $\Delta$. $\mathbf K$ has eigenvalues $0$ and $1/\tau_{\text{ex}}$; the second eigenvector dies, and the first is $\mathbf p$ itself. Projected on it, $b\mathbf D$ contributes $b\,(p_1D_1 + p_2D_2)$: $E\approx e^{-b\bar D}$. Every spin samples both compartments, so its displacement is Gaussian with the average diffusivity. The same averaging produced motional narrowing in Section 3.2. In the figure, even $\Delta/\tau_{\text{ex}} = 10$ is not yet at $e^{-b\bar D}$ at $b = 5$: the second condition, $b\lvert D_1 - D_2\rvert\ll\Delta/\tau_{\text{ex}}$, fails there.
 
     **(b)** ⇒ No. At intermediate $\Delta$ the curve is still close to bi-exponential, but the slow "component" is smaller than $p_2$ and both apparent diffusivities move towards $\bar D$: spins that started slow have partly become fast. A two-compartment model fitted without exchange returns fractions and diffusivities that depend on $\Delta$. Kärger's point was that this $\Delta$-dependence measures the exchange rate.
 
@@ -1537,7 +1537,7 @@ def _(answer):
 def _(mo):
     mo.md(r"""
     ---
-    # 3e · Chapter 3 on one page
+    # 3.5 · Chapter 3 on one page
 
     *A crib sheet: every formula of this chapter with its region. The conditions are the ones tested above against the exact signal of Chapter 2.*
 
@@ -1568,7 +1568,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Implementations
+    ## 3.5.1 Implementations
 
     - **Closed-form compartment models.** Camino and dmipy implement the cylinder and sphere signals of this chapter in their narrow-pulse (Stejskal–Tanner), Callaghan and Gaussian-phase forms, for fitting axon-diameter and cell-size models. Before fitting one, evaluate $H_2$ for the protocol (Exercise 8).
     - **The exact references.** The MCF of Chapter 2 (for example MCFAL, MISST, the cylindrical-surface code) computes the signal everywhere in the box, including the white bands of the maps.

@@ -157,7 +157,11 @@ def _(mo, show_answers):
     def exercise(text, number):
         return mo.callout(mo.md(f"### ✎ Exercise {number}\n\n" + text), kind="info")
 
-    return answer, exercise, hint, maths
+    def takeaway(text):
+        """The one thing to remember from a section."""
+        return mo.callout(mo.md("**Take-away.** " + text), kind="warn")
+
+    return answer, exercise, hint, maths, takeaway
 
 
 @app.cell(hide_code=True)
@@ -168,7 +172,7 @@ def _(mo):
     | Ch | Topic | Status |
     | --- | --- | --- |
     | **1** | **Foundations:** notation, diffusion equation, interface and boundary conditions, eigenmodes; Bloch–Torrey; the full multi-compartment problem and its weak form; phases and Feynman–Kac | this notebook |
-    | 2 | Series expansions: (a) the eigenmodes of 1a coupled by the gradient, i.e. matrix methods; (b) the cumulant expansion in powers of the gradient; (c) how the two connect | next notebook |
+    | 2 | Series expansions: (a) the eigenmodes of Section 1.1 coupled by the gradient, i.e. matrix methods; (b) the cumulant expansion in powers of the gradient; (c) how the two connect | next notebook |
     | 3 | Analytical formulas: the PGSE box, the narrow-pulse $(q,t)$ map, the long-pulse $(g,T)$ map, the inside of the box, relaxing walls and exchange | done |
     | 4 | Grids and meshes: the method of lines, finite differences, time stepping and stability, periodic cells, finite elements, curved walls | done |
     | 5 | Monte Carlo: simulating the random walk | coming |
@@ -209,7 +213,7 @@ def _(mo):
     | $\mathbf q(t) = \gamma\int_0^t\mathbf g\,dt'$, $b = \int_0^T q^2dt$ | phase-winding wave vector; $b$-value | rad/µm; ms/µm² |
     | $\delta$, $\Delta$ | gradient pulse duration and separation (PGSE) | ms |
     | $\varphi$ | phase gathered by one spin | rad |
-    | $\xi$ | Fourier variable of a characteristic function $\langle e^{i\xi r}\rangle$ (1a); in 1b it becomes $q$ | 1/µm |
+    | $\xi$ | Fourier variable of a characteristic function $\langle e^{i\xi r}\rangle$ (Section 1.1); in Section 1.2 it becomes $q$ | 1/µm |
     | $S$, $S_0$, $E = S/S_0$ | signal with and without diffusion weighting; normalised signal | |
     | $\lambda_n$, $u_n(\mathbf x)$, $\tau_n$ | eigenvalue, eigenmode, decay time $1/(D\lambda_n)$ | 1/µm², –, ms |
     | $P(\mathbf x\mid\mathbf x_0,t)$ | propagator for a known start: probability density to be at $\mathbf x$ at $t$ after starting at $\mathbf x_0$ (one molecule, or many released together at $\mathbf x_0$) | 1/µm³ |
@@ -288,9 +292,9 @@ def _(maths):
 def _(mo):
     mo.md(r"""
     ---
-    # 1a · Diffusion and the eigenmodes of a pore
+    # 1.1 · Diffusion and the eigenmodes of a pore
 
-    ## The diffusion equation
+    ## 1.1.1 The diffusion equation
 
     A water molecule is knocked about by its neighbours roughly every picosecond. Over milliseconds, the times that matter in this course, each molecule therefore performs a random walk: **Brownian motion**. Molecules that start near the same point $\mathbf x_0$ spread out in random directions, with a probability density $P(\mathbf x\mid\mathbf x_0,t)$ to be at $\mathbf x$ at time $t$: the **propagator**. The concentration is what very many such walkers add up to.
 
@@ -433,7 +437,7 @@ def _(answer):
 
     → Shortcut: $G$ is a normal distribution $\frac{1}{\sqrt{2\pi\sigma^2}}e^{-r^2/2\sigma^2}$ with $2\sigma^2 = 4Dt$, whose variance is $\sigma^2 = 2Dt$. This is per axis; in 3D, $\langle\lvert\mathbf r\rvert^2\rangle = 6Dt$.
 
-    → This is the same $\sqrt{2Dt}$ spread you get from a random walk. The equation for the *concentration* and the random walk of *one molecule* describe the same thing. [Einstein (1905)](https://doi.org/10.1002/andp.19053220806) made exactly this link, deriving $\langle r^2\rangle = 2Dt$ from the random motion of suspended particles. Part 1b builds on exactly that.
+    → This is the same $\sqrt{2Dt}$ spread you get from a random walk. The equation for the *concentration* and the random walk of *one molecule* describe the same thing. [Einstein (1905)](https://doi.org/10.1002/andp.19053220806) made exactly this link, deriving $\langle r^2\rangle = 2Dt$ from the random motion of suspended particles. Section 1.2 builds on exactly that.
     """)
     return
 
@@ -498,9 +502,17 @@ def _(C_ALT, C_MAIN, mo, np, plt, rw_D, rw_n, rw_t):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    Conservation plus Fick's law give the diffusion equation, Eq. (1.3). Its solution for a point start is the propagator; averaged over the start density it is the ensemble-average propagator $\bar P(\mathbf r,t)$. Without walls both are the Gaussian $G(r,t)$, with variance $2Dt$ per axis → in a time $t$ a molecule gets about a **diffusion length** $\ell_D\sim\sqrt{Dt}$ away (rms $\sqrt{2Dt}$ = 4.5 µm per axis in 5 ms at $D$ = 2 µm²/ms). Walls start to matter once $\ell_D$ is comparable to the pore size.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## The domain: pores, compartments and a block of tissue
+    ## 1.1.2 The domain: pores, compartments and a block of tissue
 
     The equation alone does not fix the solution. We also need where the molecules start, and what happens where they meet a wall. **This is where the microstructure enters the problem.** First some names (panel b follows the usual multi-compartment notation):
 
@@ -582,9 +594,17 @@ def _(C_ALT, C_MAIN, np, plt):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    The microstructure is the geometry of the domain: compartments $\Omega_n$, the interfaces $\Gamma_{nm}$ between them, and the outer boundary $\partial\Omega$ → the equation is the same everywhere; the tissue enters only through where these surfaces are and what happens at them.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Initial, interface and boundary conditions
+    ## 1.1.3 Initial, interface and boundary conditions
 
     **Initial condition.** At the start the molecules are in equilibrium and spread evenly: $C(\mathbf x,0)=\rho$, a constant (or one constant per compartment).
 
@@ -612,9 +632,17 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    Every interface condition is a statement about the flux into the wall: zero (reflecting), set by the jump across a membrane (permeability $\kappa$), or proportional to $C$ (absorbing, rate $\varrho$) → in a random walk: reflect, cross with a small probability, or remove. The outer boundary condition is a modelling choice: reflecting or periodic.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## The full problem, and the step to one compartment
+    ## 1.1.4 The full problem, and the step to one compartment
 
     Put the pieces together. In every compartment the molecules diffuse with their own diffusivity, starting from their own equilibrium density:
 
@@ -632,9 +660,17 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    The full problem is one diffusion equation per compartment, Eq. (1.9), coupled by the membrane conditions of Eq. (1.10), whose factors $c_{nm}$ keep unequal densities at equilibrium → with every interface impermeable it falls apart into single pores with uniform $D$ and reflecting walls: the case used in most of this course.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Eigenmodes: the natural patterns of a pore
+    ## 1.1.5 Eigenmodes: the natural patterns of a pore
 
     Put the diffusion equation in a bounded domain $\Omega$: one pore, or several compartments joined by membranes, with any of the interface and boundary conditions of the tables above. Some concentration patterns keep their **shape** and only fade in amplitude. These are the **eigenmodes** $u_n(\mathbf x)$ of the domain. Any initial concentration can be written as a sum of eigenmodes, and each one fades at its own rate:
 
@@ -907,9 +943,17 @@ def _(answer):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    In a bounded domain every concentration pattern is a sum of eigenmodes $u_n$, each fading as $e^{-D\lambda_nt}$ → the geometry and the interface conditions go into the modes, the initial condition only into their weights. The propagator follows, Eq. (1.17), and the slowest non-uniform mode sets the time $\tau_1 = 1/(D\lambda_1)$ after which the pore has been explored.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Mean-squared displacement in a slab
+    ## 1.1.6 Mean-squared displacement in a slab
 
     With the propagator in hand, every average over the molecules is an integral. The simplest one is the mean-squared displacement: how far, on average, the molecules have spread after a time $t$. Without walls it grows as $2Dt$ for ever (Exercise 1); between two walls it cannot.
     """)
@@ -990,9 +1034,17 @@ def _(C_ALT, C_FREE, C_MAIN, D1, L1, mo, np, plt):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    In a slab the mean-squared displacement rises as $2Dt$ and levels off at $L^2/6$ → the mode weights fall as $n^{-4}$, so the first mode carries 98.6%: one time scale, $\tau_1 = L^2/(\pi^2D)$, describes the whole approach to restriction.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## The position in the mode basis
+    ## 1.1.7 The position in the mode basis
 
     The MSD needed the integrals $\int x\,u_n\,dx$. They are the first row of a matrix that every later chapter uses: the **position written in the mode basis**,
 
@@ -1007,7 +1059,7 @@ def _(mo):
     | $B_{nm} = 0$ between modes of the same parity | pores symmetric about their centre (slab, disk, sphere) |
     | $B_{0n}\propto1/n^2$ | the slab; Chapter 2 explains the decay rate from the shape |
 
-    It answers: if a pattern sits in mode $m$ and is multiplied by $x$, how much ends up in mode $n$? Together with the eigenvalues it is everything the matrix methods of Chapter 2 need to know about a pore; 1b shows why.
+    It answers: if a pattern sits in mode $m$ and is multiplied by $x$, how much ends up in mode $n$? Together with the eigenvalues it is everything the matrix methods of Chapter 2 need to know about a pore; Section 1.2 shows why.
     """)
     return
 
@@ -1090,9 +1142,17 @@ def _(C_ALT, C_MAIN, mo, np, plt):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    Multiplying by position couples the modes: the position matrix $\mathbf B$, Eq. (1.20), is nonzero only between modes of opposite parity → the eigenvalues $\lambda_n$ and $\mathbf B$ are all that the matrix methods of Chapter 2 need to know about a pore.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Other geometries
+    ## 1.1.8 Other geometries
 
     The recipe is always the same: solve $-\nabla^2 u = \lambda u$ with $\partial u/\partial n = 0$ on the walls. In a disk or sphere, separate in polar or spherical coordinates. The radial part becomes a Bessel function, and the wall condition picks out the roots $\alpha$ of its **derivative**. On a closed surface, such as a circle, there is no wall at all: the mode only has to come back to itself, and **periodicity replaces the wall condition**.
 
@@ -1260,7 +1320,7 @@ def _(mo, t_check):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### Surfaces instead of volumes: the myelin sheath
+    ### 1.1.8.1 Surfaces instead of volumes: the myelin sheath
 
     Water trapped between the wraps of myelin moves along thin sheets. [Canales-Rodríguez, Tax et al. (2025)](https://doi.org/10.3389/fphy.2025.1516630) model each sheet as the **surface of a cylinder** of radius $R$, and the myelin sheath as a stack of **impermeable concentric cylinders** separated by very thin layers of water. Along the axis the motion is free. Across it, a molecule moves on a circle.
 
@@ -1366,9 +1426,17 @@ def _(answer):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    Disks, cylinders and spheres have Bessel modes, $\lambda = (\alpha/R)^2$ with $\alpha$ a root of $J_m'$ or $j_l'$ → the slowest mode has one sign change across the pore ($\alpha$ = 1.84 for a disk), not the radial one, and $R$ is the radius, not the diameter. A cylindrical surface has no walls at all: $\lambda_n = n^2/R^2$.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Beyond the mean-squared displacement: cumulants of the displacement
+    ## 1.1.9 Beyond the mean-squared displacement: cumulants of the displacement
 
     The MSD is one number per time. The ensemble-average propagator $\bar P(r,t)$ of Eqs. (1.6)–(1.7) holds the whole **distribution of displacements** $r = x - x_0$ over all molecules, starting uniformly.
 
@@ -1394,7 +1462,7 @@ def _(mo):
 
     (For molecules from a known start $x_0$, $p = P(x_0 + r\mid x_0, t)$ and the average is $\langle\cdot\rangle_{x\mid x_0}$.) A Gaussian stops at $\xi^2$, so all its cumulants beyond the variance vanish (Exercise 8a).
 
-    Keep this line in mind: 1b shows that a measurement can give you exactly this characteristic function.
+    Keep this line in mind: Section 1.2 shows that a measurement can give you exactly this characteristic function.
     """)
     return
 
@@ -1529,9 +1597,17 @@ def _(answer):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    $D(t) = \langle r^2\rangle_{x,x_0}/2t$ and the kurtosis $K(t)$ describe $\bar P(r,t)$ beyond its width → walls make $D(t)$ fall and give $K(t)$ both signs: positive at short times, $-3/5$ at long times in a slab. A nonzero $K$ means a non-Gaussian distribution, but at a single diffusion time it cannot tell restriction from heterogeneity.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Short times: the walls are felt through $S/V$
+    ## 1.1.10 Short times: the walls are felt through $S/V$
 
     **Two pools of water.** At short times a molecule only feels a wall if it starts within about one diffusion length $\ell_D = \sqrt{Dt}$ of it. That splits the water into two pools (figure below):
 
@@ -1708,9 +1784,17 @@ def _(answer):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    At short times only a layer of thickness $\sim\sqrt{Dt}$ along the walls feels them, and that layer holds a fraction $\propto\sqrt{Dt}\,S/V$ of the water → $D(t)/D = 1 - \frac{4}{3\sqrt\pi\,d}\frac SV\sqrt{Dt}$, Eq. (1.30), for any shape: a short-time measurement gives $S/V$.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## When the interfaces are not reflecting
+    ## 1.1.11 When the interfaces are not reflecting
 
     Everything so far assumed impermeable walls. The recipe for the eigenmodes stays the same, $-\nabla^2u = \lambda u$, but the condition at the interfaces changes, and with it the modes:
 
@@ -1910,11 +1994,19 @@ def _(answer):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    Permeable membranes and absorbing walls use the same recipe: modes of the whole domain, with the interface condition giving the equation for the eigenvalues → the slowest mode sets the exchange rate ($\approx4\kappa/L$) or the rate of loss at the walls ($\approx\varrho\,S/V$).
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Two compartments that exchange: the Kärger model
+    ## 1.1.12 Two compartments that exchange: the Kärger model
 
-    ### From the modes to two numbers
+    ### 1.1.12.1 From the modes to two numbers
 
     Go back to the slab with a membrane in the middle (Exercise 10). Its modes are exact, and the figure below shows how fast each of them fades as the membrane becomes more permeable.
 
@@ -1926,13 +2018,13 @@ def _(mo):
 
     → After a time of order $L^2/(4\pi^2D)$ only the first two modes are left. The concentration is then flat inside each half, and two numbers describe everything: the amounts in the two halves. Their equation is the mode equation cut down to those two modes. **The two slowest modes of the full problem become a 2×2 rate matrix** (Exercise 11a).
 
-    ### From closed halves to Gaussian compartments
+    ### 1.1.12.2 From closed halves to Gaussian compartments
 
     In the slab each half is closed, so a molecule's displacement stays bounded and is not Gaussian. Kärger's model is meant for a medium with many units of each kind, such as a tissue of many cells. Watched over distances much larger than one unit, a molecule that stays within one kind of compartment adds up many independent steps, and its displacement is Gaussian again, with an effective diffusivity $D_i$ (the argument of Exercise 1). Molecules shut inside closed units have an effective $D_i$ near zero on that scale.
 
     [Kärger (1985)](<https://doi.org/10.1016/0001-8686(85)80018-X>) combines the two limits. *Which* compartment a molecule is in follows the two-mode rate equation, with rates $k_1$ (out of 1) and $k_2$ (out of 2). *How far* it gets while in compartment $i$ is free diffusion with $D_i$.
 
-    ### The model
+    ### 1.1.12.3 The model
 
     ⇒ At equilibrium the fractions $p_1$, $p_2$ do not change: as many molecules leave 1 as enter it, $k_1p_1 = k_2p_2$ (**detailed balance**). One time scale is left, the exchange time $\tau_{\text{ex}} = 1/(k_1 + k_2)$.
 
@@ -2110,12 +2202,20 @@ def _(answer):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    Once the patterns inside each compartment have faded, two exchanging Gaussian compartments describe everything → the mean-squared displacement is $2\bar Dt$ at all times; exchange shows up only in the kurtosis, which falls from $K_0$ to zero over the exchange time $\tau_{\text{ex}}$.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     ---
-    # 1b · The diffusion MRI signal: what a gradient does, and two routes to it
+    # 1.2 · The diffusion MRI signal: what a gradient does, and two routes to it
 
-    ## What a gradient does
+    ## 1.2.1 What a gradient does
 
     After the 90° pulse the magnetization lies in the transverse plane. Write it as one complex number, $m = M_x + iM_y$: an arrow with length $\lvert m\rvert$ and angle $\arg m$. In the frame rotating at the Larmor frequency all arrows stand still, until a **diffusion gradient** is switched on. The gradient adds a magnetic field that grows linearly with position, $\mathbf g\cdot\mathbf x$, so a spin at $\mathbf x$ precesses at the angular frequency $\gamma\,\mathbf g\cdot\mathbf x$.
 
@@ -2125,7 +2225,7 @@ def _(mo):
 
     ⇒ **Only motion leaves a phase behind.** A spin that has not moved returns to exactly zero phase at the echo. A spin that moved keeps $\varphi = \gamma\int_0^T\mathbf g(t)\cdot\mathbf x(t)\,dt\ne0$. The scanner records the sum of all arrows in the voxel. Arrows that point in different directions partly cancel, and the signal drops (panel c).
 
-    → The attenuation $E = S/S_0$ measures how the spins moved while the gradient was on. The geometry of 1a enters because the walls limit that motion.
+    → The attenuation $E = S/S_0$ measures how the spins moved while the gradient was on. The geometry of Section 1.1 enters because the walls limit that motion.
     """)
     return
 
@@ -2194,9 +2294,17 @@ def _(C_ALT, C_FREE, C_MAIN, np, plt):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    A gradient makes the phase of a spin record its position, $\varphi = \gamma\int\mathbf g\cdot\mathbf x\,dt$, Eq. (1.38) → static spins refocus at the echo, moving spins keep a phase, and the spread of phases attenuates the signal $E = S/S_0$.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Two routes to the signal
+    ## 1.2.2 Two routes to the signal
 
     The picture above suggests two ways to compute $E$:
 
@@ -2204,8 +2312,8 @@ def _(mo):
     | --- | --- | --- |
     | Follows | the magnetization $m(\mathbf x,t)$ everywhere in the voxel | single spins, each on its own random path $\mathbf x(t)$ |
     | Computes | a PDE, the Bloch–Torrey equation; then $S = \int m\,d\mathbf x$ at the echo | each spin's phase $\varphi = \gamma\int\mathbf g\cdot\mathbf x\,dt$; then the average $E = \langle e^{-i\varphi}\rangle_{\text{paths}}$ |
-    | The geometry enters as | interface conditions, through the eigenmodes of 1a | walls that reflect the walkers, or let them through |
-    | Methods in this course | eigenmodes and matrices (Ch 2a), formulas (Ch 3), grids and meshes (Ch 4) | the cumulant expansion (Ch 2b), Monte Carlo (Ch 5) |
+    | The geometry enters as | interface conditions, through the eigenmodes of Section 1.1 | walls that reflect the walkers, or let them through |
+    | Methods in this course | eigenmodes and matrices (Section 2.1), formulas (Ch 3), grids and meshes (Ch 4) | the cumulant expansion (Section 2.2), Monte Carlo (Ch 5) |
 
     The two routes give exactly the same $E$. That is the **Feynman–Kac relation**, which you derive at the end of the path picture (Exercise 14). The next two sections take the routes one at a time.
     """)
@@ -2213,20 +2321,9 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## The field picture: the Bloch–Torrey equation
-
-    ### From Bloch to Bloch–Torrey
-
-    Precession alone turns each arrow at its own rate: $\partial m/\partial t = -i\gamma\,\mathbf g(t)\cdot\mathbf x\,m$. The spins also diffuse, and magnetization is carried with them exactly like the concentration in 1a. [Torrey (1956)](https://doi.org/10.1103/PhysRev.104.563) added the two effects to [Bloch's (1946)](https://doi.org/10.1103/PhysRev.70.460) equations:
-
-    $$\boxed{\ \frac{\partial m}{\partial t} = D\,\nabla^2 m \;-\; i\gamma\,\mathbf g(t)\cdot\mathbf x\; m\ }\qquad m(\mathbf x,0) = \rho,\qquad \frac{\partial m}{\partial n}=0 \text{ on impermeable interfaces}.\tag{1.35}$$
-
-    - **Diffusion** smooths phase differences out; the **gradient** winds them up. Every regime in this course is a contest between those two.
-    - $\mathbf g(t)$ is the effective gradient, so the 180° pulse is already in the equation.
-    - The scanner measures the sum over the voxel: $S(T) = \int_\Omega m(\mathbf x,T)\,d\mathbf x$, and we report $E = S/S_0$.
-    - The conditions are those of 1a, so the **geometry enters exactly as before**: through the eigenmodes. The gradient term multiplies $m$ by $\mathbf g\cdot\mathbf x$, which mixes the modes through the position matrix $\mathbf B$ of 1a (Chapter 2). [Robertson (1966)](https://doi.org/10.1103/PhysRev.151.273) was the first to expand the magnetization in the modes of a slab.
+def _(takeaway):
+    takeaway(r"""
+    One signal, two routes: follow the magnetization as a field (the Bloch–Torrey PDE) or follow the spins (the average phase over random walks) → the field route leads to eigenmodes, formulas and grids (Chapters 2–4), the path route to the cumulant expansion and Monte Carlo (Chapters 2 and 5).
     """)
     return
 
@@ -2234,9 +2331,28 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### The full problem every simulator solves
+    ## 1.2.3 The field picture: the Bloch–Torrey equation
 
-    The magnetization lives in the same compartments, with the same conditions, as the concentration in 1a (Eqs. 1.9–1.10); the block of tissue $\Omega$ is now the imaging voxel, or a piece of it. Two things are added: the gradient, and relaxation, which can differ between compartments. With the gradient written as $\mathbf g(t) = f(t)\,\mathbf g$ (for PGSE, $f = +1$ during the first lobe and $-1$ during the second, once the 180° pulse is folded in), each compartment obeys
+    ### 1.2.3.1 From Bloch to Bloch–Torrey
+
+    Precession alone turns each arrow at its own rate: $\partial m/\partial t = -i\gamma\,\mathbf g(t)\cdot\mathbf x\,m$. The spins also diffuse, and magnetization is carried with them exactly like the concentration in Section 1.1. [Torrey (1956)](https://doi.org/10.1103/PhysRev.104.563) added the two effects to [Bloch's (1946)](https://doi.org/10.1103/PhysRev.70.460) equations:
+
+    $$\boxed{\ \frac{\partial m}{\partial t} = D\,\nabla^2 m \;-\; i\gamma\,\mathbf g(t)\cdot\mathbf x\; m\ }\qquad m(\mathbf x,0) = \rho,\qquad \frac{\partial m}{\partial n}=0 \text{ on impermeable interfaces}.\tag{1.35}$$
+
+    - **Diffusion** smooths phase differences out; the **gradient** winds them up. Every regime in this course is a contest between those two.
+    - $\mathbf g(t)$ is the effective gradient, so the 180° pulse is already in the equation.
+    - The scanner measures the sum over the voxel: $S(T) = \int_\Omega m(\mathbf x,T)\,d\mathbf x$, and we report $E = S/S_0$.
+    - The conditions are those of Section 1.1, so the **geometry enters exactly as before**: through the eigenmodes. The gradient term multiplies $m$ by $\mathbf g\cdot\mathbf x$, which mixes the modes through the position matrix $\mathbf B$ of Section 1.1 (Chapter 2). [Robertson (1966)](https://doi.org/10.1103/PhysRev.151.273) was the first to expand the magnetization in the modes of a slab.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 1.2.3.2 The full problem every simulator solves
+
+    The magnetization lives in the same compartments, with the same conditions, as the concentration in Section 1.1 (Eqs. 1.9–1.10); the block of tissue $\Omega$ is now the imaging voxel, or a piece of it. Two things are added: the gradient, and relaxation, which can differ between compartments. With the gradient written as $\mathbf g(t) = f(t)\,\mathbf g$ (for PGSE, $f = +1$ during the first lobe and $-1$ during the second, once the 180° pulse is folded in), each compartment obeys
 
     $$\boxed{\ \frac{\partial m_n}{\partial t} = \nabla\cdot(D_n\nabla m_n) - \frac{m_n}{T_{2,n}} - i\gamma f(t)\,(\mathbf g\cdot\mathbf x)\,m_n\ \text{ in }\Omega_n,\qquad m_n(\mathbf x,0) = \rho_n\ },\tag{1.36}$$
 
@@ -2248,7 +2364,7 @@ def _(mo):
 
     and the signal is $S(T) = \int_\Omega m(\mathbf x, T)\,d\mathbf x$, $E = S/S_0$.
 
-    Two conditions of 1a change meaning for magnetization:
+    Two conditions of Section 1.1 change meaning for magnetization:
 
     - The partially absorbing wall becomes a **relaxing wall**: $\varrho$ is the surface relaxivity, the rate at which a wall destroys magnetization, for example through paramagnetic sites on the wall ([Brownstein & Tarr 1979](https://doi.org/10.1103/PhysRevA.19.2446)). It matters in rocks and porous media, and is rarely needed in soft tissue.
     - A **periodic** outer boundary must remember the gradient. A spin that leaves through one face and re-enters through the opposite face has crossed one period $\mathbf L$ of the tissue, and the gradient has wound a phase across that distance. So $m$ matches on opposite faces only up to that phase: $m(\mathbf x + \mathbf L, t) = e^{-i\mathbf q(t)\cdot\mathbf L}\,m(\mathbf x, t)$, with $\mathbf q(t) = \gamma\int_0^t\mathbf g\,dt'$ (Chapter 4 shows how simulators use it).
@@ -2290,7 +2406,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### The same problem in weak form
+    ### 1.2.3.3 The same problem in weak form
 
     The Bloch–Torrey equation makes a demand at every point: both sides must be equal everywhere in $\Omega$. The same problem can be stated as a demand on **averages** instead. That second statement, the weak form, is where most numerical methods start, and it shows how the boundary conditions enter them.
 
@@ -2388,11 +2504,19 @@ def _(answer):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    Bloch–Torrey is the diffusion equation of Section 1.1 plus a phase term $-i\gamma\,\mathbf g\cdot\mathbf x\,m$, with the same compartments and conditions → in weak form, Eq. (1.37), the wall conditions sit in a boundary term, and choosing the test functions chooses the method: modes give Chapter 2, hat functions give finite elements (Chapter 4).
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## The path picture: the average phase over random walks
+    ## 1.2.4 The path picture: the average phase over random walks
 
-    Follow single spins. Each spin random-walks along its own path $\mathbf x(t)$ (reflected at walls, as in 1a) and gathers its own phase
+    Follow single spins. Each spin random-walks along its own path $\mathbf x(t)$ (reflected at walls, as in Section 1.1) and gathers its own phase
 
     $$\boxed{\ \varphi = \gamma\int_0^T \mathbf g(t)\cdot\mathbf x(t)\,dt\ }.\tag{1.38}$$
 
@@ -2404,11 +2528,11 @@ def _(mo):
 
     *Sign convention: some texts write $e^{+i\varphi}$. For a refocused echo the two give the same magnitude.*
 
-    **Short pulses: the distribution of displacements.** Make both lobes so short that the spins hardly move during them. The first lobe gives each spin the phase $\mathbf q\cdot\mathbf x(0)$ and the second takes away $\mathbf q\cdot\mathbf x(\Delta)$, so $\varphi = -\mathbf q\cdot\mathbf r$ with $\mathbf r$ the displacement of 1a over the time $\Delta$. Then
+    **Short pulses: the distribution of displacements.** Make both lobes so short that the spins hardly move during them. The first lobe gives each spin the phase $\mathbf q\cdot\mathbf x(0)$ and the second takes away $\mathbf q\cdot\mathbf x(\Delta)$, so $\varphi = -\mathbf q\cdot\mathbf r$ with $\mathbf r$ the displacement of Section 1.1 over the time $\Delta$. Then
 
     $$\boxed{\ E = \big\langle e^{i\mathbf q\cdot\mathbf r}\big\rangle_{\mathbf x,\mathbf x_0}\ },\tag{1.40}$$
 
-    the characteristic function of the displacements of 1a, Eq. (1.27), with the Fourier variable $\xi$ set by the gradient: $\xi = q$. Its logarithm has the cumulants of 1a as coefficients, so in this limit $D(t)$ and $K(t)$ are what diffusion and kurtosis imaging estimate. Chapter 3 maps where the limit holds; Chapter 2 shows what changes when the pulses are not short.
+    the characteristic function of the displacements of Section 1.1, Eq. (1.27), with the Fourier variable $\xi$ set by the gradient: $\xi = q$. Its logarithm has the cumulants of Section 1.1 as coefficients, so in this limit $D(t)$ and $K(t)$ are what diffusion and kurtosis imaging estimate. Chapter 3 maps where the limit holds; Chapter 2 shows what changes when the pulses are not short.
 
     **The two routes agree.** The average phase factor of Eq. (1.39) gives exactly the same $E$ as integrating the solution of the Bloch–Torrey equation (1.33). This is an example of the **Feynman–Kac relation** between parabolic PDEs and averages over random paths. [Carr & Purcell (1954)](https://doi.org/10.1103/PhysRev.94.630) already computed echo attenuation this way, as an average phase over random walks; the general relation is due to [Kac (1949)](https://doi.org/10.1090/S0002-9947-1949-0027960-X), inspired by [Feynman's (1948)](https://doi.org/10.1103/RevModPhys.20.367) path integrals. You can derive it yourself in a few lines.
     """)
@@ -2479,7 +2603,15 @@ def _(answer):
     $$\int m(x,T)\,dx = \big\langle e^{-i\varphi}\big\rangle_{\text{paths}} .\qquad\blacksquare$$
 
     → **What it means.** The magnetization at $x$ *is* the phase-weighted density of spins at $x$. The PDE tracks the density; the random walk tracks the spins.
-    → **What it means for simulation.** Step (b), repeated many times, is a recipe: move each walker with a Gaussian step, then add its phase. That is a Monte Carlo simulation (Chapter 5). Written in the eigenbasis of 1a, the same alternation of "diffuse, then add phase" is the multiple propagator method (Chapter 2). Both converge to the Bloch–Torrey solution as $\delta t\to0$, for exactly the reason shown in (c).
+    → **What it means for simulation.** Step (b), repeated many times, is a recipe: move each walker with a Gaussian step, then add its phase. That is a Monte Carlo simulation (Chapter 5). Written in the eigenbasis of Section 1.1, the same alternation of "diffuse, then add phase" is the multiple propagator method (Chapter 2). Both converge to the Bloch–Torrey solution as $\delta t\to0$, for exactly the reason shown in (c).
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    The signal is the average phase factor over random paths, $E = \langle e^{-i\varphi}\rangle_{\text{paths}}$, Eq. (1.39); for short pulses it is the characteristic function of the displacement → the PDE and the random walk give the same signal (Feynman–Kac), and "move each walker, then add its phase" is a Monte Carlo simulation.
     """)
     return
 
@@ -2487,7 +2619,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Length scales: who wins, diffusion, the gradient or the walls?
+    ## 1.2.5 Length scales: who wins, diffusion, the gradient or the walls?
 
     Bloch–Torrey contains a handful of lengths. Which regime you are in, and so which approximation or simulation method works, depends on which length is the **shortest**.
 
@@ -2504,7 +2636,7 @@ def _(mo):
 
     | Shortest length | Regime | What the signal does | In this course |
     | --- | --- | --- | --- |
-    | $\ell_D$ | free diffusion, or short times | $E \approx e^{-bD}$; walls only add a correction $\propto (S/V)\sqrt{DT}$ | Ch 3: short times and the $(q,t)$ map; the $S/V$ law of 1a |
+    | $\ell_D$ | free diffusion, or short times | $E \approx e^{-bD}$; walls only add a correction $\propto (S/V)\sqrt{DT}$ | Ch 3: short times and the $(q,t)$ map; the $S/V$ law of Section 1.1 |
     | $L$ | motional narrowing (fully restricted) | spins average over the pore; slab: $\ln E \approx -\gamma^2g^2L^4T/(120D)$ ([Robertson 1966](https://doi.org/10.1103/PhysRev.151.273)) | Ch 2: Gaussian phase approximation; Ch 3: motional narrowing |
     | $\ell_g$ | localisation | magnetization survives only in layers of thickness $\sim\ell_g$ at the walls; $\ln E \propto -DT/\ell_g^2 \propto -g^{2/3}T$, not $-g^2$ | Ch 2: the matrix method (the cumulant series fails); Ch 3: localisation |
 
@@ -2645,6 +2777,14 @@ def _(answer):
 
 
 @app.cell(hide_code=True)
+def _(takeaway):
+    takeaway(r"""
+    Three lengths compete: the pore size $L$, the diffusion length $\ell_D = \sqrt{DT}$ and the gradient length $\ell_g = (D/\gamma g)^{1/3}$ → the shortest sets the regime: free diffusion ($\ell_D$), motional narrowing ($L$) or localisation at the walls ($\ell_g$).
+    """)
+    return
+
+
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     ---
@@ -2673,11 +2813,11 @@ def _(mo):
 
     **Chapter 2 · Series expansions: two ways to expand the signal**
 
-    Two different series, often confused. **(a)** expands the magnetization in the eigenmodes of 1a: exact once enough modes are kept, at any gradient strength, so it is a numerical method. **(b)** expands $\ln E$ in powers of the gradient: an approximation for weak gradients, which gives closed formulas.
+    Two different series, often confused. **(a)** expands the magnetization in the eigenmodes of Section 1.1: exact once enough modes are kept, at any gradient strength, so it is a numerical method. **(b)** expands $\ln E$ in powers of the gradient: an approximation for weak gradients, which gives closed formulas.
 
-    - **2a · Matrix methods.** The gradient as a matrix $\mathbf B$ in the eigenbasis: the eigenmodes stay the same, the gradient only couples them, $d\mathbf c/dt = -(D\Lambda + i\gamma g(t)\mathbf B)\,\mathbf c$. Grebenkov's MCF: one matrix exponential per piece of constant gradient, exact for piecewise-constant waveforms (Barzykin 1999; Grebenkov 2007). The multiple propagator: diffusion and phase kicks in turn, with Strang splitting and its $\tau^2$ error (Caprihan et al. 1996; Callaghan 1997). The time-ordered exponential (Axelrod & Sen 2001); trapezoids and other waveforms. **How many modes:** smoothness of the mirrored magnetization, Jackson's theorem, and why the couplings fall as $1/n^2$. Beyond simple shapes: modes computed on a mesh (SpinDoctor's matrix formalism), a differentiable version for fitting (ReMiDi), and cylindrical surfaces (Canales-Rodríguez, Tax et al. 2026).
-    - **2b · The cumulant expansion.** $\ln E = -\frac12\langle\varphi^2\rangle_{\text{paths}} + \frac1{24}\big(\langle\varphi^4\rangle_{\text{paths}} - 3\langle\varphi^2\rangle_{\text{paths}}^2\big) - \dots$ The second-order term is the **Gaussian phase approximation**: closed formulas from the mode weights and time scales of 1a (Murday & Cotts 1968; Neuman 1974; van Gelderen et al. 1994), the same in frequency as the diffusion spectrum $D(\omega)$ and OGSE (Stepišnik 1993), exact in a harmonic well. Walkers, modes and the GPA side by side: when is the phase Gaussian? The fourth-order term is the **kurtosis** (Jensen et al. 2005). With narrow pulses these are the displacement cumulants $D(t)$ and $K(t)$ of 1a. With finite pulses they become time integrals of multi-time correlation functions, and the measured kurtosis is no longer the displacement kurtosis.
-    - **2c · The link.** Grebenkov's MCF moment series computes each cumulant from the modes; the second is $\propto\iint g(t_1)g(t_2)\,[\mathbf B\,e^{-D\Lambda|t_1-t_2|}\mathbf B]_{00}\,dt_1dt_2$. Where the cumulant series stops converging, and why the matrix methods of 2a do not have that limit.
+    - **2.1 · Matrix methods.** The gradient as a matrix $\mathbf B$ in the eigenbasis: the eigenmodes stay the same, the gradient only couples them, $d\mathbf c/dt = -(D\Lambda + i\gamma g(t)\mathbf B)\,\mathbf c$. Grebenkov's MCF: one matrix exponential per piece of constant gradient, exact for piecewise-constant waveforms (Barzykin 1999; Grebenkov 2007). The multiple propagator: diffusion and phase kicks in turn, with Strang splitting and its $\tau^2$ error (Caprihan et al. 1996; Callaghan 1997). The time-ordered exponential (Axelrod & Sen 2001); trapezoids and other waveforms. **How many modes:** smoothness of the mirrored magnetization, Jackson's theorem, and why the couplings fall as $1/n^2$. Beyond simple shapes: modes computed on a mesh (SpinDoctor's matrix formalism), a differentiable version for fitting (ReMiDi), and cylindrical surfaces (Canales-Rodríguez, Tax et al. 2026).
+    - **2.2 · The cumulant expansion.** $\ln E = -\frac12\langle\varphi^2\rangle_{\text{paths}} + \frac1{24}\big(\langle\varphi^4\rangle_{\text{paths}} - 3\langle\varphi^2\rangle_{\text{paths}}^2\big) - \dots$ The second-order term is the **Gaussian phase approximation**: closed formulas from the mode weights and time scales of Section 1.1 (Murday & Cotts 1968; Neuman 1974; van Gelderen et al. 1994), the same in frequency as the diffusion spectrum $D(\omega)$ and OGSE (Stepišnik 1993), exact in a harmonic well. Walkers, modes and the GPA side by side: when is the phase Gaussian? The fourth-order term is the **kurtosis** (Jensen et al. 2005). With narrow pulses these are the displacement cumulants $D(t)$ and $K(t)$ of Section 1.1. With finite pulses they become time integrals of multi-time correlation functions, and the measured kurtosis is no longer the displacement kurtosis.
+    - **2.3 · The link.** Grebenkov's MCF moment series computes each cumulant from the modes; the second is $\propto\iint g(t_1)g(t_2)\,[\mathbf B\,e^{-D\Lambda|t_1-t_2|}\mathbf B]_{00}\,dt_1dt_2$. Where the cumulant series stops converging, and why the matrix methods of Section 2.1 do not have that limit.
     - *Implementations:* MCFAL, MISST, SpinDoctor, the cylindrical-surface code; GPA formulas in Camino and dmipy.
 
     **Chapter 3 · Analytical formulas: a map of the PGSE parameter space**
@@ -2685,7 +2825,7 @@ def _(mo):
     A PGSE experiment in a pore is fixed by three dimensionless numbers, $D\Delta/L^2$, $D\delta/L^2$ and $\gamma gL^3/D$. Every closed-form result holds in one corner of this box. The chapter computes each corner by comparing the formula with the exact solutions of Chapter 2.
 
     - **Narrow pulses, the $(q,t)$ map:** the signal as the characteristic function of the displacement, $E(q,\Delta) = \langle e^{iqr}\rangle_{x,x_0}$. Short times: free diffusion, the $b$-matrix (Stejskal & Tanner 1965; Basser et al. 1994), the surface-to-volume ratio from $D(t)$ (Mitra et al. 1992) and the short-time kurtosis. Long times: closed pores, tortuosity and structural disorder (Novikov et al. 2014). Large $q$: diffusion–diffraction and the form factors of slab, cylinder and sphere (Tanner & Stejskal 1968; Callaghan et al. 1991). Where the cumulant series stops.
-    - **Long pulses, the $(g,T)$ map** built from the length scales of 1b: free diffusion, motional narrowing (Robertson 1966) and localisation (Stoller, Happer & Dyson 1991; Hürlimann et al. 1995), meeting at a triple point.
+    - **Long pulses, the $(g,T)$ map** built from the length scales of Section 1.2: free diffusion, motional narrowing (Robertson 1966) and localisation (Stoller, Happer & Dyson 1991; Hürlimann et al. 1995), meeting at a triple point.
     - **Inside the box:** how the edge of the cumulant region moves with $\delta/\Delta$, and a tested rule for it.
     - **Extra axes:** exchange between compartments (Kärger 1985) and relaxing walls (Brownstein & Tarr 1979).
     - *Implementations:* closed-form compartment models, for example the cylinder and sphere models in Camino and dmipy.
@@ -2693,7 +2833,7 @@ def _(mo):
     **Chapter 4 · Solving the PDE on a grid or a mesh**
 
     - **Finite differences:** the domain as voxels; the Laplacian as jumps to neighbours; explicit time steps and their stability limit; periodic boundaries with a phase shift. *Implementation:* MATI.
-    - **Finite elements:** the weak form of 1b with hat functions, mass and stiffness matrices, a mesh that follows the cell walls; permeable membranes as double nodes. *Implementation:* SpinDoctor.
+    - **Finite elements:** the weak form of Section 1.2 with hat functions, mass and stiffness matrices, a mesh that follows the cell walls; permeable membranes as double nodes. *Implementation:* SpinDoctor.
 
     **Chapter 5 · Monte Carlo: simulating the random walk**
 

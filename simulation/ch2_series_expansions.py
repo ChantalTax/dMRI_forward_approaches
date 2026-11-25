@@ -198,7 +198,7 @@ def _(mo):
 
     Both halves of this chapter expand the signal in a series. They are easy to confuse, and they do very different things.
 
-    | | **2a · Eigenmode expansion (matrix methods)** | **2b · Cumulant expansion** |
+    | | **2.1 · Eigenmode expansion (matrix methods)** | **2.2 · Cumulant expansion** |
     | --- | --- | --- |
     | What is expanded | the magnetization $m(x,t)$, in the eigenmodes $u_n$ | $\ln E$, in powers of the gradient |
     | Small parameter | none: keep enough modes | the phase spread, $\langle\varphi^2\rangle_{\text{paths}} = \lim\frac1N\sum_j\varphi_j^2\lesssim 1$ |
@@ -206,7 +206,7 @@ def _(mo):
     | Output | numbers | closed formulas you can fit and interpret |
     | First term | — | the Gaussian phase approximation |
 
-    Section 2c shows that they are built from the same pieces.
+    Section 2.3 shows that they are built from the same pieces.
     """)
     return
 
@@ -215,9 +215,9 @@ def _(mo):
 def _(mo):
     mo.md(r"""
     ---
-    # 2a · Matrix methods
+    # 2.1 · Matrix methods
 
-    ## The Bloch–Torrey equation in the eigenbasis
+    ## 2.1.1 The Bloch–Torrey equation in the eigenbasis
 
     The eigenmodes of a pore are a complete set: any magnetization that satisfies the interface conditions can be written as a sum of them. So write
 
@@ -262,7 +262,7 @@ def _(maths):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## The PGSE signal with Grebenkov's MCF
+    ## 2.1.2 The PGSE signal with Grebenkov's MCF
 
     When the gradient is **constant** over an interval of length $\tau$, $d\mathbf c/dt = -(D\Lambda + i\gamma g\mathbf B)\mathbf c$ has constant coefficients and is solved by one matrix exponential: $\mathbf c(t+\tau) = e^{-(D\Lambda + i\gamma g\mathbf B)\tau}\,\mathbf c(t)$.
 
@@ -344,7 +344,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Any waveform: a staircase, or diffusion and kicks in turn
+    ## 2.1.3 Any waveform: a staircase, or diffusion and kicks in turn
 
     Real gradients have **ramps**: the lobes are trapezoids, and oscillating or free waveforms are not piecewise constant at all. There are two ways to step through such a waveform with the same $\Lambda$ and $\mathbf B$.
 
@@ -480,7 +480,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## How many modes? Smoothness, and Jackson's theorem
+    ## 2.1.4 How many modes? Smoothness, and Jackson's theorem
 
     How large must $N$ be? Approximation theory gives the right way to think about it.
 
@@ -580,7 +580,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Implementations
+    ## 2.1.5 Implementations
 
     | Toolbox | Method | Geometry | Notes |
     | --- | --- | --- | --- |
@@ -599,9 +599,9 @@ def _(mo):
 def _(mo):
     mo.md(r"""
     ---
-    # 2b · The cumulant expansion
+    # 2.2 · The cumulant expansion
 
-    ## Expanding the logarithm of the signal
+    ## 2.2.1 Expanding the logarithm of the signal
 
     The path picture gives $E = \langle e^{-i\varphi}\rangle_{\text{paths}}$: the **characteristic function** of the phase. As for the displacement in Chapter 1, its logarithm is a series of cumulants:
 
@@ -611,7 +611,7 @@ def _(mo):
 
     **The Gaussian phase approximation (GPA)** keeps only the first term: $E \approx e^{-\langle\varphi^2\rangle_{\text{paths}}/2}$. It is exact when the phase is Gaussian (free diffusion, Exercise 4), and good whenever the higher cumulants are small compared with $\langle\varphi^2\rangle_{\text{paths}}$.
 
-    ## The second cumulant from the modes
+    ## 2.2.2 The second cumulant from the modes
 
     $\varphi = \gamma\int g(t)\,x(t)\,dt$ is linear in the path, so its variance only needs the **position autocorrelation**:
 
@@ -698,7 +698,7 @@ def _(mo):
     mo.md(r"""
     ### See it: the GPA against the exact signal
 
-    The exact curve is the MCF of 2a with 40 modes; the GPA uses the closed formula of Exercise 4 summed over 400 modes. Both use the PGSE sliders above.
+    The exact curve is the MCF of Section 2.1 with 40 modes; the GPA uses the closed formula of Exercise 4 summed over 400 modes. Both use the PGSE sliders above.
     """)
     return
 
@@ -772,7 +772,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## The fourth cumulant: kurtosis, and why finite pulses matter
+    ## 2.2.3 The fourth cumulant: kurtosis, and why finite pulses matter
 
     Diffusion kurtosis imaging ([Jensen et al. 2005](https://doi.org/10.1002/mrm.20508)) fits the first two terms in powers of $b$:
 
@@ -848,7 +848,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## The same in frequency: the diffusion spectrum
+    ## 2.2.4 The same in frequency: the diffusion spectrum
 
     Write the variance of the phase in the frequency domain. With $Q(\omega) = \int q(t)\,e^{i\omega t}dt$,
 
@@ -885,9 +885,9 @@ def _(C_ALT, C_FREE, C_MAIN, D0, L_a, mo, np, plt, slab_weights):
 def _(mo):
     mo.md(r"""
     ---
-    # 2c · The link: cumulants are matrix products
+    # 2.3 · The link: cumulants are matrix products
 
-    The two halves of this chapter look different, but they are built from the same $\Lambda$ and $\mathbf B$. Expand the exact solution of 2a in powers of the gradient. Treating $i\gamma g\mathbf B$ as a perturbation of $D\Lambda$ (variation of constants, applied repeatedly):
+    The two halves of this chapter look different, but they are built from the same $\Lambda$ and $\mathbf B$. Expand the exact solution of Section 2.1 in powers of the gradient. Treating $i\gamma g\mathbf B$ as a perturbation of $D\Lambda$ (variation of constants, applied repeatedly):
 
     $$c_0(T) = 1 \;-\; i\gamma\int_0^T g(t)\,B_{00}\,dt \;-\; \gamma^2\int_0^T\!dt_2\int_0^{t_2}\!dt_1\;g(t_2)\,g(t_1)\,\big[\mathbf B\,e^{-D\Lambda(t_2-t_1)}\mathbf B\big]_{00} \;+\;\dots\tag{2.14}$$
 
@@ -898,8 +898,8 @@ def _(mo):
     which is where the name of the method comes from: **MCF = multiple correlation function** (Grebenkov 2007). The time-ordered exponential of Axelrod & Sen (2001) is the same expansion written compactly.
 
     - The **moments** of the phase are these terms. Taking the logarithm turns them into **cumulants**: the second-order term is $-\langle\varphi^2\rangle_{\text{paths}}/2$, the GPA.
-    - The matrix methods of 2a sum the whole series at once, by computing the exponentials directly. That is why they work at any $G$.
-    - The cumulant series of 2b truncates the logarithm. That is why it has a radius of convergence (Exercise 5c), while the series for $E$ itself does not (for a finite number of modes).
+    - The matrix methods of Section 2.1 sum the whole series at once, by computing the exponentials directly. That is why they work at any $G$.
+    - The cumulant series of Section 2.2 truncates the logarithm. That is why it has a radius of convergence (Exercise 5c), while the series for $E$ itself does not (for a finite number of modes).
     """)
     return
 
@@ -909,7 +909,7 @@ def _(exercise):
     exercise(r"""
     **(a)** Why does the first-order term vanish?
 
-    **(b)** Show that the second-order term equals $-\langle\varphi^2\rangle_{\text{paths}}/2$ with $\langle\varphi^2\rangle_{\text{paths}}$ from 2b. Use $\mathbf e_0^{\mathsf T}e^{-D\Lambda s} = \mathbf e_0^{\mathsf T}$ and $e^{-D\Lambda s}\mathbf e_0 = \mathbf e_0$.
+    **(b)** Show that the second-order term equals $-\langle\varphi^2\rangle_{\text{paths}}/2$ with $\langle\varphi^2\rangle_{\text{paths}}$ from Section 2.2. Use $\mathbf e_0^{\mathsf T}e^{-D\Lambda s} = \mathbf e_0^{\mathsf T}$ and $e^{-D\Lambda s}\mathbf e_0 = \mathbf e_0$.
 
     **(c)** For a finite number of modes, the series for $E = c_0(T)$ converges for every $G$, but the cumulant series for $\ln E$ does not. Explain the difference in one sentence. Which would you use to compute the signal at $G = 600$ mT/m in an 8 µm slab, and which to write down a model you can fit?
     """, "7 · The second-order term is the GPA")
@@ -919,7 +919,7 @@ def _(exercise):
 @app.cell(hide_code=True)
 def _(hint):
     hint(r"""
-    - **(b)** Write $[\mathbf Be^{-D\Lambda\tau}\mathbf B]_{00} = \sum_n B_{0n}\,e^{-D\lambda_n\tau}\,B_{n0}$ and compare with the position autocorrelation in 2b. The integral over $t_1 < t_2$ is half of the integral over the whole square, because the integrand is symmetric.
+    - **(b)** Write $[\mathbf Be^{-D\Lambda\tau}\mathbf B]_{00} = \sum_n B_{0n}\,e^{-D\lambda_n\tau}\,B_{n0}$ and compare with the position autocorrelation in Section 2.2. The integral over $t_1 < t_2$ is half of the integral over the whole square, because the integrand is symmetric.
     """)
     return
 
@@ -929,7 +929,7 @@ def _(answer):
     answer(r"""
     **(a)** ⇒ It is $-i\gamma B_{00}\int g\,dt$. With $x$ measured from the centre, $B_{00} = \langle x\rangle_x = 0$. (Even with another origin, $\int g\,dt = 0$ at the echo, so it vanishes anyway.)
 
-    **(b)** ⇒ $[\mathbf Be^{-D\Lambda\tau}\mathbf B]_{00} = \sum_n B_{0n}^2e^{-D\lambda_n\tau} = \langle x(t_1)x(t_2)\rangle_{\text{paths}}$ with $\tau = t_2 - t_1$ (2b, and $\mathbf B$ symmetric).
+    **(b)** ⇒ $[\mathbf Be^{-D\Lambda\tau}\mathbf B]_{00} = \sum_n B_{0n}^2e^{-D\lambda_n\tau} = \langle x(t_1)x(t_2)\rangle_{\text{paths}}$ with $\tau = t_2 - t_1$ (Section 2.2, and $\mathbf B$ symmetric).
 
     ⇒ The second-order term is $-\gamma^2\int_{t_1<t_2}g(t_1)g(t_2)\langle x(t_1)x(t_2)\rangle_{\text{paths}} = -\frac{\gamma^2}{2}\iint g(t_1)g(t_2)\langle x(t_1)x(t_2)\rangle_{\text{paths}} = -\frac12\langle\varphi^2\rangle_{\text{paths}}$. ✓
 
@@ -945,7 +945,7 @@ def _(answer):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## How far does the cumulant series reach? The radius of convergence, and computing it in practice
+    ## 2.3.1 How far does the cumulant series reach? The radius of convergence, and computing it in practice
 
     Exercises 5c and 7c showed *that* the cumulant series stops somewhere. This section shows **where**, and how to compute the cumulants of any order in practice.
 
@@ -967,7 +967,7 @@ def _(mo):
     | Route | How | Strength | Weakness |
     | --- | --- | --- | --- |
     | Fit a polynomial in $b$ to $\ln E$ | DKI-style, on $[0, b_{\max}]$ | works on measured data | biased by the omitted higher terms; ill-conditioned beyond 2–3 terms |
-    | Nested time integrals (2c) | $k$-fold integrals of $\mathbf Be^{-D\Lambda\tau}\mathbf B\cdots$ | exact, and each term has a meaning | the cost grows fast with the order; impractical beyond the 4th |
+    | Nested time integrals (Section 2.3) | $k$-fold integrals of $\mathbf Be^{-D\Lambda\tau}\mathbf B\cdots$ | exact, and each term has a meaning | the cost grows fast with the order; impractical beyond the 4th |
     | Cauchy integral on a circle | $E$ at $M$ complex $G$ on a circle, then an FFT of $\ln E$ | every order at once, to rounding error; also reveals $R$ | needs a model that accepts complex $G$ |
 
     **Recipe: cumulants from a circle in the complex plane** ([Lyness & Moler 1967](https://doi.org/10.1137/0704019))
@@ -984,7 +984,7 @@ def _(mo):
 
     ⑥ **Convert.** With $b = \beta G^2$ and $\beta = \gamma^2\delta^2(\Delta-\delta/3)$: $\ D_{\text{app}} = -c_2/\beta$ and $K_{\text{app}} = 6c_4/(\beta^2D_{\text{app}}^2)$, and so on for the higher orders.
 
-    The figures use the PGSE sliders at the top of 2a.
+    The figures use the PGSE sliders at the top of Section 2.1.
     """)
     return
 
@@ -1261,7 +1261,7 @@ def _(mo):
     - **The PGSE box:** three dimensionless numbers, $D\Delta/L^2$, $D\delta/L^2$ and $\gamma gL^3/D$, with a narrow-pulse face and a long-pulse face.
     - **Narrow pulses, the $(q,t)$ map:** $E = \langle e^{iqr}\rangle_{x,x_0}$ (Tanner & Stejskal 1968); free diffusion and the $b$-matrix; the surface-to-volume ratio and the short-time kurtosis (Mitra et al. 1992); closed pores, tortuosity and disorder (Novikov et al. 2014); diffraction and the form factors of slab, cylinder and sphere (Callaghan et al. 1991); where the cumulant series stops, $qr_{\text{rms}}\approx1$.
     - **Long pulses, the $(g,T)$ map:** free diffusion, motional narrowing (Robertson 1966; Neuman 1974) and localisation (Stoller, Happer & Dyson 1991; Hürlimann et al. 1995), with the triple point.
-    - **Inside the box:** when the Gaussian phase approximation of 2b holds for a real PGSE, tested against the exact MCF of 2a.
+    - **Inside the box:** when the Gaussian phase approximation of Section 2.2 holds for a real PGSE, tested against the exact MCF of Section 2.1.
     - **Extra axes:** relaxing walls (Brownstein & Tarr 1979) and exchange (Kärger 1985).
 
     **Chapter 4 · Solving the PDE on a grid or a mesh:** finite differences (MATI) and finite elements (SpinDoctor), including the mesh-based modes used by the matrix formalism.
