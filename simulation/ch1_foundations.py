@@ -1140,6 +1140,8 @@ def _(mo):
     mo.md(r"""
     ## 1.1.7 The position in the mode basis
 
+    **Functions as vectors.** The orthonormal modes are a basis for functions on the pore, just as $\mathbf e_1, \mathbf e_2, \mathbf e_3$ are a basis for arrows in space. Projecting a function onto a mode gives one coordinate, $c_n = \int u_n f\,dx$, and an operation on functions, such as multiplying by $x$, becomes a matrix acting on those coordinates (panel below).
+
     The MSD needed the integrals $\int x\,u_n\,dx$. They are the first row of a matrix that every later chapter uses: the **position written in the mode basis**,
 
     $$\boxed{\ B_{nm} = \int u_n(x)\;x\;u_m(x)\,dx\ },\tag{1.23}$$
@@ -1155,6 +1157,24 @@ def _(mo):
 
     It answers: if a pattern sits in mode $m$ and is multiplied by $x$, how much ends up in mode $n$? Together with the eigenvalues it is everything the matrix methods of Chapter 2 need to know about a pore; Section 1.2 shows why.
     """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(maths):
+    maths(r"""
+    ⇒ **Vectors.** In an orthonormal basis, $\mathbf v = \sum_iv_i\mathbf e_i$ with coordinates $v_i = \mathbf e_i\cdot\mathbf v$: the projection onto $\mathbf e_i$. A linear map $\mathcal A$ has the matrix $A_{ij} = \mathbf e_i\cdot(\mathcal A\,\mathbf e_j)$: apply the map to basis vector $j$ and read off component $i$.
+
+    ⇒ **Functions.** Replace the dot product by $\int f\,g\,dx$. The modes are orthonormal, $\int u_nu_m\,dx = \delta_{nm}$, so any function is $f = \sum_nc_nu_n$ with $c_n = \int u_n f\,dx$. (Exercise 2(d) did exactly this for the delta-function start: $c_n = u_n(x_0)$.)
+
+    ⇒ **Multiply by $x$.** Take mode $u_m$, multiply by $x$, project onto $u_n$: $B_{nm} = \int u_n\,x\,u_m\,dx$, Eq. (1.23).
+
+    ⇒ Then $x\,f(x) = \sum_n\big(\sum_mB_{nm}c_m\big)u_n$: multiplying a function by $x$ is multiplying its coordinate vector by $\mathbf B$, $\mathbf c\to\mathbf B\mathbf c$.
+
+    → **The Laplacian in the same basis.** $-\nabla^2u_m = \lambda_mu_m$, so $\int u_n(-\nabla^2u_m)\,dx = \lambda_m\delta_{nm}$: a diagonal matrix $\Lambda$. That is why the modes were chosen: diffusion does not mix them.
+
+    → The gradient term of the signal multiplies the magnetization by $x$ (Section 1.2), so it acts through $\mathbf B$, which is not diagonal. The Bloch–Torrey equation then becomes $d\mathbf c/dt = -(D\Lambda + i\gamma g(t)\,\mathbf B)\,\mathbf c$: the matrix method of Chapter 2, Eq. (2.2). Keeping $N$ modes makes these $N\times N$ matrices (Exercise 3).
+    """, title="Recap: projecting onto the eigenbasis")
     return
 
 
