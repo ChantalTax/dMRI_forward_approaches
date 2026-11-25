@@ -739,59 +739,6 @@ def _(maths):
 
 
 @app.cell(hide_code=True)
-def _(exercise):
-    exercise(r"""
-    Take a slab $0 \le x \le L$ (diffusion between two parallel reflecting planes).
-
-    **(a)** Solve $-u'' = \lambda u$ with $u'(0)=u'(L)=0$. Consider $\lambda<0$, $\lambda=0$ and $\lambda>0$ separately.
-
-    **(b)** Normalise the modes so that $\int_0^L u_n^2\,dx = 1$.
-
-    **(c)** Show that two different modes are orthogonal.
-
-    **(d)** A molecule starts at $x_0$: the initial condition is $C(x,0) = \delta(x - x_0)$. Expand it in the modes and write down the propagator $P(x\,|\,x_0,t)$ for the slab.
-    """, "2 · Eigenmodes of a slab")
-    return
-
-
-@app.cell(hide_code=True)
-def _(hint):
-    hint(r"""
-    - For $\lambda = -k^2 < 0$ the general solution is $A\cosh kx + B\sinh kx$; for $\lambda = k^2 > 0$ it is $A\cos kx + B\sin kx$.
-    - Apply $u'(0)=0$ first: it removes one of the two functions. Then $u'(L)=0$ restricts $k$.
-    - For (b) and (c): $\cos a\cos b = \tfrac12[\cos(a-b)+\cos(a+b)]$.
-    - For (d): expand the start, $\delta(x - x_0) = \sum_nc_nu_n(x)$, multiply by $u_m$ and integrate. Orthonormality leaves $c_m = u_m(x_0)$ (the separation-of-variables derivation above).
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(answer):
-    answer(r"""
-    **(a)** ⇒ $\lambda = -k^2 < 0$: $u = A\cosh kx + B\sinh kx$. $u'(0) = Bk = 0$ gives $B = 0$; $u'(L) = Ak\sinh kL = 0$ gives $A = 0$. No negative eigenvalues. (Quicker: multiply $-u''=\lambda u$ by $u$ and integrate by parts with the wall conditions: $\lambda\int u^2 = \int u'^2 \ge 0$.)
-
-    ⇒ $\lambda = 0$: $u = A + Bx$, and $u' = B = 0$. So $u_0$ is a constant: the uniform mode.
-
-    ⇒ $\lambda = k^2 > 0$: $u = A\cos kx + B\sin kx$. $u'(0) = Bk = 0$ gives $B = 0$. $u'(L) = -Ak\sin kL = 0$ with $A \ne 0$ needs $\sin kL = 0$, so $kL = n\pi$.
-
-    $$\lambda_n = \left(\frac{n\pi}{L}\right)^2,\qquad u_n(x) \propto \cos\frac{n\pi x}{L},\qquad n = 0,1,2,\dots$$
-
-    **(b)** ⇒ $\int_0^L A^2\cos^2(n\pi x/L)\,dx = A^2 L/2$ for $n \ge 1$, and $A^2 L$ for $n=0$. So
-
-    $$u_0 = \frac{1}{\sqrt L},\qquad u_n = \sqrt{\frac 2L}\cos\frac{n\pi x}{L}\ \ (n\ge1).$$
-
-    **(c)** ⇒ For $n \ne m$: $\int_0^L \cos\frac{n\pi x}{L}\cos\frac{m\pi x}{L}dx = \tfrac12\int_0^L\left[\cos\frac{(n-m)\pi x}{L} + \cos\frac{(n+m)\pi x}{L}\right]dx = 0$, because each cosine runs over a whole number of half periods and integrates to $\sin(\text{integer}\cdot\pi)=0$.
-
-    **(d)** ⇒ Insert into the general propagator:
-
-    $$\boxed{\ P(x\,|\,x_0,t) = \frac1L + \frac2L\sum_{n=1}^{\infty}\cos\frac{n\pi x}{L}\cos\frac{n\pi x_0}{L}\,e^{-D(n\pi/L)^2 t}\ }.$$
-
-    → The first term is the uniform long-time state, $1/L$. The slowest mode that still carries information fades with $\tau_1 = L^2/(\pi^2 D)$: 3.2 ms for $L = 8$ µm and $D = 2$ µm²/ms.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
 def _(np):
     def slab_modes(x, L, N):
         """First N Neumann modes of a slab [0, L] on grid x: returns (U [N, len(x)], lam [N])."""
@@ -813,7 +760,7 @@ def _(mo):
     mo.md(r"""
     ### See it: modes and the propagator in a slab
 
-    Top: how much each mode has faded, $e^{-D\lambda_nt}$, against time; the dots mark the time chosen with the slider. Bottom left: the $N$ terms of the mode sum, $u_n(x_0)\,e^{-D\lambda_nt}\,u_n(x)$: each mode, weighted by where the molecule started and by how much it has faded. Bottom right: their sum, the propagator of a molecule released at $x_0$. Make $t$ short and $N$ small, and watch the sum fail; move $t$ to the right, and watch the dots of the higher modes drop to zero one by one.
+    First the picture, then the derivation: Exercise 2 below derives the modes of a slab that are shown here. Top: how much each mode has faded, $e^{-D\lambda_nt}$, against time; the dots mark the time chosen with the slider. Bottom left: the $N$ terms of the mode sum, $u_n(x_0)\,e^{-D\lambda_nt}\,u_n(x)$: each mode, weighted by where the molecule started and by how much it has faded. Bottom right: their sum, the propagator of a molecule released at $x_0$. Make $t$ short and $N$ small, and watch the sum fail; move $t$ to the right, and watch the dots of the higher modes drop to zero one by one.
     """)
     return
 
@@ -913,6 +860,59 @@ def _(
             ),
         ]
     )
+    return
+
+
+@app.cell(hide_code=True)
+def _(exercise):
+    exercise(r"""
+    Take a slab $0 \le x \le L$ (diffusion between two parallel reflecting planes).
+
+    **(a)** Solve $-u'' = \lambda u$ with $u'(0)=u'(L)=0$. Consider $\lambda<0$, $\lambda=0$ and $\lambda>0$ separately.
+
+    **(b)** Normalise the modes so that $\int_0^L u_n^2\,dx = 1$.
+
+    **(c)** Show that two different modes are orthogonal.
+
+    **(d)** A molecule starts at $x_0$: the initial condition is $C(x,0) = \delta(x - x_0)$. Expand it in the modes and write down the propagator $P(x\,|\,x_0,t)$ for the slab.
+    """, "2 · Eigenmodes of a slab")
+    return
+
+
+@app.cell(hide_code=True)
+def _(hint):
+    hint(r"""
+    - For $\lambda = -k^2 < 0$ the general solution is $A\cosh kx + B\sinh kx$; for $\lambda = k^2 > 0$ it is $A\cos kx + B\sin kx$.
+    - Apply $u'(0)=0$ first: it removes one of the two functions. Then $u'(L)=0$ restricts $k$.
+    - For (b) and (c): $\cos a\cos b = \tfrac12[\cos(a-b)+\cos(a+b)]$.
+    - For (d): expand the start, $\delta(x - x_0) = \sum_nc_nu_n(x)$, multiply by $u_m$ and integrate. Orthonormality leaves $c_m = u_m(x_0)$ (the separation-of-variables derivation above).
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(answer):
+    answer(r"""
+    **(a)** ⇒ $\lambda = -k^2 < 0$: $u = A\cosh kx + B\sinh kx$. $u'(0) = Bk = 0$ gives $B = 0$; $u'(L) = Ak\sinh kL = 0$ gives $A = 0$. No negative eigenvalues. (Quicker: multiply $-u''=\lambda u$ by $u$ and integrate by parts with the wall conditions: $\lambda\int u^2 = \int u'^2 \ge 0$.)
+
+    ⇒ $\lambda = 0$: $u = A + Bx$, and $u' = B = 0$. So $u_0$ is a constant: the uniform mode.
+
+    ⇒ $\lambda = k^2 > 0$: $u = A\cos kx + B\sin kx$. $u'(0) = Bk = 0$ gives $B = 0$. $u'(L) = -Ak\sin kL = 0$ with $A \ne 0$ needs $\sin kL = 0$, so $kL = n\pi$.
+
+    $$\lambda_n = \left(\frac{n\pi}{L}\right)^2,\qquad u_n(x) \propto \cos\frac{n\pi x}{L},\qquad n = 0,1,2,\dots$$
+
+    **(b)** ⇒ $\int_0^L A^2\cos^2(n\pi x/L)\,dx = A^2 L/2$ for $n \ge 1$, and $A^2 L$ for $n=0$. So
+
+    $$u_0 = \frac{1}{\sqrt L},\qquad u_n = \sqrt{\frac 2L}\cos\frac{n\pi x}{L}\ \ (n\ge1).$$
+
+    **(c)** ⇒ For $n \ne m$: $\int_0^L \cos\frac{n\pi x}{L}\cos\frac{m\pi x}{L}dx = \tfrac12\int_0^L\left[\cos\frac{(n-m)\pi x}{L} + \cos\frac{(n+m)\pi x}{L}\right]dx = 0$, because each cosine runs over a whole number of half periods and integrates to $\sin(\text{integer}\cdot\pi)=0$.
+
+    **(d)** ⇒ Insert into the general propagator:
+
+    $$\boxed{\ P(x\,|\,x_0,t) = \frac1L + \frac2L\sum_{n=1}^{\infty}\cos\frac{n\pi x}{L}\cos\frac{n\pi x_0}{L}\,e^{-D(n\pi/L)^2 t}\ }.$$
+
+    → The first term is the uniform long-time state, $1/L$. The slowest mode that still carries information fades with $\tau_1 = L^2/(\pi^2 D)$: 3.2 ms for $L = 8$ µm and $D = 2$ µm²/ms.
+    """)
     return
 
 
